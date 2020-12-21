@@ -1,10 +1,10 @@
 <template>
     <!--    warning: v-cloak 此指令可以解决使用插值表达式页面闪烁问题-->
-    <div class="videoPlayer">
+    <div class="videoPlayer" v-cloak v-show="ifLoad">
         <div class="video_content">
             <!--http://10.1.71.155/static/video/test.mp4-->
             <!--@/assets/video/test.mp4-->
-            <video class="player" ref="player" src="http://10.1.71.155/static/video/test.mp4" width="100%" height="100%"
+            <video class="player" ref="player" src="@/assets/video/test.mp4" width="100%" height="100%"
                    preload="auto" @canplaythrough="videoCanplaythrough" @playing="videoPlaying" @pause="videoPause"
                    @ended="videoEnd">
             </video>
@@ -19,6 +19,9 @@
             <a-icon class="playerBtn" title="入点" type="login" @click="logEvent('login')"/>
             <a-icon class="playerBtn" title="出点" type="logout" @click="logEvent('logout')"/>
             <a-icon class="playerBtn" title="清除入点和出点" type="close" @click="logEvent('logRemove')"/>
+            <a-icon class="playerBtn" title="跳转至入点" type="vertical-align-bottom" @click="logEvent('toLogin')"/>
+            <a-icon class="playerBtn" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
+            <button @click="btnClick">test</button>
             <div class="progress">
                 <!--                <div class="progress_content">1</div>-->
                 <progress ref="progress" class="progress_content" value="0" :max="this.$refs.player.duration"
@@ -124,26 +127,42 @@
                         break
                     case 'logRemove':
                         this.$refs.login.style.left = 0
-                        this.$refs.logout.style.left = 0
+                        this.$refs.logout.style.right = 0
+                        break
+                    case 'toLogin':
+                        let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
+                        this.$refs.player.currentTime = this.$refs.player.duration * left / 100
+                        this.$refs.progress.value = this.$refs.player.currentTime
+                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                        this.$refs.player.pause()
+                        this.ifPlay = false
+                        break
+                    case 'toLogout':
+                        let right = isNaN(parseFloat(this.$refs.logout.style.right)) ? 0 : parseFloat(this.$refs.logout.style.right)
+                        this.$refs.player.currentTime = this.$refs.player.duration - this.$refs.player.duration * right / 100
+                        this.$refs.progress.value = this.$refs.player.currentTime
+                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                        this.$refs.player.pause()
+                        this.ifPlay = false
                         break
                 }
 
                 function ifLoginSmall(login, logout, ifLogin, value) {
                     let leftLog = isNaN(parseFloat(login.style.left)) ? 0 : parseFloat(login.style.left)
-                    let rightLog = isNaN(parseFloat(logout.style.left)) ? 0 : parseFloat(logout.style.left)
+                    let rightLog = isNaN(parseFloat(logout.style.right)) ? 0 : parseFloat(logout.style.right)
                     if (ifLogin) {
-                        if (value <= rightLog) {
+                        if (value <= 100 - rightLog) {
                             login.style.left = value + '%'
                         } else {
-                            login.style.left = rightLog + '%'
-                            logout.style.left = value + '%'
+                            login.style.left = value + '%'
+                            logout.style.right = 100 - value + '%'
                         }
                     } else {
                         if (value > leftLog) {
-                            logout.style.left = value + '%'
+                            logout.style.right = 100 - value + '%'
                         } else {
                             login.style.left = value + '%'
-                            logout.style.left = leftLog + '%'
+                            logout.style.right = 100 - value + '%'
                         }
                     }
                 }
@@ -167,6 +186,15 @@
             },
             progressMouseUp() {
                 this.ifMouseDown = false
+            },
+            btnClick() {
+                //入点，出点时间
+                let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
+                let right = isNaN(parseFloat(this.$refs.logout.style.right)) ? 0 : parseFloat(this.$refs.logout.style.right)
+                console.log('入点时间', this.$refs.player.duration * left / 100)
+                console.log(timeFormat(this.$refs.player.duration * left / 100, this.frameRate))
+                console.log('出点时间', this.$refs.player.duration - this.$refs.player.duration * right / 100)
+                console.log(timeFormat(this.$refs.player.duration - this.$refs.player.duration * right / 100, this.frameRate))
             }
         }
     }
@@ -212,18 +240,23 @@
         box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
         padding: 10px;
 
+        [v-cloak] {
+            display: none;
+        }
+
         .video_btn {
             .playerBtn {
                 color: @icon-color;
-                font-size: 30px;
+                font-size: 20px;
+                line-height: 20px;
                 padding: 8px;
             }
 
             .time {
                 color: @icon-color;
-                font-size: 25px;
+                font-size: 20px;
                 font-weight: lighter;
-                line-height: 25px;
+                line-height: 20px;
                 padding: 5px;
                 cursor: default;
                 user-select: none;
@@ -253,7 +286,7 @@
                 .login {
                     height: 16px;
                     width: 2px;
-                    background: red;
+                    background: black;
                     position: absolute;
                     left: 0;
                 }
@@ -271,9 +304,9 @@
                 .logout {
                     height: 16px;
                     width: 2px;
-                    background: blue;
+                    background: black;
                     position: absolute;
-                    left: 0;
+                    right: 0;
                 }
 
                 .logout::after {
