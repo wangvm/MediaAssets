@@ -1,2 +1,2 @@
-* 使用less
+* less
 * UI库使用 ant-design

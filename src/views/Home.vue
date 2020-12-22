@@ -1,7 +1,7 @@
 <template>
     <div class="home">
         <div class="home_video">
-            <videoPlayer></videoPlayer>
+            <videoPlayer :video-info="videoInfo"></videoPlayer>
         </div>
     </div>
 </template>
@@ -12,7 +12,11 @@
     export default {
         name: 'Home',
         data() {
-            return {}
+            return {
+                videoInfo: {
+                    url: require('@/assets/video/test.mp4')
+                }
+            }
         },
         components: {
             videoPlayer

@@ -4,8 +4,7 @@
         <div class="video_content">
             <!--http://10.1.71.155/static/video/test.mp4-->
             <!--@/assets/video/test.mp4-->
-            <video class="player" ref="player" src="@/assets/video/test.mp4" width="100%" height="100%"
-                   preload="auto"
+            <video class="player" ref="player" :src="videoInfo.url" width="100%" height="100%" preload="auto"
                    @canplaythrough="videoEvent('canplaythrough')"
                    @playing="videoEvent('playing')"
                    @pause="videoEvent('pause')"
@@ -28,9 +27,13 @@
             <button @click="btnClick">test</button>
             <div class="progress">
                 <progress ref="progress" class="progress_content" value="0" :max="this.$refs.player.duration"
-                          @mousedown="progressMouseDown" @mousemove="progressMouseMove"
-                          @mouseup="progressMouseUp" @click="progressClick" @mouseenter="progressMouseEnter"
-                          @mouseleave="progressMouseLeave"></progress>
+                          @mousedown="progressMouseDown"
+                          @mousemove="progressMouseMove"
+                          @mouseup="progressMouseUp"
+                          @click="progressClick"
+                          @mouseenter="progressMouseEnter"
+                          @mouseleave="progressMouseLeave">
+                </progress>
                 <span class="login" ref="login"></span>
                 <span class="logout" ref="logout"></span>
                 <img class="video_preview" ref="preview" src=""/>
@@ -54,6 +57,9 @@
                 ifPreview: false
             }
         },
+        props: {
+            videoInfo: Object
+        },
         mounted() {
             this.player = this.$refs.player
             this.playerPreview = this.$refs.playerPreview
@@ -65,12 +71,12 @@
                     case 'canplaythrough':
                         //视频加载完成
                         if (!this.ifLoad) {
-                            this.$refs.player.muted = true
-                            this.$refs.player.play()
+                            this.player.muted = true
+                            this.player.play()
                             setTimeout(() => {
-                                this.$refs.player.currentTime = 0
-                                this.$refs.player.pause()
-                                this.$refs.player.muted = false
+                                this.player.currentTime = 0
+                                this.player.pause()
+                                this.player.muted = false
                                 this.ifLoad = true
                             }, 1000)
                         }
@@ -79,8 +85,8 @@
                         //判断播放器正在播放
                         if (this.ifLoad) {
                             this.timer = setInterval(() => {
-                                this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
-                                this.$refs.progress.value = this.$refs.player.currentTime
+                                this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                                this.$refs.progress.value = this.player.currentTime
                             }, this.frameRate)
                         }
                         break
@@ -93,8 +99,8 @@
                         //视频播放完成
                         this.ifPlay = false
                         this.player.currentTime = 0
-                        this.$refs.progress.value = this.$refs.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                        this.$refs.progress.value = this.player.currentTime
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
                         break
                 }
             },
@@ -113,23 +119,23 @@
                         this.player.currentTime = 0
                         this.ifPlay = false
                         this.player.pause()
-                        this.$refs.progress.value = this.$refs.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                        this.$refs.progress.value = this.player.currentTime
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
                         break
                     case 'back':
-                        this.$refs.player.currentTime -= 1 / 25
-                        this.$refs.progress.value = this.$refs.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                        this.player.currentTime -= 1 / 25
+                        this.$refs.progress.value = this.player.currentTime
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
                         break
                     case 'forward':
-                        this.$refs.player.currentTime += 1 / 25
-                        this.$refs.progress.value = this.$refs.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                        this.player.currentTime += 1 / 25
+                        this.$refs.progress.value = this.player.currentTime
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
                         break
                 }
             },
             logEvent(status) {
-                let logIndex = this.$refs.player.currentTime / this.$refs.player.duration * 100
+                let logIndex = this.player.currentTime / this.player.duration * 100
                 switch (status) {
                     case 'login':
                         ifLoginSmall(this.$refs.login, this.$refs.logout, true, logIndex)
@@ -143,18 +149,18 @@
                         break
                     case 'toLogin':
                         let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
-                        this.$refs.player.currentTime = this.$refs.player.duration * left / 100
-                        this.$refs.progress.value = this.$refs.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
-                        this.$refs.player.pause()
+                        this.player.currentTime = this.player.duration * left / 100
+                        this.$refs.progress.value = this.player.currentTime
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                        this.player.pause()
                         this.ifPlay = false
                         break
                     case 'toLogout':
                         let right = isNaN(parseFloat(this.$refs.logout.style.right)) ? 0 : parseFloat(this.$refs.logout.style.right)
-                        this.$refs.player.currentTime = this.$refs.player.duration - this.$refs.player.duration * right / 100
-                        this.$refs.progress.value = this.$refs.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
-                        this.$refs.player.pause()
+                        this.player.currentTime = this.player.duration - this.player.duration * right / 100
+                        this.$refs.progress.value = this.player.currentTime
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                        this.player.pause()
                         this.ifPlay = false
                         break
                 }
@@ -180,10 +186,9 @@
                 }
             },
             progressClick() {
-                let currentTime = this.$refs.player.duration * event.offsetX / this.$refs.progress.offsetWidth
-                this.$refs.player.currentTime = currentTime
-                this.$refs.progress.value = this.$refs.player.currentTime
-                this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                this.player.currentTime = this.player.duration * event.offsetX / this.$refs.progress.offsetWidth
+                this.$refs.progress.value = this.player.currentTime
+                this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
             },
             progressMouseEnter() {
                 this.ifPreview = true
@@ -194,17 +199,16 @@
             },
             progressMouseMove() {
                 if (this.ifMouseDown) {
-                    let currentTime = this.$refs.player.duration * event.offsetX / this.$refs.progress.offsetWidth
-                    this.$refs.player.currentTime = currentTime
-                    this.$refs.progress.value = this.$refs.player.currentTime
-                    this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                    this.player.currentTime = this.player.duration * event.offsetX / this.$refs.progress.offsetWidth
+                    this.$refs.progress.value = this.player.currentTime
+                    this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
                 }
                 if (this.ifPreview) {
                     let canvas = document.createElement("canvas") // 创建一个画布
                     canvas.width = 100
                     canvas.height = 50
-                    this.$refs.playerPreview.currentTime = this.$refs.player.duration * event.offsetX / this.$refs.progress.offsetWidth
-                    canvas.getContext('2d').drawImage(this.$refs.playerPreview, 0, 0, canvas.width, canvas.height) // getContext:设置画布环境；drawImage:画画
+                    this.playerPreview.currentTime = this.player.duration * event.offsetX / this.$refs.progress.offsetWidth
+                    canvas.getContext('2d').drawImage(this.playerPreview, 0, 0, canvas.width, canvas.height) // getContext:设置画布环境；drawImage:画画
                     this.$refs.preview.src = canvas.toDataURL("image/png") // 获取图片的url
                     this.$refs.preview.style.left = event.offsetX - 50 + 'px'
                 }
@@ -220,10 +224,10 @@
                 //入点，出点时间
                 let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
                 let right = isNaN(parseFloat(this.$refs.logout.style.right)) ? 0 : parseFloat(this.$refs.logout.style.right)
-                console.log('入点时间', this.$refs.player.duration * left / 100)
-                console.log(timeFormat(this.$refs.player.duration * left / 100, this.frameRate))
-                console.log('出点时间', this.$refs.player.duration - this.$refs.player.duration * right / 100)
-                console.log(timeFormat(this.$refs.player.duration - this.$refs.player.duration * right / 100, this.frameRate))
+                console.log('入点时间', this.player.duration * left / 100)
+                console.log(timeFormat(this.player.duration * left / 100, this.frameRate))
+                console.log('出点时间', this.player.duration - this.player.duration * right / 100)
+                console.log(timeFormat(this.player.duration - this.player.duration * right / 100, this.frameRate))
             }
         }
     }
