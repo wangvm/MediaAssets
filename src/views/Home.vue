@@ -14,7 +14,8 @@
         data() {
             return {
                 videoInfo: {
-                    url: require('@/assets/video/test.mp4')
+                    url: require('@/assets/video/test.mp4'),
+                    frameRate: 25
                 }
             }
         },

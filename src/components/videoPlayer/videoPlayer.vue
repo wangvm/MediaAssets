@@ -1,3 +1,8 @@
+<!--videoInfo: {-->
+<!--url: require('@/assets/video/test.mp4'),-->
+<!--frameRate: 25-->
+<!--}-->
+
 <template>
     <!--    warning: v-cloak 此指令可以解决使用插值表达式页面闪烁问题-->
     <div class="videoPlayer" v-cloak v-show="ifLoad">
@@ -24,7 +29,7 @@
             <a-icon class="playerBtn" title="清除入点和出点" type="close" @click="logEvent('logRemove')"/>
             <a-icon class="playerBtn" title="跳转至入点" type="vertical-align-bottom" @click="logEvent('toLogin')"/>
             <a-icon class="playerBtn" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
-            <button @click="btnClick">test</button>
+            <!--<button @click="btnClick">test</button>-->
             <div class="progress">
                 <progress ref="progress" class="progress_content" value="0" :max="this.$refs.player.duration"
                           @mousedown="progressMouseDown"
@@ -52,7 +57,6 @@
                 ifLoad: false,//视频是否加载完成
                 ifPlay: false,//播放暂停切换
                 timer: null,
-                frameRate: 25,
                 ifMouseDown: false,
                 ifPreview: false
             }
@@ -64,6 +68,11 @@
             this.player = this.$refs.player
             this.playerPreview = this.$refs.playerPreview
         },
+        destroyed() {
+            //离开页面假如视频再播放，销毁定时器
+            clearInterval(this.timer)
+            this.timer = null
+        },
         methods: {
             //warning 设置定时器让播放器静音播放1s解决刷新进页面第一次播放前1s卡顿的问题
             videoEvent(status) {
@@ -71,6 +80,7 @@
                     case 'canplaythrough':
                         //视频加载完成
                         if (!this.ifLoad) {
+                            // console.log('load')
                             this.player.muted = true
                             this.player.play()
                             setTimeout(() => {
@@ -85,9 +95,9 @@
                         //判断播放器正在播放
                         if (this.ifLoad) {
                             this.timer = setInterval(() => {
-                                this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                                this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                                 this.$refs.progress.value = this.player.currentTime
-                            }, this.frameRate)
+                            }, this.videoInfo.frameRate)
                         }
                         break
                     case 'pause':
@@ -100,7 +110,7 @@
                         this.ifPlay = false
                         this.player.currentTime = 0
                         this.$refs.progress.value = this.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         break
                 }
             },
@@ -120,17 +130,17 @@
                         this.ifPlay = false
                         this.player.pause()
                         this.$refs.progress.value = this.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         break
                     case 'back':
                         this.player.currentTime -= 1 / 25
                         this.$refs.progress.value = this.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         break
                     case 'forward':
                         this.player.currentTime += 1 / 25
                         this.$refs.progress.value = this.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         break
                 }
             },
@@ -151,7 +161,7 @@
                         let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
                         this.player.currentTime = this.player.duration * left / 100
                         this.$refs.progress.value = this.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         this.player.pause()
                         this.ifPlay = false
                         break
@@ -159,7 +169,7 @@
                         let right = isNaN(parseFloat(this.$refs.logout.style.right)) ? 0 : parseFloat(this.$refs.logout.style.right)
                         this.player.currentTime = this.player.duration - this.player.duration * right / 100
                         this.$refs.progress.value = this.player.currentTime
-                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         this.player.pause()
                         this.ifPlay = false
                         break
@@ -188,7 +198,7 @@
             progressClick() {
                 this.player.currentTime = this.player.duration * event.offsetX / this.$refs.progress.offsetWidth
                 this.$refs.progress.value = this.player.currentTime
-                this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
             },
             progressMouseEnter() {
                 this.ifPreview = true
@@ -201,7 +211,7 @@
                 if (this.ifMouseDown) {
                     this.player.currentTime = this.player.duration * event.offsetX / this.$refs.progress.offsetWidth
                     this.$refs.progress.value = this.player.currentTime
-                    this.$refs.time.innerText = timeFormat(this.player.currentTime, this.frameRate)
+                    this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                 }
                 if (this.ifPreview) {
                     let canvas = document.createElement("canvas") // 创建一个画布
@@ -220,15 +230,15 @@
                 this.ifPreview = false
                 this.$refs.preview.style.display = 'none'
             },
-            btnClick() {
-                //入点，出点时间
-                let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
-                let right = isNaN(parseFloat(this.$refs.logout.style.right)) ? 0 : parseFloat(this.$refs.logout.style.right)
-                console.log('入点时间', this.player.duration * left / 100)
-                console.log(timeFormat(this.player.duration * left / 100, this.frameRate))
-                console.log('出点时间', this.player.duration - this.player.duration * right / 100)
-                console.log(timeFormat(this.player.duration - this.player.duration * right / 100, this.frameRate))
-            }
+            // btnClick() {
+            //     //入点，出点时间
+            //     let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
+            //     let right = isNaN(parseFloat(this.$refs.logout.style.right)) ? 0 : parseFloat(this.$refs.logout.style.right)
+            //     console.log('入点时间', this.player.duration * left / 100)
+            //     console.log(timeFormat(this.player.duration * left / 100, this.videoInfo.frameRate))
+            //     console.log('出点时间', this.player.duration - this.player.duration * right / 100)
+            //     console.log(timeFormat(this.player.duration - this.player.duration * right / 100, this.videoInfo.frameRate))
+            // }
         }
     }
 
