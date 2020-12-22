@@ -5,10 +5,14 @@
         * props:
         * 对象:{视频url,视频帧速}
         * object:{url:xxxx,frameRate:xxxxx}
-* views
-    * home 首页 
-    * login 登录注册
-
+        
+* views && router
+    * home 首页 router: '/'
+    * login 登录注册 router: '/login'
+    
+* store
+    * 暂无
+    
 * 一些配置
-    * CSS-->LESS
-    * UI库-->ant design vue 
+    * CSS --> Less
+    * UI库 --> ant design vue 
