@@ -8,6 +8,7 @@
                    preload="auto" @canplaythrough="videoCanplaythrough" @playing="videoPlaying" @pause="videoPause"
                    @ended="videoEnd">
             </video>
+            <video v-show="false" ref="playerPreview" src="@/assets/video/test.mp4"></video>
         </div>
         <div v-if="ifLoad" class="video_btn">
             <a-icon v-show="!ifPlay" class="playerBtn" title="播放" type="play-circle" @click="playerEvent('play')"/>
@@ -26,9 +27,11 @@
                 <!--                <div class="progress_content">1</div>-->
                 <progress ref="progress" class="progress_content" value="0" :max="this.$refs.player.duration"
                           @mousedown="progressMouseDown" @mousemove="progressMouseMove"
-                          @mouseup="progressMouseUp" @click="progressClick"></progress>
+                          @mouseup="progressMouseUp" @click="progressClick" @mouseenter="progressMouseEnter"
+                          @mouseleave="progressMouseLeave"></progress>
                 <span class="login" ref="login"></span>
                 <span class="logout" ref="logout"></span>
+                <img class="video_preview" ref="preview" src=""/>
             </div>
         </div>
     </div>
@@ -39,16 +42,19 @@
         name: "videoPlayer",
         data() {
             return {
-                player: null,
-                ifLoad: false,
-                ifPlay: false,
+                player: null,//视频播放器
+                playerPreview: null,//视频进度条预览
+                ifLoad: false,//视频是否加载完成
+                ifPlay: false,//播放暂停切换
                 timer: null,
                 frameRate: 25,
-                ifMouseDown: false
+                ifMouseDown: false,
+                ifPreview: false
             }
         },
         mounted() {
             this.player = this.$refs.player
+            this.playerPreview = this.$refs.playerPreview
         },
         methods: {
             //warning 设置定时器让播放器静音播放1s解决刷新进页面第一次播放前1s卡顿的问题
@@ -173,6 +179,10 @@
                 this.$refs.progress.value = this.$refs.player.currentTime
                 this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
             },
+            progressMouseEnter() {
+                this.ifPreview = true
+                this.$refs.preview.style.display = 'block'
+            },
             progressMouseDown() {
                 this.ifMouseDown = true
             },
@@ -183,9 +193,22 @@
                     this.$refs.progress.value = this.$refs.player.currentTime
                     this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
                 }
+                if (this.ifPreview) {
+                    let canvas = document.createElement("canvas") // 创建一个画布
+                    canvas.width = 100
+                    canvas.height = 50
+                    this.$refs.playerPreview.currentTime = this.$refs.player.duration * e.offsetX / this.$refs.progress.offsetWidth
+                    canvas.getContext('2d').drawImage(this.$refs.playerPreview, 0, 0, canvas.width, canvas.height) // getContext:设置画布环境；drawImage:画画
+                    this.$refs.preview.src = canvas.toDataURL("image/png") // 获取图片的url
+                    this.$refs.preview.style.left = e.offsetX - 50 + 'px'
+                }
             },
             progressMouseUp() {
                 this.ifMouseDown = false
+            },
+            progressMouseLeave() {
+                this.ifPreview = false
+                this.$refs.preview.style.display = 'none'
             },
             btnClick() {
                 //入点，出点时间
@@ -237,6 +260,7 @@
         @icon-color: rgba(0, 0, 0, 1);
         width: 100%;
         height: 100%;
+        min-width: 500px;
         box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
         padding: 10px;
 
@@ -317,6 +341,15 @@
                     position: absolute;
                     top: 15px;
                     left: -14px;
+                }
+
+                .video_preview {
+                    width: 100px;
+                    height: 50px;
+                    position: absolute;
+                    top: -50px;
+                    left: -50px;
+                    display: none;
                 }
             }
         }

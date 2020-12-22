@@ -24,7 +24,7 @@
     .home {
         .home_video {
             margin: 0 auto;
-            width: 800px;
+            width: 600px;
         }
     }
 </style>
