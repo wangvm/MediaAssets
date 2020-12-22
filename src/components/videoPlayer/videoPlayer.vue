@@ -5,8 +5,11 @@
             <!--http://10.1.71.155/static/video/test.mp4-->
             <!--@/assets/video/test.mp4-->
             <video class="player" ref="player" src="@/assets/video/test.mp4" width="100%" height="100%"
-                   preload="auto" @canplaythrough="videoCanplaythrough" @playing="videoPlaying" @pause="videoPause"
-                   @ended="videoEnd">
+                   preload="auto"
+                   @canplaythrough="videoEvent('canplaythrough')"
+                   @playing="videoEvent('playing')"
+                   @pause="videoEvent('pause')"
+                   @ended="videoEvent('end')">
             </video>
             <video v-show="false" ref="playerPreview" src="@/assets/video/test.mp4"></video>
         </div>
@@ -24,7 +27,6 @@
             <a-icon class="playerBtn" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
             <button @click="btnClick">test</button>
             <div class="progress">
-                <!--                <div class="progress_content">1</div>-->
                 <progress ref="progress" class="progress_content" value="0" :max="this.$refs.player.duration"
                           @mousedown="progressMouseDown" @mousemove="progressMouseMove"
                           @mouseup="progressMouseUp" @click="progressClick" @mouseenter="progressMouseEnter"
@@ -58,39 +60,43 @@
         },
         methods: {
             //warning 设置定时器让播放器静音播放1s解决刷新进页面第一次播放前1s卡顿的问题
-            videoCanplaythrough() {
-                //视频加载完成
-                if (!this.ifLoad) {
-                    this.$refs.player.muted = true
-                    this.$refs.player.play()
-                    setTimeout(() => {
-                        this.$refs.player.currentTime = 0
-                        this.$refs.player.pause()
-                        this.$refs.player.muted = false
-                        this.ifLoad = true
-                    }, 1000)
-                }
-            },
-            videoPlaying() {
-                //判断播放器正在播放
-                if (this.ifLoad) {
-                    this.timer = setInterval(() => {
-                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+            videoEvent(status) {
+                switch (status) {
+                    case 'canplaythrough':
+                        //视频加载完成
+                        if (!this.ifLoad) {
+                            this.$refs.player.muted = true
+                            this.$refs.player.play()
+                            setTimeout(() => {
+                                this.$refs.player.currentTime = 0
+                                this.$refs.player.pause()
+                                this.$refs.player.muted = false
+                                this.ifLoad = true
+                            }, 1000)
+                        }
+                        break
+                    case 'playing':
+                        //判断播放器正在播放
+                        if (this.ifLoad) {
+                            this.timer = setInterval(() => {
+                                this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                                this.$refs.progress.value = this.$refs.player.currentTime
+                            }, this.frameRate)
+                        }
+                        break
+                    case 'pause':
+                        //播放器暂停
+                        clearInterval(this.timer)
+                        this.timer = null
+                        break
+                    case 'end':
+                        //视频播放完成
+                        this.ifPlay = false
+                        this.player.currentTime = 0
                         this.$refs.progress.value = this.$refs.player.currentTime
-                    }, this.frameRate)
+                        this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
+                        break
                 }
-            },
-            videoPause() {
-                //播放器暂停
-                clearInterval(this.timer)
-                this.timer = null
-            },
-            videoEnd() {
-                //视频播放完成
-                this.ifPlay = false
-                this.player.currentTime = 0
-                this.$refs.progress.value = this.$refs.player.currentTime
-                this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
             },
             playerEvent(status) {
                 //播放器 播放，暂停，停止
@@ -173,8 +179,8 @@
                     }
                 }
             },
-            progressClick(e) {
-                let currentTime = this.$refs.player.duration * e.offsetX / this.$refs.progress.offsetWidth
+            progressClick() {
+                let currentTime = this.$refs.player.duration * event.offsetX / this.$refs.progress.offsetWidth
                 this.$refs.player.currentTime = currentTime
                 this.$refs.progress.value = this.$refs.player.currentTime
                 this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
@@ -186,9 +192,9 @@
             progressMouseDown() {
                 this.ifMouseDown = true
             },
-            progressMouseMove(e) {
+            progressMouseMove() {
                 if (this.ifMouseDown) {
-                    let currentTime = this.$refs.player.duration * e.offsetX / this.$refs.progress.offsetWidth
+                    let currentTime = this.$refs.player.duration * event.offsetX / this.$refs.progress.offsetWidth
                     this.$refs.player.currentTime = currentTime
                     this.$refs.progress.value = this.$refs.player.currentTime
                     this.$refs.time.innerText = timeFormat(this.$refs.player.currentTime, this.frameRate)
@@ -197,10 +203,10 @@
                     let canvas = document.createElement("canvas") // 创建一个画布
                     canvas.width = 100
                     canvas.height = 50
-                    this.$refs.playerPreview.currentTime = this.$refs.player.duration * e.offsetX / this.$refs.progress.offsetWidth
+                    this.$refs.playerPreview.currentTime = this.$refs.player.duration * event.offsetX / this.$refs.progress.offsetWidth
                     canvas.getContext('2d').drawImage(this.$refs.playerPreview, 0, 0, canvas.width, canvas.height) // getContext:设置画布环境；drawImage:画画
                     this.$refs.preview.src = canvas.toDataURL("image/png") // 获取图片的url
-                    this.$refs.preview.style.left = e.offsetX - 50 + 'px'
+                    this.$refs.preview.style.left = event.offsetX - 50 + 'px'
                 }
             },
             progressMouseUp() {
