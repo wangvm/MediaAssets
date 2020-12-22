@@ -11,7 +11,7 @@
     * login 登录注册 router: '/login'
     
 * store
-    * 暂无
+    * 无
     
 * 一些配置
     * CSS --> Less
