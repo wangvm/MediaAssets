@@ -315,6 +315,7 @@
 
                 progress::-webkit-progress-bar {
                     background-color: #eee;
+
                 }
 
                 /* 表示已完成进度背景色 */
