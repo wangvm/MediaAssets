@@ -8,14 +8,13 @@
         <div class="video_content">
             <!--http://10.1.71.155/static/video/test.mp4-->
             <!--@/assets/video/test.mp4-->
-<!--            <div class="video_content_loading"></div>-->
             <video class="player" ref="player" :src="videoInfo.url" width="100%" height="100%" preload="auto"
                    @canplaythrough="videoEvent('canplaythrough')"
                    @playing="videoEvent('playing')"
                    @pause="videoEvent('pause')"
                    @ended="videoEvent('end')">
             </video>
-            <video v-show="false" ref="playerPreview" src="@/assets/video/test.mp4"></video>
+            <video v-show="false" ref="playerPreview" :src="videoInfo.url" width="100%" height="100%"></video>
         </div>
         <div v-if="ifLoad" class="video_btn">
             <a-icon v-show="!ifPlay" class="playerBtn" title="播放" type="play-circle" @click="playerEvent('play')"/>
@@ -284,18 +283,6 @@
         box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
         padding: 10px;
         position: relative;
-
-        /*.video_content {*/
-        /*    width: 100%;*/
-        /*    height: 100%;*/
-        /*    .video_content_loading{*/
-        /*        width: 100%;*/
-        /*        height: 100%;*/
-        /*        background: rgba(0,0,0,0.3);*/
-
-        /*        position: absolute;*/
-        /*    }*/
-        /*}*/
 
         .video_btn {
             .playerBtn {
