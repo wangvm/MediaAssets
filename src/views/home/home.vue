@@ -15,7 +15,7 @@
         name: "home",
         components: {
             topBar
-        }
+        },
     }
 </script>
 

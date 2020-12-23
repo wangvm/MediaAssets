@@ -11,7 +11,7 @@
     * login 登录注册 router: '/login'
     
 * store
-    * 无
+    * userName 用户名状态
     
 * 一些配置
     * CSS --> Less
