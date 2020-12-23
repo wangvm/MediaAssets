@@ -1,6 +1,5 @@
 <template>
     <div class="login">
-        <top-bar></top-bar>
         登录注册
     </div>
 </template>

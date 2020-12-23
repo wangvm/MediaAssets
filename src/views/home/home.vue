@@ -1,6 +1,5 @@
 <template>
     <div class="home">
-        <top-bar></top-bar>
         <!--div class='test'为测试代码，可删，无用-->
         <div class="test">
             home

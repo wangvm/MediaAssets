@@ -5,6 +5,7 @@
         * props:
         * 对象:{视频url,视频帧速}
         * object:{url:xxxx,frameRate:xxxxx}
+    * videoItem 列表框
         
 * views && router
     * home 首页 router: '/'
