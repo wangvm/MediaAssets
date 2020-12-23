@@ -4,11 +4,11 @@
 <!--}-->
 
 <template>
-    <!--    warning: v-cloak 此指令可以解决使用插值表达式页面闪烁问题-->
-    <div class="videoPlayer" v-cloak v-show="ifLoad">
+    <div class="videoPlayer">
         <div class="video_content">
             <!--http://10.1.71.155/static/video/test.mp4-->
             <!--@/assets/video/test.mp4-->
+<!--            <div class="video_content_loading"></div>-->
             <video class="player" ref="player" :src="videoInfo.url" width="100%" height="100%" preload="auto"
                    @canplaythrough="videoEvent('canplaythrough')"
                    @playing="videoEvent('playing')"
@@ -283,10 +283,19 @@
         min-width: 500px;
         box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
         padding: 10px;
+        position: relative;
 
-        [v-cloak] {
-            display: none;
-        }
+        /*.video_content {*/
+        /*    width: 100%;*/
+        /*    height: 100%;*/
+        /*    .video_content_loading{*/
+        /*        width: 100%;*/
+        /*        height: 100%;*/
+        /*        background: rgba(0,0,0,0.3);*/
+
+        /*        position: absolute;*/
+        /*    }*/
+        /*}*/
 
         .video_btn {
             .playerBtn {
