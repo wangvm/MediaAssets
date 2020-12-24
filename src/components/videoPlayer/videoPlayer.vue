@@ -78,17 +78,7 @@
                 switch (status) {
                     case 'canplaythrough':
                         //视频加载完成
-                        if (!this.ifLoad) {
-                            // console.log('load')
-                            this.player.muted = true
-                            this.player.play()
-                            setTimeout(() => {
-                                this.player.currentTime = 0
-                                this.player.pause()
-                                this.player.muted = false
-                                this.ifLoad = true
-                            }, 1000)
-                        }
+                        this.ifLoad = true
                         break
                     case 'playing':
                         //判断播放器正在播放
