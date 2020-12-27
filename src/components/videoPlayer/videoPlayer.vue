@@ -28,7 +28,10 @@
             <a-icon class="playerBtn" title="清除入点和出点" type="close" @click="logEvent('logRemove')"/>
             <a-icon class="playerBtn" title="跳转至入点" type="vertical-align-bottom" @click="logEvent('toLogin')"/>
             <a-icon class="playerBtn" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
-            <!--<button @click="btnClick">test</button>-->
+<!--     input：调节声音大小       -->
+            <input type="range" min="0" max="100" value="50" @change="setValue()" ref="ran">
+            <span class="video_volume">{{volume}}</span>
+<!--            <button @click="btnClick">test</button>-->
             <div class="progress">
                 <progress ref="progress" class="progress_content" value="0" :max="this.$refs.player.duration"
                           @mousedown="progressMouseDown"
@@ -57,7 +60,8 @@
                 ifPlay: false,//播放暂停切换
                 timer: null,
                 ifMouseDown: false,
-                ifPreview: false
+                ifPreview: false,
+                volume: "50",
             }
         },
         props: {
@@ -66,13 +70,26 @@
         mounted() {
             this.player = this.$refs.player
             this.playerPreview = this.$refs.playerPreview
+            console.log(this)
+
         },
         destroyed() {
             //离开页面假如视频再播放，销毁定时器
             clearInterval(this.timer)
             this.timer = null
         },
+
         methods: {
+            //改变播放视频声音大小
+            setValue() {
+                var myVid = this.$refs.player
+                var value = this.$refs.ran.value
+                // console.log(value);
+
+                myVid.volume = value/100;
+                myVid.muted = false
+                this.volume = value//mustache语法获取value数值
+            },
             //warning 设置定时器让播放器静音播放1s解决刷新进页面第一次播放前1s卡顿的问题
             videoEvent(status) {
                 switch (status) {
@@ -280,6 +297,11 @@
                 font-size: 20px;
                 line-height: 20px;
                 padding: 8px;
+            }
+
+            .video_volume {
+                font-size: 10px;
+                margin: 0 0 0 1px;
             }
 
             .time {
