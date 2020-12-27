@@ -28,10 +28,13 @@
             <a-icon class="playerBtn" title="清除入点和出点" type="close" @click="logEvent('logRemove')"/>
             <a-icon class="playerBtn" title="跳转至入点" type="vertical-align-bottom" @click="logEvent('toLogin')"/>
             <a-icon class="playerBtn" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
-<!--     input：调节声音大小       -->
-            <input type="range" min="0" max="100" value="50" @change="setValue()" ref="ran">
-            <span class="video_volume">{{volume}}</span>
-<!--            <button @click="btnClick">test</button>-->
+            <!--     input：调节声音大小       -->
+            <a-icon class="playerBtn" title="音量" type="customer-service"/>
+            <input type="range" min="0" max="100" value="100" ref="range"
+                   @mousedown="setValue('mouseDown')"
+                   @mousemove="setValue('mouseMove')"
+                   @mouseup="setValue('mouseUp')">
+            <!--            <button @click="btnClick">test</button>-->
             <div class="progress">
                 <progress ref="progress" class="progress_content" value="0" :max="this.$refs.player.duration"
                           @mousedown="progressMouseDown"
@@ -59,9 +62,9 @@
                 ifLoad: false,//视频是否加载完成
                 ifPlay: false,//播放暂停切换
                 timer: null,
-                ifMouseDown: false,
+                ifPreviewMouseDown: false,
                 ifPreview: false,
-                volume: "50",
+                ifVolumeMouseDown: false
             }
         },
         props: {
@@ -70,7 +73,6 @@
         mounted() {
             this.player = this.$refs.player
             this.playerPreview = this.$refs.playerPreview
-            console.log(this)
 
         },
         destroyed() {
@@ -81,14 +83,23 @@
 
         methods: {
             //改变播放视频声音大小
-            setValue() {
-                var myVid = this.$refs.player
-                var value = this.$refs.ran.value
-                // console.log(value);
-
-                myVid.volume = value/100;
-                myVid.muted = false
-                this.volume = value//mustache语法获取value数值
+            setValue(status) {
+                let myVid = this.player
+                let value = this.$refs.range.value
+                switch (status) {
+                    case 'mouseDown':
+                        this.ifVolumeMouseDown = true
+                        break
+                    case 'mouseMove':
+                        if (this.ifVolumeMouseDown) {
+                            myVid.volume = value / 100
+                            myVid.muted = false
+                        }
+                        break
+                    case 'mouseUp':
+                        this.ifVolumeMouseDown = false
+                        break
+                }
             },
             //warning 设置定时器让播放器静音播放1s解决刷新进页面第一次播放前1s卡顿的问题
             videoEvent(status) {
@@ -211,10 +222,10 @@
                 this.$refs.preview.style.display = 'block'
             },
             progressMouseDown() {
-                this.ifMouseDown = true
+                this.ifPreviewMouseDown = true
             },
             progressMouseMove() {
-                if (this.ifMouseDown) {
+                if (this.ifPreviewMouseDown) {
                     this.player.currentTime = this.player.duration * event.offsetX / this.$refs.progress.offsetWidth
                     this.$refs.progress.value = this.player.currentTime
                     this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
@@ -230,7 +241,7 @@
                 }
             },
             progressMouseUp() {
-                this.ifMouseDown = false
+                this.ifPreviewMouseDown = false
             },
             progressMouseLeave() {
                 this.ifPreview = false
@@ -299,9 +310,30 @@
                 padding: 8px;
             }
 
-            .video_volume {
-                font-size: 10px;
-                margin: 0 0 0 1px;
+            input[type=range] {
+                width: 100px;
+                border-radius: 10px; /*这个属性设置使填充进度条时的图形为圆角*/
+            }
+
+            input[type=range]::-webkit-slider-runnable-track {
+                height: 10px;
+                border-radius: 10px; /*将轨道设为圆角的*/
+                box-shadow: 0 1px 1px #def3f8, inset 0 .125em .125em #0d1112; /*轨道内置阴影效果*/
+            }
+
+            input[type=range]:focus {
+                outline: none;
+            }
+
+            input[type=range]::-webkit-slider-thumb {
+                /*-webkit-appearance: none;*/
+                height: 25px;
+                width: 25px;
+                margin-top: -5px; /*使滑块超出轨道部分的偏移量相等*/
+                background: #ffffff;
+                border-radius: 50%; /*外观设置为圆形*/
+                border: solid 0.125em rgba(205, 224, 230, 0.5); /*设置边框*/
+                box-shadow: 0 .125em .125em #3b4547; /*添加底部阴影*/
             }
 
             .time {
