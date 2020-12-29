@@ -3,7 +3,7 @@
 <!--frameRate: 25-->
 <!--}-->
 <template>
-    <div class="videoPlayer" contenteditable="true" @keydown="videoPlayerKeyEvent">
+    <div class="videoPlayer" contenteditable="true" @keydown="videoPlayerKeyEvent" onselectstart="return false;">
         <!--     video 播放器       -->
         <div class="video_content">
             <!--http://10.1.71.155/static/video/test.mp4-->
@@ -346,6 +346,7 @@
         padding: 10px;
         position: relative;
         outline: none;
+        cursor: default;
 
         .video_btn {
             .playerBtn {
@@ -353,6 +354,7 @@
                 font-size: @font-size;
                 line-height: @line-height;
                 padding: 8px;
+                user-select: none;
             }
 
             input[type=range] {
@@ -387,8 +389,6 @@
                 font-weight: lighter;
                 line-height: @line-height;
                 padding: 5px;
-                cursor: default;
-                user-select: none;
             }
 
             .progress {
