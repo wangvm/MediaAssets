@@ -21,7 +21,8 @@
         },
         components: {
             videoPlayer
-        }
+        },
+        methods: {}
     }
 </script>
 

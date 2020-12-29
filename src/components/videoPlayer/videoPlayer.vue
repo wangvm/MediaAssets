@@ -2,9 +2,8 @@
 <!--url: require('@/assets/video/test.mp4'),-->
 <!--frameRate: 25-->
 <!--}-->
-
 <template>
-    <div class="videoPlayer">
+    <div class="videoPlayer" contenteditable="true" @keydown="videoPlayerKeyEvent">
         <!--     video 播放器       -->
         <div class="video_content">
             <!--http://10.1.71.155/static/video/test.mp4-->
@@ -13,25 +12,29 @@
                    @canplaythrough="videoEvent('canplaythrough')"
                    @playing="videoEvent('playing')"
                    @pause="videoEvent('pause')"
-                   @ended="videoEvent('end')">
+                   @ended="videoEvent('end')"
+                   @mouseover="videoEvent('mouseover')"
+                   @mouseout="videoEvent('mouseout')">
             </video>
             <video v-show="false" ref="playerPreview" :src="videoInfo.url" width="100%" height="100%"></video>
         </div>
         <div class="video_btn">
             <!--     a-icon：按钮封装       -->
-            <a-icon v-show="!ifPlay" class="playerBtn" title="播放" type="play-circle" @click="playerEvent('play')"/>
-            <a-icon v-show="ifPlay" class="playerBtn" title="暂停" type="pause-circle" @click="playerEvent('pause')"/>
-            <a-icon class="playerBtn" title="停止" type="undo" @click="playerEvent('stop')"/>
+            <a-icon v-show="!ifPlay" class="playerBtn" title="播放(空格)" type="play-circle"
+                    @click="playerBtnEvent('play')"/>
+            <a-icon v-show="ifPlay" class="playerBtn" title="暂停(空格)" type="pause-circle"
+                    @click="playerBtnEvent('pause')"/>
+            <a-icon class="playerBtn" title="停止(Enter)" type="undo" @click="playerBtnEvent('stop')"/>
             <span class="time" title="时:分:秒:帧" ref="time">00:00:00:00</span>
-            <a-icon class="playerBtn" title="上一帧" type="step-backward" @click="playerEvent('back')"/>
-            <a-icon class="playerBtn" title="下一帧" type="step-forward" @click="playerEvent('forward')"/>
+            <a-icon class="playerBtn" title="上一帧(方向左)" type="step-backward" @click="playerBtnEvent('back')"/>
+            <a-icon class="playerBtn" title="下一帧(方向右)" type="step-forward" @click="playerBtnEvent('forward')"/>
             <a-icon class="playerBtn" title="入点" type="login" @click="logEvent('login')"/>
             <a-icon class="playerBtn" title="出点" type="logout" @click="logEvent('logout')"/>
             <a-icon class="playerBtn" title="清除入点和出点" type="close" @click="logEvent('logRemove')"/>
             <a-icon class="playerBtn" title="跳转至入点" type="vertical-align-bottom" @click="logEvent('toLogin')"/>
             <a-icon class="playerBtn" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
             <!--     input：调节声音大小       -->
-            <a-icon class="playerBtn" title="音量" type="customer-service" @click="volumeEvent('volumeClick')"/>
+            <a-icon class="playerBtn" title="音量(上下方向控制音量)" type="customer-service" @click="volumeEvent('volumeClick')"/>
             <input type="range" min="0" max="100" value="100" ref="range"
                    @mousedown="volumeEvent('mouseDown')"
                    @mousemove="volumeEvent('mouseMove')"
@@ -72,14 +75,18 @@
         props: {
             videoInfo: Object
         },
+        created() {
+        },
         mounted() {
             this.player = this.$refs.player
             this.playerPreview = this.$refs.playerPreview
+            this.player.addEventListener("keydown", this.videoPlayerKeyEvent)
         },
         destroyed() {
             //离开页面假如视频再播放，销毁定时器
             clearInterval(this.timer)
             this.timer = null
+            document.removeEventListener("keydown", this.videoPlayerKeyEvent)
         },
         computed: {
             getPlayerDuration() {
@@ -87,32 +94,25 @@
             }
         },
         methods: {
-            //改变播放视频声音大小
-            volumeEvent(status) {
+            videoPlayerKeyEvent(event) {
                 let myVid = this.player
-                let value = this.$refs.range.value
-                switch (status) {
-                    case 'volumeClick':
-                        if (!myVid.muted) {
-                            myVid.muted = true
-                            this.$refs.range.value = 0
-                        } else {
-                            myVid.muted = false
-                            this.$refs.range.value = 100
-                        }
-                        break
-                    case 'mouseDown':
-                        this.ifVolumeMouseDown = true
-                        break
-                    case 'mouseMove':
-                        if (this.ifVolumeMouseDown) {
-                            myVid.volume = value / 100
-                            // myVid.muted = false
-                        }
-                        break
-                    case 'mouseUp':
-                        this.ifVolumeMouseDown = false
-                        break
+                // console.log(event.key)
+                if (event.key === ' ' && this.ifPlay === false) {
+                    this.playerBtnEvent('play')
+                } else if (event.key === ' ' && this.ifPlay === true) {
+                    this.playerBtnEvent('pause')
+                } else if (event.key === 'Enter') {
+                    this.playerBtnEvent('stop')
+                } else if (event.key === 'ArrowLeft') {
+                    this.playerBtnEvent('back')
+                } else if (event.key === 'ArrowRight') {
+                    this.playerBtnEvent('forward')
+                } else if (event.key === 'ArrowUp') {
+                    this.$refs.range.value++
+                    myVid.volume = this.$refs.range.value / 100
+                } else if (event.key === 'ArrowDown') {
+                    this.$refs.range.value--
+                    myVid.volume = this.$refs.range.value / 100
                 }
             },
             //warning 设置定时器让播放器静音播放1s解决刷新进页面第一次播放前1s卡顿的问题
@@ -146,7 +146,7 @@
                         break
                 }
             },
-            playerEvent(status) {
+            playerBtnEvent(status) {
                 //播放器 播放，暂停，停止
                 switch (status) {
                     case 'play':
@@ -165,12 +165,12 @@
                         this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         break
                     case 'back':
-                        this.player.currentTime -= 1 / 25
+                        this.player.currentTime -= 1 / this.videoInfo.frameRate
                         this.$refs.progress.value = this.player.currentTime
                         this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         break
                     case 'forward':
-                        this.player.currentTime += 1 / 25
+                        this.player.currentTime += 1 / this.videoInfo.frameRate
                         this.$refs.progress.value = this.player.currentTime
                         this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         break
@@ -262,6 +262,33 @@
                 this.ifPreview = false
                 this.$refs.preview.style.display = 'none'
             },
+            //改变播放视频声音大小
+            volumeEvent(status) {
+                let myVid = this.player
+                let value = this.$refs.range.value
+                switch (status) {
+                    case 'volumeClick':
+                        if (!myVid.muted) {
+                            myVid.muted = true
+                            this.$refs.range.value = 0
+                        } else {
+                            myVid.muted = false
+                            this.$refs.range.value = 100
+                        }
+                        break
+                    case 'mouseDown':
+                        this.ifVolumeMouseDown = true
+                        break
+                    case 'mouseMove':
+                        if (this.ifVolumeMouseDown) {
+                            myVid.volume = value / 100
+                        }
+                        break
+                    case 'mouseUp':
+                        this.ifVolumeMouseDown = false
+                        break
+                }
+            },
             // btnClick() {
             //     //入点，出点时间
             //     let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
@@ -318,6 +345,7 @@
         box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
         padding: 10px;
         position: relative;
+        outline: none;
 
         .video_btn {
             .playerBtn {
