@@ -5,8 +5,8 @@ import store from './store'
 //安装less
 import less from 'less'
 //安装ant-design UI库
-import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/antd.less'
+import Antd from 'ant-design-vue';
 
 Vue.config.productionTip = false
 Vue.use(less)

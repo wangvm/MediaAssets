@@ -5,6 +5,7 @@
 
 <template>
     <div class="videoPlayer">
+        <!--     video 播放器       -->
         <div class="video_content">
             <!--http://10.1.71.155/static/video/test.mp4-->
             <!--@/assets/video/test.mp4-->
@@ -16,7 +17,8 @@
             </video>
             <video v-show="false" ref="playerPreview" :src="videoInfo.url" width="100%" height="100%"></video>
         </div>
-        <div v-if="ifLoad" class="video_btn">
+        <div class="video_btn">
+            <!--     a-icon：按钮封装       -->
             <a-icon v-show="!ifPlay" class="playerBtn" title="播放" type="play-circle" @click="playerEvent('play')"/>
             <a-icon v-show="ifPlay" class="playerBtn" title="暂停" type="pause-circle" @click="playerEvent('pause')"/>
             <a-icon class="playerBtn" title="停止" type="undo" @click="playerEvent('stop')"/>
@@ -31,12 +33,12 @@
             <!--     input：调节声音大小       -->
             <a-icon class="playerBtn" title="音量" type="customer-service"/>
             <input type="range" min="0" max="100" value="100" ref="range"
-                   @mousedown="setValue('mouseDown')"
-                   @mousemove="setValue('mouseMove')"
-                   @mouseup="setValue('mouseUp')">
-            <!--            <button @click="btnClick">test</button>-->
+                   @mousedown="volumeEvent('mouseDown')"
+                   @mousemove="volumeEvent('mouseMove')"
+                   @mouseup="volumeEvent('mouseUp')">
+            <!--     progress 进度条封装       -->
             <div class="progress">
-                <progress ref="progress" class="progress_content" value="0" :max="this.$refs.player.duration"
+                <progress ref="progress" class="progress_content" value="0" :max="getPlayerDuration" v-if="ifLoad"
                           @mousedown="progressMouseDown"
                           @mousemove="progressMouseMove"
                           @mouseup="progressMouseUp"
@@ -61,10 +63,10 @@
                 playerPreview: null,//视频进度条预览
                 ifLoad: false,//视频是否加载完成
                 ifPlay: false,//播放暂停切换
-                timer: null,
-                ifPreviewMouseDown: false,
-                ifPreview: false,
-                ifVolumeMouseDown: false
+                timer: null,//播放器定时器
+                ifPreviewMouseDown: false,//进度条实时变化
+                ifPreview: false,//进度条预览图
+                ifVolumeMouseDown: false//音量实时变化
             }
         },
         props: {
@@ -73,17 +75,20 @@
         mounted() {
             this.player = this.$refs.player
             this.playerPreview = this.$refs.playerPreview
-
         },
         destroyed() {
             //离开页面假如视频再播放，销毁定时器
             clearInterval(this.timer)
             this.timer = null
         },
-
+        computed: {
+            getPlayerDuration() {
+                return this.player.duration
+            }
+        },
         methods: {
             //改变播放视频声音大小
-            setValue(status) {
+            volumeEvent(status) {
                 let myVid = this.player
                 let value = this.$refs.range.value
                 switch (status) {
@@ -121,6 +126,7 @@
                         //播放器暂停
                         clearInterval(this.timer)
                         this.timer = null
+                        this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
                         break
                     case 'end':
                         //视频播放完成
@@ -212,7 +218,7 @@
                     }
                 }
             },
-            progressClick() {
+            progressClick(event) {
                 this.player.currentTime = this.player.duration * event.offsetX / this.$refs.progress.offsetWidth
                 this.$refs.progress.value = this.player.currentTime
                 this.$refs.time.innerText = timeFormat(this.player.currentTime, this.videoInfo.frameRate)
@@ -224,7 +230,7 @@
             progressMouseDown() {
                 this.ifPreviewMouseDown = true
             },
-            progressMouseMove() {
+            progressMouseMove(event) {
                 if (this.ifPreviewMouseDown) {
                     this.player.currentTime = this.player.duration * event.offsetX / this.$refs.progress.offsetWidth
                     this.$refs.progress.value = this.player.currentTime
@@ -295,6 +301,8 @@
 <style scoped lang="less">
     .videoPlayer {
         @icon-color: rgba(0, 0, 0, 1);
+        @font-size: 20px;
+        @line-height: 20px;
         width: 100%;
         height: 100%;
         min-width: 500px;
@@ -305,8 +313,8 @@
         .video_btn {
             .playerBtn {
                 color: @icon-color;
-                font-size: 20px;
-                line-height: 20px;
+                font-size: @font-size;
+                line-height: @line-height;
                 padding: 8px;
             }
 
@@ -338,9 +346,9 @@
 
             .time {
                 color: @icon-color;
-                font-size: 20px;
+                font-size: @font-size;
                 font-weight: lighter;
-                line-height: 20px;
+                line-height: @line-height;
                 padding: 5px;
                 cursor: default;
                 user-select: none;
@@ -368,12 +376,20 @@
                     background: lightsalmon;
                 }
 
-                .login {
+                .login, .logout {
                     height: 16px;
                     width: 2px;
                     background: black;
+                }
+
+                .login {
                     position: absolute;
                     left: 0;
+                }
+
+                .logout {
+                    position: absolute;
+                    right: 0;
                 }
 
                 .login::after {
@@ -384,14 +400,6 @@
                     position: absolute;
                     top: -15px;
                     left: -14px;
-                }
-
-                .logout {
-                    height: 16px;
-                    width: 2px;
-                    background: black;
-                    position: absolute;
-                    right: 0;
                 }
 
                 .logout::after {
