@@ -31,7 +31,7 @@
             <a-icon class="playerBtn" title="跳转至入点" type="vertical-align-bottom" @click="logEvent('toLogin')"/>
             <a-icon class="playerBtn" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
             <!--     input：调节声音大小       -->
-            <a-icon class="playerBtn" title="音量" type="customer-service"/>
+            <a-icon class="playerBtn" title="音量" type="customer-service" @click="volumeEvent('volumeClick')"/>
             <input type="range" min="0" max="100" value="100" ref="range"
                    @mousedown="volumeEvent('mouseDown')"
                    @mousemove="volumeEvent('mouseMove')"
@@ -92,13 +92,22 @@
                 let myVid = this.player
                 let value = this.$refs.range.value
                 switch (status) {
+                    case 'volumeClick':
+                        if (!myVid.muted) {
+                            myVid.muted = true
+                            this.$refs.range.value = 0
+                        } else {
+                            myVid.muted = false
+                            this.$refs.range.value = 100
+                        }
+                        break
                     case 'mouseDown':
                         this.ifVolumeMouseDown = true
                         break
                     case 'mouseMove':
                         if (this.ifVolumeMouseDown) {
                             myVid.volume = value / 100
-                            myVid.muted = false
+                            // myVid.muted = false
                         }
                         break
                     case 'mouseUp':
