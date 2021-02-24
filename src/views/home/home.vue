@@ -4,8 +4,12 @@
     <el-main class="home-main">
       <div class="home-container">
         <div class="login-type">
-          <div class="type-login type-common" @click="changeLoginType('login')">登录</div>
-          <div class="type-register type-common" @click="changeLoginType('register')">注册</div>
+          <div class="type-login type-common" @click="changeLoginType('login')">
+            <el-button type="primary" class="type-common">登录</el-button>
+          </div>
+          <div class="type-register type-common" @click="changeLoginType('register')">
+            <el-button type="danger" class="type-common">注册</el-button>
+          </div>
         </div>
         <div class="login-show">
           <div class="form" v-if="loginType">
@@ -42,7 +46,7 @@
               </el-input>
             </div>
             <div class="form-button">
-              <el-button class="button-register" type="primary" @click="loginAndRegisterClick">注册</el-button>
+              <el-button class="button-register" type="danger" @click="loginAndRegisterClick">注册</el-button>
             </div>
           </div>
         </div>
@@ -152,7 +156,7 @@
     position: relative;
 
     .home-header {
-      background: rgba(255, 255, 255, .5);
+      background: rgba(255, 255, 255, .8);
       font-size: 20px;
       font-weight: bold;
       display: flex;
@@ -200,6 +204,7 @@
 
           .type-common {
             width: 100%;
+            height: 100%;
             flex: 1;
             display: flex;
             justify-content: center;
@@ -240,15 +245,6 @@
               margin-right: 10px;
               display: flex;
               justify-content: flex-end;
-
-              .button-login {
-                background-color: rgb(64, 158, 255);
-              }
-
-              .button-register {
-                background-color: rgb(245, 108, 108);
-                border: none;
-              }
             }
           }
         }
