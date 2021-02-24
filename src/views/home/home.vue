@@ -25,7 +25,9 @@
               </el-input>
             </div>
             <div class="form-button">
-              <el-button class="button-login" type="primary" @click="loginAndRegisterClick">登录</el-button>
+              <el-button class="button-login" type="primary" @click="loginAndRegisterClick">
+                登录
+              </el-button>
             </div>
           </div>
           <div class="form" v-else>
