@@ -4,13 +4,14 @@ import router from './router'
 import store from './store'
 //安装less
 import less from 'less'
-//安装ant-design UI库
-import 'ant-design-vue/dist/antd.less'
-import Antd from 'ant-design-vue';
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+import VueParticles from 'vue-particles'
 
 Vue.config.productionTip = false
 Vue.use(less)
-Vue.use(Antd)
+Vue.use(ElementUI)
+Vue.use(VueParticles)
 
 new Vue({
     router,

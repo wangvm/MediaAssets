@@ -1,24 +1,22 @@
 <template>
-    <div id="app">
-        <top-bar></top-bar>
-        <router-view/>
-    </div>
+  <div id="app">
+    <router-view/>
+  </div>
 </template>
 
 <script>
-    import topBar from "./components/topBar/topBar"
 
     export default {
         name: 'App',
-        components: {
-            topBar,
+        created() {
+            console.log('%c媒资管理系统对你说：f12进来瞅啥，快出去', "background:black;color:white;border-radius:10px;padding:5px 10px;")
         }
     }
 </script>
 
 <style lang="less">
-    * {
-        margin: 0;
-        padding: 0;
-    }
+  * {
+    margin: 0;
+    padding: 0;
+  }
 </style>
