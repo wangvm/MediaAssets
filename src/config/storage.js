@@ -1,18 +1,17 @@
-const IF_LOGIN = 'ifLogin'
+const LOGIN_TYPE = 'ifLogin'
 const CURRENT_MENU = 'currentMenu'
 
 // 判断登录状态
-export function setIfLogin(bool) {
-    localStorage.setItem(IF_LOGIN, bool)
+export function setLoginType(bool) {
+    localStorage.setItem(LOGIN_TYPE, bool)
 }
 
-export function getIfLogin() {
-    return localStorage.getItem(IF_LOGIN)
+export function getLoginType() {
+    return localStorage.getItem(LOGIN_TYPE)
 }
 
-export function removeIfLogin() {
-    N
-    localStorage.removeItem(IF_LOGIN)
+export function removeLoginType() {
+    localStorage.removeItem(LOGIN_TYPE)
 }
 
 // 保存当前菜单值

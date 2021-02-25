@@ -8,19 +8,27 @@
       <span>媒资管理系统</span>
     </div>
     <template v-for="item in menuList">
-      <el-submenu v-if="item.children.length>0" :index="item.index">
-        <template slot="title">
-          <i :class="item.icon"></i>
-          {{item.name}}
-        </template>
-        <template v-for="citem in item.children">
-          <el-menu-item :index="citem.index">{{citem.name}}</el-menu-item>
-        </template>
-      </el-submenu>
-      <el-menu-item v-else :index="item.index">
-        <i :class="item.icon"></i>
-        <span slot="title">{{item.name}}</span>
-      </el-menu-item>
+      <div v-if="item.children.length>0">
+        <el-submenu :index="item.index">
+          <template slot="title">
+            <i :class="item.icon"></i>
+            {{item.name}}
+          </template>
+          <template v-for="citem in item.children">
+            <router-link :to="citem.index">
+              <el-menu-item :index="citem.index">{{citem.name}}</el-menu-item>
+            </router-link>
+          </template>
+        </el-submenu>
+      </div>
+      <div v-else>
+        <router-link :to="item.index">
+          <el-menu-item :index="item.index">
+            <i :class="item.icon"></i>
+            <span slot="title">{{item.name}}</span>
+          </el-menu-item>
+        </router-link>
+      </div>
     </template>
   </el-menu>
 </template>
@@ -44,21 +52,31 @@
         methods: {
             getMenuList() {
                 // todo 测试：模拟动态获取菜单
-                let getMenu = [
-                    {name: '主页', value: '00'},
-                    {name: '项目管理', value: '10'},
-                    {name: '项目列表', value: '11'},
-                    {name: '创建项目', value: '12'},
-                    {name: '用户管理', value: '20'},
-                    {name: '用户列表', value: '21'},
-                    {name: '任务管理', value: '30'},
-                    {name: '任务列表', value: '31'},
-                    {name: '创建任务', value: '32'},
-                    {name: '内容审核', value: '40'},
-                    {name: '审核列表', value: '41'},
-                    {name: '视频编目', value: '50'},
-                    {name: '编目列表', value: '51'}
-                ]
+                let loginType = this.$store.state.loginType
+                let getMenu = []
+                if (loginType === 'admin') {
+                    getMenu = [
+                        {name: '主页', value: '00'},
+                        {name: '项目管理', value: '10'},
+                        {name: '项目列表', value: '11'},
+                        {name: '创建项目', value: '12'},
+                        {name: '用户管理', value: '20'},
+                        {name: '用户列表', value: '21'},
+                        // {name: '任务管理', value: '30'},
+                        // {name: '任务列表', value: '31'},
+                        // {name: '创建任务', value: '32'},
+                        // {name: '内容审核', value: '40'},
+                        // {name: '审核列表', value: '41'},
+                        // {name: '视频编目', value: '50'},
+                        // {name: '编目列表', value: '51'}
+                    ]
+                } else {
+                    getMenu = [
+                        {name: '主页', value: '00'},
+                        {name: '项目管理', value: '10'},
+                        {name: '项目列表', value: '11'},
+                    ]
+                }
                 this.initMenu(getMenu)
             },
             initMenu(getMenu) {

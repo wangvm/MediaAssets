@@ -5,12 +5,12 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
     state: {
-        ifLogin: false,
+        loginType:'',
         currentMenu: '',
     },
     mutations: {
-        changeIfLogin(state, pre) {
-            state.ifLogin = pre
+        updateLoginType(state, pre) {
+            state.loginType = pre
         },
         updateCurrentMenu(state, pre) {
             state.currentMenu = pre

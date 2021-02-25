@@ -20,9 +20,11 @@
               </el-input>
             </div>
             <div class="form-input">
-              <el-input placeholder="请输入密码" v-model="password" show-password>
-                <template slot="prepend">密 码：</template>
-              </el-input>
+              <form>
+                <el-input placeholder="请输入密码" v-model="password" show-password>
+                  <template slot="prepend">密 码：</template>
+                </el-input>
+              </form>
             </div>
             <div class="form-button">
               <el-button class="button-login" type="primary" @click="loginAndRegisterClick">
@@ -38,14 +40,18 @@
               </el-input>
             </div>
             <div class="form-input">
-              <el-input placeholder="请输入密码" v-model="password" show-password>
-                <template slot="prepend">新 的 密 码：</template>
-              </el-input>
+              <form>
+                <el-input placeholder="请输入密码" v-model="password" show-password>
+                  <template slot="prepend">新 的 密 码：</template>
+                </el-input>
+              </form>
             </div>
             <div class="form-input">
-              <el-input placeholder="请再次输入密码" v-model="password1" show-password>
-                <template slot="prepend">确 认 密 码：</template>
-              </el-input>
+              <form>
+                <el-input placeholder="请再次输入密码" v-model="password1" show-password>
+                  <template slot="prepend">确 认 密 码：</template>
+                </el-input>
+              </form>
             </div>
             <div class="form-button">
               <el-button class="button-register" type="danger" @click="loginAndRegisterClick">注册</el-button>
@@ -77,7 +83,7 @@
 </template>
 
 <script>
-    import {setIfLogin, getIfLogin} from "../../config/storage"
+    import {setLoginType, getLoginType} from "../../config/storage"
 
     export default {
         name: "home",
@@ -87,8 +93,10 @@
                 username: '',//账号
                 password: '',//密码
                 password1: '',//注册验证密码
-                testUsername: 'admin',//todo 测试账号,有了接口就删
-                testPassword: 'admin',//todo 测试密码,有了接口就删
+                testUsername: 'admin',//todo 测试账号,有了接口就删 管理员
+                testPassword: 'admin',//todo 测试密码,有了接口就删 管理员
+                testUsername1: 'user',//todo 测试账号,有了接口就删 用户
+                testUserPassword: 'user',//todo 测试账号,有了接口就删 用户
             }
         },
         methods: {
@@ -115,8 +123,13 @@
                         console.log(`账号：${username}。密码：${password}。`)
                         if (username === this.testUsername && password === this.testPassword) {
                             this.$message.success('登录成功')
-                            setIfLogin(true)
-                            this.$store.commit('changeIfLogin', JSON.parse(getIfLogin()))
+                            setLoginType('admin')
+                            this.$store.commit('updateLoginType', getLoginType())
+                            this.$router.push('/admin')
+                        } else if (username === this.testUsername1 && password === this.testUserPassword) {
+                            this.$message.success('登录成功')
+                            setLoginType('user')
+                            this.$store.commit('updateLoginType', getLoginType())
                             this.$router.push('/admin')
                         } else {
                             this.$message.error('登录失败')

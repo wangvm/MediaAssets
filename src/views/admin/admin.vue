@@ -7,7 +7,9 @@
       <el-header class="admin-header">
         <adminHeader/>
       </el-header>
-      <el-main class="admin-main">Main</el-main>
+      <el-main class="admin-main">
+        <router-view/>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -15,7 +17,7 @@
 <script>
     import adminAside from "../../components/adminAside/adminAside"
     import adminHeader from "../../components/adminHeader/adminHeader"
-    import {getIfLogin} from "../../config/storage"
+    import {getLoginType} from "../../config/storage"
 
     export default {
         name: "admin",
@@ -25,12 +27,12 @@
         },
         methods: {
             initIfLogin() {
-                let ifLogin = JSON.parse(getIfLogin())
-                if (!ifLogin) {
+                let loginType = getLoginType()
+                if (!loginType) {
                     this.$message.error('登录超时，请重新登录')
                     this.$router.push('/')
                 } else {
-                    this.$store.commit('changeIfLogin', JSON.parse(getIfLogin()))
+                    this.$store.commit('updateLoginType', getLoginType())
                 }
             }
         },
@@ -48,7 +50,10 @@
     }
 
     .admin-header {
+      height: 100%;
+      width: 100%;
       box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+      padding: 0;
     }
 
     .admin-main {
