@@ -3,18 +3,18 @@
     <el-header class="home-header">媒资管理系统</el-header>
     <el-main class="home-main">
       <div class="home-container">
-        <div class="login-type">
-          <div class="type-login type-common" @click="changeLoginType('login')">
-            <el-button type="primary" class="type-common">登录</el-button>
-          </div>
-          <div class="type-register type-common" @click="changeLoginType('register')">
-            <el-button type="danger" class="type-common">注册</el-button>
-          </div>
-        </div>
-        <div class="login-show">
-          <div class="form" v-if="loginType">
-            <div class="form-title">用户登录</div>
-            <div class="form-input">
+              <div class="login-type">
+                <div class="type-login type-common" @click="updateLoginType('login')">
+                  <el-button type="primary" class="type-common">登录</el-button>
+                </div>
+                <div class="type-register type-common" @click="updateLoginType('register')">
+                  <el-button type="danger" class="type-common">注册</el-button>
+                </div>
+              </div>
+              <div class="login-show">
+                <div class="form" v-if="loginType">
+                  <div class="form-title">用户登录</div>
+                  <div class="form-input">
               <el-input placeholder="请输入账号" v-model="username">
                 <template slot="prepend">账 号：</template>
               </el-input>
@@ -27,7 +27,7 @@
               </form>
             </div>
             <div class="form-button">
-              <el-button class="button-login" type="primary" @click="loginAndRegisterClick">
+              <el-button class="button-login" type="primary" @click="loginClick">
                 登录
               </el-button>
             </div>
@@ -54,7 +54,7 @@
               </form>
             </div>
             <div class="form-button">
-              <el-button class="button-register" type="danger" @click="loginAndRegisterClick">注册</el-button>
+              <el-button class="button-register" type="danger" @click="registerClick">注册</el-button>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@
             }
         },
         methods: {
-            changeLoginType(type) {
+            updateLoginType(type) {
                 switch (type) {
                     case 'login':
                         this.loginType = true
@@ -112,44 +112,43 @@
                         break
                 }
             },
-            loginAndRegisterClick() {
-                if (this.loginType) {
-                    const {username, password} = this
-                    if (!username) {
-                        this.$message.error('账号不能为空')
-                    } else if (!password) {
-                        this.$message.error('密码不能为空')
-                    } else {
-                        console.log(`账号：${username}。密码：${password}。`)
-                        if (username === this.testUsername && password === this.testPassword) {
-                            this.$message.success('登录成功')
-                            setLoginType('admin')
-                            this.$store.commit('updateLoginType', getLoginType())
-                            this.$router.push('/admin')
-                        } else if (username === this.testUsername1 && password === this.testUserPassword) {
-                            this.$message.success('登录成功')
-                            setLoginType('user')
-                            this.$store.commit('updateLoginType', getLoginType())
-                            this.$router.push('/admin')
-                        } else {
-                            this.$message.error('登录失败')
-                        }
-                        this.initFormData()
-                    }
+            loginClick(){
+                const {username, password} = this
+                if (!username) {
+                    this.$message.error('账号不能为空')
+                } else if (!password) {
+                    this.$message.error('密码不能为空')
                 } else {
-                    const {username, password, password1} = this
-                    if (!username) {
-                        this.$message.error('账号不能为空')
-                    } else if (!password) {
-                        this.$message.error('密码不能为空')
-                    } else if (password !== password1) {
-                        this.$message.error('两次密码不一致')
+                    console.log(`账号：${username}。密码：${password}。`)
+                    if (username === this.testUsername && password === this.testPassword) {
+                        this.$message.success('登录成功')
+                        setLoginType('admin')
+                        this.$store.commit('updateLoginType', getLoginType())
+                        this.$router.push('/admin')
+                    } else if (username === this.testUsername1 && password === this.testUserPassword) {
+                        this.$message.success('登录成功')
+                        setLoginType('user')
+                        this.$store.commit('updateLoginType', getLoginType())
+                        this.$router.push('/admin')
                     } else {
-                        console.log(`账号：${username}；密码：${password}；第二次密码：${password1}；`)
-                        this.$message.success('注册成功，请登录')
-                        this.loginType = true
-                        this.initFormData()
+                        this.$message.error('登录失败')
                     }
+                    this.initFormData()
+                }
+            },
+            registerClick(){
+                const {username, password, password1} = this
+                if (!username) {
+                    this.$message.error('账号不能为空')
+                } else if (!password) {
+                    this.$message.error('密码不能为空')
+                } else if (password !== password1) {
+                    this.$message.error('两次密码不一致')
+                } else {
+                    console.log(`账号：${username}；密码：${password}；第二次密码：${password1}；`)
+                    this.$message.success('注册成功，请登录')
+                    this.loginType = true
+                    this.initFormData()
                 }
             },
             initFormData() {

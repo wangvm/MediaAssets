@@ -1,8 +1,8 @@
 <template>
-  <div class="admin-header">
+  <header class="admin-header">
     <span class="header-title">欢迎使用，{{getLoginType}}</span>
     <el-button class="header-exit" type="primary" size="mini" @click="exitClick">退出</el-button>
-  </div>
+  </header>
 </template>
 
 <script>

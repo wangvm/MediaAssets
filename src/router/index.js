@@ -1,13 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import home from "../views/home/home"
-import admin from "../views/admin/admin"
-import edit from "../views/edit/edit"
-// 二级路由
-import adminHome from "../views/admin/childAdmin/adminHome"
-import adminProjectList from "../views/admin/childAdmin/adminProjectList"
-import adminProjectCreate from "../views/admin/childAdmin/adminProjectCreate"
-import adminUserList from "../views/admin/childAdmin/adminUserList"
 // test
 import Home from "../views/Home"
 
@@ -17,36 +9,53 @@ const routes = [
     {
         path: '/',
         name: 'home',
-        component: home
+        component: () => import('../views/home/home')
     },
     {
         path: '/admin',
         name: 'admin',
-        component: admin,
+        component: () => import('../views/admin/admin'),
         redirect: '/admin/home',
         children: [
             {
-                path: 'home',
-                component: adminHome
+                path: '/admin/home',
+                component: () => import('../views/admin/childAdmin/admin-home'),
             },
             {
-                path: 'projectList',
-                component: adminProjectList
+                path: '/admin/projectList',
+                component: () => import('../views/admin/childAdmin/admin-project-list'),
             },
             {
-                path: 'projectCreate',
-                component: adminProjectCreate
+                path: '/admin/projectCreate',
+                component: () => import('../views/admin/childAdmin/admin-project-create'),
             },
             {
-                path: 'userList',
-                component: adminUserList
+                path: '/admin/userList',
+                component: () => import('../views/admin/childAdmin/admin-user-list'),
             }
         ]
     },
     {
         path: '/edit',
         name: 'edit',
-        component: edit
+        component: () => import('../views/edit/edit'),
+        children: [
+            {
+                path: 'task',
+                name: 'task',
+                component: () => import('../views/edit/childEdit/edit-task'),
+            },
+            {
+                path: 'check',
+                name: 'check',
+                component: () => import('../views/edit/childEdit/edit-check'),
+            },
+            {
+                path: 'video',
+                name: 'video',
+                component: () => import('../views/edit/childEdit/edit-video'),
+            }
+        ]
     },
     {
         path: '/Home',

@@ -1,12 +1,12 @@
 <template>
   <div>
-    项目列表
+    审核
   </div>
 </template>
 
 <script>
     export default {
-        name: "adminProjectList"
+        name: "editCheck"
     }
 </script>
 

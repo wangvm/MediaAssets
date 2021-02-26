@@ -1,4 +1,4 @@
-const LOGIN_TYPE = 'ifLogin'
+const LOGIN_TYPE = 'loginType'
 const CURRENT_MENU = 'currentMenu'
 
 // 判断登录状态
