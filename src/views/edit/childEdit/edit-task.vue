@@ -12,17 +12,28 @@
     </el-menu>
     <div class="edit-task-content">
       <div v-if="currentMenuIndex==='1'">任务列表</div>
-      <div v-else>创建任务</div>
+      <div v-else style="width: 600px">
+        <videoPlayer :video-info="videoInfo"></videoPlayer>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+    import videoPlayer from '../../../components/video-player/video-player.vue'
+
     export default {
         name: "editTask",
+        components: {
+            videoPlayer
+        },
         data() {
             return {
                 currentMenuIndex: '1',
+                videoInfo: {
+                    url: require('@/assets/video/test.mp4'),
+                    frameRate: 25,
+                }
             }
         },
         methods: {
@@ -40,12 +51,12 @@
 
     .el-menu-vertical-demo {
       box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+      height: 100%;
     }
 
     .edit-task-content {
       width: 100%;
       margin: 10px 20px;
-      height: 100px;
     }
   }
 
