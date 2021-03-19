@@ -8,7 +8,7 @@
         <div class="video_content">
             <!--http://10.1.71.155/static/video/test.mp4-->
             <!--@/assets/video/test.mp4-->
-            <video class="player" ref="player" :src="videoInfo.url" width="100%" height="100%" preload="auto"
+            <video class="player" ref="player" src="@/assets/video/test.mp4" width="100%" height="100%" preload="auto"
                    @canplaythrough="videoEvent('canplaythrough')"
                    @playing="videoEvent('playing')"
                    @pause="videoEvent('pause')"
@@ -16,7 +16,7 @@
                    @mouseover="videoEvent('mouseover')"
                    @mouseout="videoEvent('mouseout')">
             </video>
-            <video v-show="false" ref="playerPreview" :src="videoInfo.url" width="100%" height="100%"></video>
+            <video v-show="false" ref="playerPreview" src="@/assets/video/test.mp4" width="100%" height="100%"></video>
         </div>
         <div class="video_btn">
             <!--     a-icon：按钮封装       -->

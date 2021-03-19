@@ -31,4 +31,20 @@ const router = new VueRouter({
     routes
 })
 
+
+// router.beforeEach((to, from, next) => {
+//     if (to.path === '/') {//若要跳转的页面时登陆页面
+//         next();//则直接跳转
+//     }
+//     else if (to.path === '/admin') {//若要跳转的页面是个人界面
+//         let token = localStorage.getItem('token');//获取本地存储的token值
+//         if (token === null||token === '') {//若token为空则验证不通过，跳转到登录界面
+//             next('/');
+//         }else {//不为空则验证成功
+//             next();
+//         }
+//     }else {
+//         next();//     }
+// });
+
 export default router
