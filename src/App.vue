@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view/>
+    <keep-alive>
+      <router-view/>
+    </keep-alive>
   </div>
 </template>
 
@@ -9,7 +11,8 @@
     export default {
         name: 'App',
         created() {
-            console.log('%c媒资管理系统对你说：f12进来瞅啥，快出去', "background:black;color:white;border-radius:10px;padding:5px 10px;")
+            console.log('%c这是一条后台的消息：f12进来瞅啥，快出去',
+                "background:black;color:white;border-radius:10px;padding:5px 10px;cursor:default;")
         }
     }
 </script>
@@ -18,5 +21,9 @@
   * {
     margin: 0;
     padding: 0;
+  }
+
+  a {
+    text-decoration: none;
   }
 </style>

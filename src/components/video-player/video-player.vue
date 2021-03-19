@@ -19,22 +19,22 @@
             <video v-show="false" ref="playerPreview" src="@/assets/video/test.mp4" width="100%" height="100%"></video>
         </div>
         <div class="video_btn">
-            <!--     a-icon：按钮封装       -->
-            <a-icon v-show="!ifPlay" class="playerBtn" title="播放(空格)" type="play-circle"
+            <!--     i：按钮封装       -->
+            <i v-show="!ifPlay" class="playerBtn el-icon-video-play" title="播放(空格)" type="play-circle"
                     @click="playerBtnEvent('play')"/>
-            <a-icon v-show="ifPlay" class="playerBtn" title="暂停(空格)" type="pause-circle"
+            <i v-show="ifPlay" class="playerBtn el-icon-video-pause" title="暂停(空格)" type="pause-circle"
                     @click="playerBtnEvent('pause')"/>
-            <a-icon class="playerBtn" title="停止(Enter)" type="undo" @click="playerBtnEvent('stop')"/>
+            <i class="playerBtn el-icon-refresh-left" title="停止(Enter)" type="undo" @click="playerBtnEvent('stop')"/>
             <span class="time" title="时:分:秒:帧" ref="time">00:00:00:00</span>
-            <a-icon class="playerBtn" title="上一帧(方向左)" type="step-backward" @click="playerBtnEvent('back')"/>
-            <a-icon class="playerBtn" title="下一帧(方向右)" type="step-forward" @click="playerBtnEvent('forward')"/>
-            <a-icon class="playerBtn" title="入点" type="login" @click="logEvent('login')"/>
-            <a-icon class="playerBtn" title="出点" type="logout" @click="logEvent('logout')"/>
-            <a-icon class="playerBtn" title="清除入点和出点" type="close" @click="logEvent('logRemove')"/>
-            <a-icon class="playerBtn" title="跳转至入点" type="vertical-align-bottom" @click="logEvent('toLogin')"/>
-            <a-icon class="playerBtn" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
+            <i class="playerBtn el-icon-arrow-left" title="上一帧(方向左)" type="step-backward" @click="playerBtnEvent('back')"/>
+            <i class="playerBtn el-icon-arrow-right" title="下一帧(方向右)" type="step-forward" @click="playerBtnEvent('forward')"/>
+            <i class="playerBtn el-icon-sort-down" title="入点" type="login" @click="logEvent('login')"/>
+            <i class="playerBtn el-icon-sort-up" title="出点" type="logout" @click="logEvent('logout')"/>
+            <i class="playerBtn el-icon-sort" title="清除入点和出点" type="close" @click="logEvent('logRemove')"/>
+            <i class="playerBtn el-icon-caret-bottom" title="跳转至入点" type="vertical-align-bottom" @click="logEvent('toLogin')"/>
+            <i class="playerBtn el-icon-caret-top" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
             <!--     input：调节声音大小       -->
-            <a-icon class="playerBtn" title="音量(上下方向控制音量)" type="customer-service" @click="volumeEvent('volumeClick')"/>
+            <i class="playerBtn el-icon-s-operation" title="音量(上下方向控制音量)" type="customer-service" @click="volumeEvent('volumeClick')"/>
             <input type="range" min="0" max="100" value="100" ref="range"
                    @mousedown="volumeEvent('mouseDown')"
                    @mousemove="volumeEvent('mouseMove')"
@@ -355,6 +355,7 @@
                 line-height: @line-height;
                 padding: 8px;
                 user-select: none;
+                cursor: pointer;
             }
 
             input[type=range] {
