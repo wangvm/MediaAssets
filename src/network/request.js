@@ -2,32 +2,18 @@ import axios from "axios"
 
 let baseUrl = 'http://121.196.100.229:8080'
 
-// export function request(config) {
-//     const instance = axios.create({
-//         baseURL: 'http://121.196.100.229:8080',
-//         timeout: 5000
-//     });
-//
-//     instance.interceptors.request.use(config => {
-//         return config
-//     },err => {
-//
-//     })
-//
-//     return instance(config)
-// }
-
 let instance = axios.create({
     headers: {},
     baseURL: baseUrl,
     crossDomain: true,
     withCredentials: false,
 })
-
+//http request拦截器
 instance.interceptors.request.use(
   config => {
       const token = sessionStorage.getItem('token')
-      if (token) {
+    //debugger
+      if (token) {//判断是否存在token，如果存在则每个http header都加上token
           config.headers.token = token
       }
       return config

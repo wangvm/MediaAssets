@@ -79,7 +79,6 @@
 <script>
 import {setIfLogin, getIfLogin} from "../../config/storage";
 import $api from "@/network/api";
-import {mapMutations} from 'vuex';
 
 export default {
   name: "home",
@@ -94,7 +93,6 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setToken']),
     changeLoginType(type) {
       switch (type) {
         case 'login':
@@ -117,11 +115,13 @@ export default {
         } else {
           $api.login(username, password).then(res => {
             console.log(res)
-            if (res.code == 6) {
+            if (res.code == 200) {
               this.$router.push('/admin')
             }else if(res.code == 2) {
               alert(res.message)
             }else if (res.code == 3) {
+              alert(res.message)
+            }else if (res.code == 6) {
               alert(res.message)
             }
           })
@@ -162,6 +162,11 @@ export default {
         } else {
           $api.register(username, password).then(res => {
             console.log(res)
+            if (res.code == 200) {
+              location.reload()
+            }else if(res.code == 5) {
+              alert(res.message);
+            }
           })
           // console.log(`账号：${username}；密码：${password}；第二次密码：${password1}；`)
           // this.$message.success('注册成功，请登录')
