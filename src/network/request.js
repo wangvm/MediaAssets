@@ -11,7 +11,7 @@ let instance = axios.create({
 //http request拦截器
 instance.interceptors.request.use(
   config => {
-      const token = sessionStorage.getItem('token')
+      const token = sessionStorage.getItem('userToken')
     //debugger
       if (token) {//判断是否存在token，如果存在则每个http header都加上token
           config.headers.token = token

@@ -65,6 +65,7 @@
                         {name: '创建项目', value: '12'},
                         {name: '用户管理', value: '20'},
                         {name: '用户列表', value: '21'},
+                        {name: '创建用户', value: '22'},
                     ]
                 } else {
                     getMenu = [
