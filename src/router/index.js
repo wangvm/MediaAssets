@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import admin from "../views/admin/admin"
 // test
 import Home from "../views/Home"
 

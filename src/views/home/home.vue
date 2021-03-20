@@ -88,25 +88,15 @@
 				username: '',//账号
 				password: '',//密码
 				password1: '',//注册验证密码
-				testUsername: 'admin',//todo 测试账号,有了接口就删
-				testPassword: 'admin',//todo 测试密码,有了接口就删
 			}
 		},
 		methods: {
 			changeLoginType(type) {
-				switch (type) {
-					case 'login':
-						this.loginType = true
-						this.initFormData()
-						break
-					case 'register':
-						this.loginType = false
-						this.initFormData()
-						break
-				}
+				type === 'login' ? this.loginType = true : this.loginType = false
+				this.initFormData()
 			},
 			loginAndRegisterClick() {
-				const {username, password, password1} = this
+				const {username, password} = this
 				if (!username)
 					return this.$message.error('账号不能为空')
 				if (!password)
@@ -116,7 +106,6 @@
 			async login() {
 				const {username, password} = this
 				let resLogin = await $api.login(username, password)
-				console.log(resLogin)
 				resLogin.code === 200 ? this.$message.success(resLogin.message) : this.$message.error(resLogin.message)
 				if (resLogin.code === 200) {
 					let token = resLogin.data
@@ -131,15 +120,12 @@
 				if (password !== password1)
 					return this.$message.error('两次密码不一致')
 				let resRegister = await $api.register(username, password)
-				console.log(resRegister)
 				this.$message.info(resRegister.message)
 				resRegister.code === 200 && this.changeLoginType('login')
 				this.initFormData()
 			},
 			initFormData() {
-				this.username = ''
-				this.password = ''
-				this.password1 = ''
+				this.username = this.password = this.password1 = ''
 			}
 		}
 	}
