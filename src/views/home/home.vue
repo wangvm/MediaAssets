@@ -91,18 +91,22 @@
 			}
 		},
 		methods: {
+			// 登录注册切换
 			changeLoginType(type) {
 				type === 'login' ? this.loginType = true : this.loginType = false
 				this.initFormData()
 			},
+			// 登录注册-前端验证
 			loginAndRegisterClick() {
 				const {username, password} = this
+        // todo 此处还能再优化下
 				if (!username)
 					return this.$message.error('账号不能为空')
 				if (!password)
 					return this.$message.error('密码不能为空')
 				this.loginType ? this.login() : this.register()
 			},
+			// 登录
 			async login() {
 				const {username, password} = this
 				let resLogin = await $api.login(username, password)
@@ -115,6 +119,7 @@
 				}
 				this.initFormData()
 			},
+			// 注册
 			async register() {
 				const {username, password, password1} = this
 				if (password !== password1)
@@ -124,6 +129,7 @@
 				resRegister.code === 200 && this.changeLoginType('login')
 				this.initFormData()
 			},
+			// 初始化input值
 			initFormData() {
 				this.username = this.password = this.password1 = ''
 			}
