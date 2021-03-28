@@ -20,7 +20,7 @@
 <script>
     import adminAside from "../../components/admin-aside"
     import adminHeader from "../../components/admin-header"
-    import {getCurrentMenu, getLoginType, setCurrentMenu} from "../../config/storage"
+    import {getCurrentMenu, getLoginType, getUserToken, setCurrentMenu} from "../../config/storage"
     import menuConfig from "../../config/menu-config"
 
     export default {
@@ -40,24 +40,25 @@
             }
         },
         created() {
-            this.initLoginType()
+            this.initUserToken()
             this.getMenuList()
         },
         methods: {
-            initLoginType() {
-                let loginType = getLoginType()
-                if (!loginType) {
+            initUserToken() {
+                let userToken = getUserToken()
+                if (!userToken) {
                     this.$message.error('登录超时，请重新登录')
                     this.$router.push('/')
                 } else {
-                    this.$store.commit('updateLoginType', getLoginType())
+                    this.$store.commit('updateUserToken', getUserToken())
                 }
             },
             getMenuList() {
                 // todo 测试：模拟动态获取菜单
                 let loginType = this.$store.state.loginType
                 let getMenu = []
-                if (loginType === 'admin') {
+              //rol值为admin:0;user:1编目;user:2创建；user:3审核
+                if (loginType === 0) {
                     getMenu = [
                         {name: '主页', value: '00'},
                         {name: '项目管理', value: '10'},
@@ -122,3 +123,4 @@
     }
   }
 </style>
+}

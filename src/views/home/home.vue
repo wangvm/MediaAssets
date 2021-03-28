@@ -93,12 +93,21 @@
 		methods: {
 			// 登录注册切换
 			changeLoginType(type) {
-				type === 'login' ? this.loginType = true : this.loginType = false
-				this.initFormData()
+				switch (type) {
+					case 'login':
+						this.loginType = true
+						this.initFormData()
+						break
+					case 'register':
+						this.loginType = false
+						this.initFormData()
+						break
+				}
 			},
 			// 登录注册-前端验证
 			loginAndRegisterClick() {
-				const {username, password} = this
+        this.$router.push('/admin')
+				const {username, password, password1} = this
         // todo 此处还能再优化下
 				if (!username)
 					return this.$message.error('账号不能为空')
@@ -110,10 +119,12 @@
 			async login() {
 				const {username, password} = this
 				let resLogin = await $api.login(username, password)
-				resLogin.code === 200 ? this.$message.success(resLogin.message) : this.$message.error(resLogin.message)
+				console.log(resLogin)
 				if (resLogin.code === 200) {
 					let token = resLogin.data
 					setUserToken(token)
+          let loginType = 0
+          setLoginType(loginType)
 					this.$store.commit('setToken', getUserToken())
 					this.$router.push('/admin')
 				}
@@ -125,13 +136,16 @@
 				if (password !== password1)
 					return this.$message.error('两次密码不一致')
 				let resRegister = await $api.register(username, password)
+				console.log(resRegister)
 				this.$message.info(resRegister.message)
 				resRegister.code === 200 && this.changeLoginType('login')
 				this.initFormData()
 			},
 			// 初始化input值
 			initFormData() {
-				this.username = this.password = this.password1 = ''
+				this.username = ''
+				this.password = ''
+				this.password1 = ''
 			}
 		}
 	}

@@ -2,8 +2,8 @@ const LOGIN_TYPE = 'loginType'
 const CURRENT_MENU = 'currentMenu'
 
 // 判断登录状态
-export function setLoginType(bool) {
-	localStorage.setItem(LOGIN_TYPE, bool)
+export function setLoginType(loginType) {
+	localStorage.setItem(LOGIN_TYPE, loginType)
 }
 
 export function getLoginType() {
