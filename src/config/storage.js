@@ -1,5 +1,6 @@
 const LOGIN_TYPE = 'loginType'
 const CURRENT_MENU = 'currentMenu'
+const USER_TOKEN = 'userToken'
 
 // 判断登录状态
 export function setLoginType(loginType) {
@@ -29,13 +30,13 @@ export function removeCurrentMenu() {
 
 //保存token
 export function setUserToken(token) {
-	localStorage.setItem('userToken', token)
+	localStorage.setItem(USER_TOKEN, token)
 }
 
 export function getUserToken() {
-	return localStorage.getItem('userToken')
+	return localStorage.getItem(USER_TOKEN)
 }
 
 export function removeUserToken() {
-	localStorage.removeItem('userToken')
+	localStorage.removeItem(USER_TOKEN)
 }

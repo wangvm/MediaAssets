@@ -77,7 +77,7 @@
 </template>
 
 <script>
-	import {setUserToken, getUserToken} from "../../config/storage"
+	import {setUserToken, getUserToken, setLoginType, getLoginType} from "../../config/storage"
 	import $api from "../../network/api"
 
 	export default {
@@ -106,9 +106,8 @@
 			},
 			// 登录注册-前端验证
 			loginAndRegisterClick() {
-        this.$router.push('/admin')
-				const {username, password, password1} = this
-        // todo 此处还能再优化下
+				const {username, password} = this
+				// todo 此处还能再优化下
 				if (!username)
 					return this.$message.error('账号不能为空')
 				if (!password)
@@ -119,12 +118,12 @@
 			async login() {
 				const {username, password} = this
 				let resLogin = await $api.login(username, password)
-				console.log(resLogin)
 				if (resLogin.code === 200) {
-					let token = resLogin.data
+					let token = resLogin.data.token
+					let loginType = 0
 					setUserToken(token)
-          let loginType = 0
-          setLoginType(loginType)
+					setLoginType(loginType)
+          this.$store.commit('updateLoginType',getLoginType())
 					this.$store.commit('setToken', getUserToken())
 					this.$router.push('/admin')
 				}
@@ -136,8 +135,6 @@
 				if (password !== password1)
 					return this.$message.error('两次密码不一致')
 				let resRegister = await $api.register(username, password)
-				console.log(resRegister)
-				this.$message.info(resRegister.message)
 				resRegister.code === 200 && this.changeLoginType('login')
 				this.initFormData()
 			},

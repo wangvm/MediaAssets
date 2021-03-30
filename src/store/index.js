@@ -7,7 +7,7 @@ export default new Vuex.Store({
 	state: {
 		loginType: '',
 		currentMenu: '',
-		token: localStorage.getItem('token') || ''
+		token: ''
 	},
 	mutations: {
 		updateLoginType(state, pre) {
@@ -16,7 +16,7 @@ export default new Vuex.Store({
 		updateCurrentMenu(state, pre) {
 			state.currentMenu = pre
 		},
-		setToken(state, token) { 
+		setToken(state, token) {
 			state.token = token
 		},
 		delToken(state) {

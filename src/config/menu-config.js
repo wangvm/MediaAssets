@@ -36,7 +36,7 @@ const menuConfig = {
     '22': {
         name: '创建用户',
         value: '22',
-        index: '/admin/userList'
+        index: '/admin/userCreate'
     }
 }
 export default menuConfig
