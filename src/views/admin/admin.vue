@@ -59,7 +59,7 @@
 				// todo 测试：模拟动态获取菜单
 				let loginType = this.$store.state.loginType
 				let getMenu = []
-				//rol值为admin:0;user:1编目;user:2创建；user:3审核
+				//rol值为admin:0;user:1创建；user:2编目; user:3审核
 				if (loginType === '0') {
 					getMenu = [
 						{name: '主页', value: '00'},
