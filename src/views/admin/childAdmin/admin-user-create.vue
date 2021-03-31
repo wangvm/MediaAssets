@@ -45,9 +45,7 @@ export default {
   name: "admin-user-create",
   data() {
     return {
-      createList: [
-        {username: '', password: '', role: ''},
-      ],
+      createList: [],
       selectOptions: [{
         value: '1',
         label: '创建任务'
@@ -61,44 +59,59 @@ export default {
     }
   },
   created() {
+    this.initUserList()
   },
   methods: {
+    // 初始化创建列表
+    initUserList() {
+      this.createList = [
+        {username: '', password: '', role: ''},
+      ]
+    },
+    // 增加创建用户 +号按钮
     addItem() {
       this.createList.push(
         {username: '', password: '', role: ''}
       )
     },
+    // 创建用户按钮
     createUser() {
       let repeatIndex = this.repeatItem(this.createList)
-      if (repeatIndex[0] !== repeatIndex[1]) return this.$message.error(`用户${repeatIndex[0] * 1 + 1}与用户${repeatIndex[1] * 1 + 1}账号重复`)
+      if (repeatIndex[0] !== repeatIndex[1]) return this.$message.error(`用户${repeatIndex[0] + 1}与用户${repeatIndex[1] + 1}账号重复`)
       let emptyPasswordIndex = this.emptyPassword(this.createList)
       if (emptyPasswordIndex !== -1) return this.$message.error(`用户${emptyPasswordIndex * 1 + 1}密码为空`)
-      let resList = this.filterItem(this.createList)
-      //todo
-      // 深拷贝一次，删除不必要的隐士函数
-      console.log('创建用户数据',resList)
+      let resList = this.filterItem(this.createList).map(val => {
+        return {username: val.username, password: val.password, role: val.role}
+      })
+      console.log(resList)
+      // 创建成功/失败
+      let code = 200
+      code === 200 && this.initUserList()
     },
+    // 判断用户名是否重复
     repeatItem(list) {
       let usernameList = []
       let repeatIndex = [-1, -1]
       Object.keys(list).forEach(val => {
         if (list[val].username === '') return
         let index = usernameList.findIndex(name => name === list[val].username)
-        index === -1 ? usernameList.push(list[val].username)
-          : repeatIndex = [index.toString(), val]
+        index === -1 ?
+          usernameList.push(list[val].username)
+          : repeatIndex = [index, parseInt(val)]
       })
       return repeatIndex
     },
+    // 过滤用户名为空的信息
     filterItem(list) {
-      let res = list.filter(val => val.username !== '')
-      return res
+      return list.filter(val => val.username !== '')
     },
+    // 判断密码是否为空
     emptyPassword(list) {
       let emptyList = []
       Object.keys(list).forEach(val => {
-        list[val].username !== '' && list[val].password === '' && emptyList.push(val)
+        list[val].username !== '' && list[val].password === '' && emptyList.push(parseInt(val))
       })
-      return emptyList[0] || -1
+      return emptyList.length===0 ? -1 : emptyList[0]
     }
   }
 }
@@ -120,7 +133,7 @@ export default {
       margin: 0 10px;
     }
 
-    .item-select{
+    .item-select {
       width: 600px;
     }
   }

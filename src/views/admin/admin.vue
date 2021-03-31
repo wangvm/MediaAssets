@@ -110,6 +110,7 @@
 <style scoped lang="less">
   .admin {
     height: 100vh;
+    position: relative;
 
     .admin-aside {
     }

@@ -1,7 +1,9 @@
 import axios from "axios"
 import {Message} from 'element-ui'
+import {getUserToken} from "../config/storage"
 
 let baseUrl = 'http://121.196.100.229:8080'
+
 
 let instance = axios.create({
   headers: {},
@@ -12,7 +14,7 @@ let instance = axios.create({
 //http request拦截器
 instance.interceptors.request.use(
   config => {
-    const token = sessionStorage.getItem('userToken')
+    const token = getUserToken()
     //debugger
     if (token) {//判断是否存在token，如果存在则每个http header都加上token
       config.headers.token = token

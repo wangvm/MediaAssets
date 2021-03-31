@@ -2,8 +2,7 @@
   <div id="admin-user-list">
     <div class="top">
       <div class="top_add_btn">
-        <el-button type="primary">添加用户</el-button>
-        <el-button type="danger" @click="deleteSelect()">删除用户</el-button>
+        <el-button size="mini" type="danger" @click="deleteSelect()">删除用户</el-button>
       </div>
       <div class="top_find">
         <el-input
@@ -11,59 +10,98 @@
           v-model="input">
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
+        <el-button type="mini" @click="addUser">添加用户</el-button>
       </div>
     </div>
     <div class="content">
       <div class="content_table">
         <el-table
           ref="multipleTable"
-          :data="tableData"
+          :data="userList"
           tooltip-effect="dark"
           style="width: 100%"
           height="100%"
-          :default-sort = "{prop: 'num', order: 'ascending'}"
+          :default-sort="{prop: 'index', order: 'ascending'}"
           @selection-change="handleSelectionChange">
           <el-table-column
             type="selection"
             width="80">
           </el-table-column>
           <el-table-column
-            prop="num"
+            prop="index"
             label="序号"
             sortable
             width="150">
           </el-table-column>
           <el-table-column
-            prop="name"
+            prop="username"
             label="账号"
             width="200">
-            <el-input
-              placeholder="请输入内容"
-              v-model="inputName"
-              v-show="edit == true"
-              clearable>
-            </el-input>
-            <span v-show="edit == false">{{tableData.name}}</span>
           </el-table-column>
           <el-table-column
             prop="password"
             label="密码"
             width="250">
+            <template slot-scope="scope">
+              <span v-if="!scope.row.edit">******</span>
+              <span v-else>
+                <el-input :placeholder="scope.row.password"
+                          v-model="scope.row.edit_password"
+                          show-password>
+                </el-input>
+              </span>
+            </template>
           </el-table-column>
           <el-table-column
             prop="power"
             label="权限"
             width="200">
+            <template slot-scope="scope">
+              <span v-if="!scope.row.edit">
+                {{
+                  scope.row.power === '1' ? '创建任务' :
+                    scope.row.power === '2' ? '编目' :
+                      '审核'
+                }}
+              </span>
+              <span v-else>
+                <el-select v-model="scope.row.power" clearable placeholder="请选择">
+                  <el-option
+                    v-for="item in options"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </span>
+            </template>
           </el-table-column>
           <el-table-column label="操作" width="200">
             <template slot-scope="scope">
               <el-button
                 size="small"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                type="text"
+                v-if="!scope.row.edit"
+                @click="handleEdit(scope.row)">编辑
+              </el-button>
               <el-button
                 size="small"
-                type="danger"
-                @click.native.prevent="deleteRow(scope.$index, tableData)">删除</el-button>
+                type="text"
+                v-if="!scope.row.edit"
+                @click.native.prevent="deleteRow(scope.$index, userList)">删除
+              </el-button>
+              <el-button
+                size="small"
+                type="text"
+                v-if="scope.row.edit"
+                @click="deterMine(scope.$index, scope.row)">确定
+              </el-button>
+              <el-button
+                size="small"
+                type="text"
+                v-if="scope.row.edit"
+                @click="cancelClick(scope.$index, scope.row)">取消
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -88,48 +126,93 @@ export default {
   name: "adminUserList",
   data() {
     return {
-      currentPage: 4,
+      currentPage: 1,
       input: '',
-      edit: false,
+      edit: '',
       inputName: '',
 
-      tableData: [
-        {num: 1,name: '王小虎',password: '******', power: '创建任务'},
-        {num: 2,name: '王小虎',password: '******', power: '创建任务'},
-        {num: 3,name: '王小虎',password: '******', power: '创建任务'},
-        {num: 4,name: '王小虎',password: '******', power: '编目'},
-        {num: 5,name: '王小虎',password: '******', power: '审核'},
-        {num: 6,name: '王小虎',password: '******', power: '审核'},
-        {num: 7,name: '王小虎',password: '******', power: '编目'},
-        {num: 8,name: '王小虎',password: '******', power: '创建任务'},
-        {num: 9,name: '王小虎',password: '******', power: '编目'},
-        {num: 10,name: '王小虎',password: '******', power: '编目'},
-        {num: 11,name: '王小虎',password: '******', power: '创建任务'},
-        {num: 12,name: '王小虎',password: '******', power: '创建任务'},
-        {num: 13,name: '王小虎',password: '******', power: '创建任务'},
-      ],
-      multipleSelection: []
+      userList: [],
+      multipleSelection: [],
+      options: [{
+        value: '1',
+        label: '创建任务'
+      }, {
+        value: '2',
+        label: '编目'
+      }, {
+        value: '3',
+        label: '审核'
+      }],
     };
   },
+  created() {
+    this.getUserList()
+  },
   methods: {
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
+    getUserList() {//获取到信息
+      let userList = [
+        {username: '王小虎', password: '123456', power: '1'},
+        {username: '王小虎', password: '234567', power: '1'},
+        {username: '王小虎', password: '345678', power: '1'},
+        {username: '王小虎', password: '456789', power: '1'},
+        {username: '王小虎', password: '123456', power: '2'},
+        {username: '王小虎', password: '234567', power: '2'},
+        {username: '王小虎', password: '345678', power: '2'},
+        {username: '王小虎', password: '456789', power: '2'},
+        {username: '王小虎', password: '123425', power: '3'},
+        {username: '王小虎', password: '345267', power: '3'},
+        {username: '王小虎', password: '345267', power: '3'},
+        {username: '王小虎', password: '234156', power: '3'},
+        {username: '王小虎', password: '546745', power: '3'},
+      ]
+      this.addAttr(userList)
     },
-    handleCurrentChange(val) {
+    addAttr(list) {//添加信息项
+      let resUserList = []
+      list.map((val, index) => {
+        val['edit'] = false
+        val['index'] = index + 1
+        val['edit_password'] = ''
+        val['edit_power'] = ''
+        resUserList.push(val)
+      })
+      this.userList = resUserList
+    },
+    handleSizeChange(val) {//每页显示多少条
+      console.log(`每页 ${val} 条`);
+
+    },
+    handleCurrentChange(val) {//切换到第几页
       console.log(`当前页: ${val}`);
     },
 
-    handleSelectionChange(val) {
+
+    handleSelectionChange(val) {//多选任务
       this.multipleSelection = val;
     },
-    handleEdit(index, row) {
-      console.log(index, row);
+    handleEdit(row) {//编辑任务
+      row.edit = true
     },
-    deleteRow(index, rows) {
+    deleteRow(index, rows) {//删除任务
       rows.splice(index, 1);
     },
-    deleteSelect(index, rows) {
-      orws.splice(index, this.multipleSelection)
+    deterMine(index, row) {//确认修改任务
+      row.edit_password !== '' ?
+        row.password = row.edit_password
+        : row.edit_password = row.password
+      row.edit = false
+    },
+    cancelClick(index, row) {//取消修改任务
+      row.edit_password = row.password
+      row.edit = false
+    },
+    addUser() {//添加用户
+      this.userList.push(
+        {username: '', password: '', power: '', edit: 'true', edit_password: '', edit_power: ''}
+      )
+    },
+    deleteSelect(index, rows) {//删除多选的任务
+      rows.splice(this.multipleSelection, index)
     }
   },
 }
@@ -146,9 +229,11 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     .top_add_btn {
       margin-left: 1%;
     }
+
     .top_find {
       margin-right: 5%;
     }
