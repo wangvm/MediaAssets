@@ -134,7 +134,7 @@
 				const {username, password, password1} = this
 				if (password !== password1)
 					return this.$message.error('两次密码不一致')
-				let resRegister = await $api.register(username, password)
+        let resRegister = await $api.register([{username, password}])
 				resRegister.code === 200 && this.changeLoginType('login')
 				this.initFormData()
 			},

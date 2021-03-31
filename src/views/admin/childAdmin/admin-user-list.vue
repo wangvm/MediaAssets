@@ -1,35 +1,29 @@
 <template>
   <el-card class="admin-user-list">
     <div class="top">
-      <div class="top_add_btn">
-        <el-button size="mini" type="danger" @click="deleteSelect()">删除用户</el-button>
+      <div class="top_title">
+        <span>用户列表</span>
       </div>
       <div class="top_find">
         <el-input
+          size="medium"
           placeholder="请输入搜索内容"
           v-model="input">
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
-        <el-button type="mini" @click="addUser">添加用户</el-button>
+        <el-button type="mini">搜索</el-button>
       </div>
     </div>
     <div class="content">
       <div class="content_table">
         <el-table
-          ref="multipleTable"
-          :data="userList"
+          :data="showList"
           tooltip-effect="dark"
           style="width: 100%"
-          height="100%"
-          :default-sort="{prop: 'index', order: 'ascending'}"
-          @selection-change="handleSelectionChange">
-          <el-table-column
-            type="selection">
-          </el-table-column>
+          v-loading="loading">
           <el-table-column
             prop="index"
-            label="序号"
-            sortable>
+            label="序号">
           </el-table-column>
           <el-table-column
             prop="username"
@@ -49,18 +43,18 @@
             </template>
           </el-table-column>
           <el-table-column
-            prop="power"
+            prop="role"
             label="权限">
             <template slot-scope="scope">
               <span v-if="!scope.row.edit">
                 {{
-                  scope.row.power === '1' ? '创建任务' :
-                    scope.row.power === '2' ? '编目' :
-                      '审核'
+                  scope.row.role === '1' ? '创建任务' :
+                    scope.row.role === '2' ? '编目' :
+                      scope.row.role ==='0' ? '审核': '未设置'
                 }}
               </span>
               <span v-else>
-                <el-select v-model="scope.row.power" clearable placeholder="请选择">
+                <el-select v-model="scope.row.role" clearable placeholder="请选择">
                   <el-option
                     v-for="item in options"
                     :key="item.value"
@@ -77,13 +71,13 @@
                 size="small"
                 type="text"
                 v-if="!scope.row.edit"
-                @click="handleEdit(scope.row)">编辑
+                @click="EditUser(scope.row)">编辑
               </el-button>
               <el-button
                 size="small"
                 type="text"
                 v-if="!scope.row.edit"
-                @click.native.prevent="deleteRow(scope.row)">删除
+                @click.native.prevent="deleteUser(scope.row)">删除
               </el-button>
               <el-button
                 size="small"
@@ -107,10 +101,10 @@
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[10, 20, 30, 40]"
-        :page-size="10"
+        :page-sizes="pageSizes"
+        :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400">
+        :total="6">
       </el-pagination>
     </div>
   </el-card>
@@ -123,13 +117,17 @@ export default {
   name: "adminUserList",
   data() {
     return {
-      currentPage: 1,
-      input: '',
-      edit: '',
-      inputName: '',
+      currentPage: 1,//默认显示第几页
+      input: '',//搜索康输入的值
+      edit: '',//是否点击编辑，Boolean
+      pageSize: 2,//默认每页显示多少条
+      pageSizes: [2, 3, 4, 6],//每页显示多少条有哪些选项
+      loading: false,//表格loading
 
-      userList: [],
-      multipleSelection: [],
+      userList: [],//从api.js中获取到的数组
+      showList: [],//每页显示的数组
+      //权限选项
+      value: '',
       options: [{
         value: '1',
         label: '创建任务'
@@ -143,78 +141,73 @@ export default {
     };
   },
   created() {
-    this.getUserList()
+    this.getUserList()//初始化数组信息
   },
   methods: {
-    async getUserList() {//获取到信息
-      let res =  await $api.getUserList()
+    //获取到信息
+    async getUserList() {
+      this.loading = true//开始缓冲
+      let res = await $api.getUserList()
       let userList = res.data
-      // let userList = [
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
-      // ]
       this.addAttr(userList)
+      this.handleSizeChange(this.pageSize)
     },
-    addAttr(list) {//添加信息项
+    //添加(属性)信息项
+    addAttr(list) {
       let resUserList = []
       list.map((val, index) => {
         val['edit'] = false
         val['index'] = index + 1
         val['edit_password'] = ''
-        val['edit_power'] = ''
+        val['edit_role'] = ''
         resUserList.push(val)
       })
-      console.log(resUserList)
       this.userList = resUserList
+      this.loading = false//结束缓冲
     },
-    handleSizeChange(val) {//每页显示多少条
-      console.log(`每页 ${val} 条`);
-
+    //每页显示多少条
+    handleSizeChange(val) {
+      let show = []
+      //判断请求到的数组长度是否小于等于每页显示的数组条数：是->显示的数组=请求道的数组；否->显示的数组=请求的数组slice（第几页-1， 显示多少组）
+      this.userList.length <= val ? show = this.userList : show = this.userList.slice(this.currentPage - 1, val)
+      this.pageSize = val//此时需更新每页显示多少条
+      this.showList = show
     },
-    handleCurrentChange(val) {//切换到第几页
+    //切换到第几页
+    handleCurrentChange(val) {
+      let pageList = []
+      let num = Math.ceil(this.userList.length / this.pageSize)//向上取整（取请求数组长度/每页显示的条数）= 第几页
+      if(val === num) {//若页数=最后一页
+        if (this.userList.length % this.pageSize !== 0) {//若最后一页不满，则显示剩余条数
+          pageList = this.userList.slice((val - 1) * this.pageSize, this.userList.length - (val - 1) * this.pageSize)
+        }
+      }
+      pageList = this.userList.slice((val - 1) * this.pageSize, val * this.pageSize)
+      this.showList = pageList
       console.log(`当前页: ${val}`);
     },
-
-
-    handleSelectionChange(val) {//多选任务
-      this.multipleSelection = val;
-    },
-    handleEdit(row) {//编辑任务
+    //编辑任务
+    EditUser(row) {
       row.edit = true
     },
-    async deleteRow(currentUser) {//删除任务
+    //删除任务
+    async deleteUser(currentUser) {
       let uid = currentUser.uid
-      let resDeleteUser =await $api.deleteUser(uid)
+      let resDeleteUser = await $api.deleteUser(uid)
       console.log(resDeleteUser)
     },
-    deterMine(index, row) {//确认修改任务
+    //确认修改任务
+    deterMine(index, row) {
       row.edit_password !== '' ?
         row.password = row.edit_password
         : row.edit_password = row.password
       row.edit = false
     },
-    cancelClick(index, row) {//取消修改任务
+    //取消修改任务
+    cancelClick(index, row) {
       row.edit_password = row.password
       row.edit = false
     },
-    addUser() {//添加用户
-      this.userList.push(
-        {username: '', password: '', power: '', edit: 'true', edit_password: '', edit_power: ''}
-      )
-    },
-    deleteSelect(index, rows) {//删除多选的任务
-      rows.splice(this.multipleSelection, index)
-    }
   },
 }
 </script>
@@ -222,35 +215,30 @@ export default {
 <style scoped lang="less">
 .admin-user-list {
   width: 100%;
-  //height: 86vh;
 
   .top {
     width: 100%;
-    //height: 10%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid rgb(235, 235, 235);
 
-    .top_add_btn {
+    .top_title {
       margin-left: 1%;
     }
 
     .top_find {
       margin-right: 5%;
+      display: flex;
     }
   }
 
   .content {
     width: 100%;
-    //height: 80%;
-    //overflow: hidden;
-    //overflow-y: scroll;
-    //background-color: cadetblue;
   }
 
   .bottom {
     width: 100%;
-    //height: 10%;
     display: flex;
     justify-content: center;
     align-items: center;

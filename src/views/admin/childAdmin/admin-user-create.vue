@@ -5,7 +5,7 @@
       <el-button style="float: right; padding: 3px 0" type="text" @click="createUser">创建用户</el-button>
     </div>
     <template v-for="(item,index) in createList">
-      <el-divider content-position="center"><p class='item-title'>用户{{index+1}}</p></el-divider>
+      <el-divider content-position="center"><p class='item-title'>用户{{ index + 1 }}</p></el-divider>
       <div class="create-item">
         <el-input class='item-input'
                   v-model="item.username"
@@ -41,6 +41,8 @@
 </template>
 
 <script>
+import $api from "../../../network/api"
+
 export default {
   name: "admin-user-create",
   data() {
@@ -84,6 +86,7 @@ export default {
         return {username: val.username, password: val.password, role: val.role}
       })
       console.log(resList)
+      // todo 列表注册待调通
       // 创建成功/失败
       let code = 200
       code === 200 && this.initUserList()
@@ -111,7 +114,7 @@ export default {
       Object.keys(list).forEach(val => {
         list[val].username !== '' && list[val].password === '' && emptyList.push(parseInt(val))
       })
-      return emptyList.length===0 ? -1 : emptyList[0]
+      return emptyList.length === 0 ? -1 : emptyList[0]
     }
   }
 }
