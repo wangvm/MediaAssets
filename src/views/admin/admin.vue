@@ -121,6 +121,9 @@
       box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
       padding: 0;
       min-width: 1000px;
+
+      position: relative;
+      z-index: 9;
     }
 
     .admin-main {

@@ -1,5 +1,5 @@
 <template>
-  <div id="admin-user-list">
+  <el-card class="admin-user-list">
     <div class="top">
       <div class="top_add_btn">
         <el-button size="mini" type="danger" @click="deleteSelect()">删除用户</el-button>
@@ -24,24 +24,20 @@
           :default-sort="{prop: 'index', order: 'ascending'}"
           @selection-change="handleSelectionChange">
           <el-table-column
-            type="selection"
-            width="80">
+            type="selection">
           </el-table-column>
           <el-table-column
             prop="index"
             label="序号"
-            sortable
-            width="150">
+            sortable>
           </el-table-column>
           <el-table-column
             prop="username"
-            label="账号"
-            width="200">
+            label="账号">
           </el-table-column>
           <el-table-column
             prop="password"
-            label="密码"
-            width="250">
+            label="密码">
             <template slot-scope="scope">
               <span v-if="!scope.row.edit">******</span>
               <span v-else>
@@ -54,8 +50,7 @@
           </el-table-column>
           <el-table-column
             prop="power"
-            label="权限"
-            width="200">
+            label="权限">
             <template slot-scope="scope">
               <span v-if="!scope.row.edit">
                 {{
@@ -76,7 +71,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="200">
+          <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button
                 size="small"
@@ -88,7 +83,7 @@
                 size="small"
                 type="text"
                 v-if="!scope.row.edit"
-                @click.native.prevent="deleteRow(scope.$index, userList)">删除
+                @click.native.prevent="deleteRow(scope.row)">删除
               </el-button>
               <el-button
                 size="small"
@@ -118,10 +113,12 @@
         :total="400">
       </el-pagination>
     </div>
-  </div>
+  </el-card>
 </template>
 
 <script>
+import $api from "@/network/api";
+
 export default {
   name: "adminUserList",
   data() {
@@ -149,22 +146,23 @@ export default {
     this.getUserList()
   },
   methods: {
-    getUserList() {//获取到信息
-      let userList = [
-        {username: '王小虎', password: '123456', power: '1'},
-        {username: '王小虎', password: '234567', power: '1'},
-        {username: '王小虎', password: '345678', power: '1'},
-        {username: '王小虎', password: '456789', power: '1'},
-        {username: '王小虎', password: '123456', power: '2'},
-        {username: '王小虎', password: '234567', power: '2'},
-        {username: '王小虎', password: '345678', power: '2'},
-        {username: '王小虎', password: '456789', power: '2'},
-        {username: '王小虎', password: '123425', power: '3'},
-        {username: '王小虎', password: '345267', power: '3'},
-        {username: '王小虎', password: '345267', power: '3'},
-        {username: '王小虎', password: '234156', power: '3'},
-        {username: '王小虎', password: '546745', power: '3'},
-      ]
+    async getUserList() {//获取到信息
+      let res =  await $api.getUserList()
+      let userList = res.data
+      // let userList = [
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      //   {uid: 'dafasdfasdfasdf', username: '王小虎', password: '123456', power: '1'},
+      // ]
       this.addAttr(userList)
     },
     addAttr(list) {//添加信息项
@@ -176,6 +174,7 @@ export default {
         val['edit_power'] = ''
         resUserList.push(val)
       })
+      console.log(resUserList)
       this.userList = resUserList
     },
     handleSizeChange(val) {//每页显示多少条
@@ -193,8 +192,10 @@ export default {
     handleEdit(row) {//编辑任务
       row.edit = true
     },
-    deleteRow(index, rows) {//删除任务
-      rows.splice(index, 1);
+    async deleteRow(currentUser) {//删除任务
+      let uid = currentUser.uid
+      let resDeleteUser =await $api.deleteUser(uid)
+      console.log(resDeleteUser)
     },
     deterMine(index, row) {//确认修改任务
       row.edit_password !== '' ?
@@ -219,13 +220,13 @@ export default {
 </script>
 
 <style scoped lang="less">
-#admin-user-list {
+.admin-user-list {
   width: 100%;
-  height: 86vh;
+  //height: 86vh;
 
   .top {
     width: 100%;
-    height: 10%;
+    //height: 10%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -241,15 +242,15 @@ export default {
 
   .content {
     width: 100%;
-    height: 80%;
-    overflow: hidden;
-    overflow-y: scroll;
-    background-color: cadetblue;
+    //height: 80%;
+    //overflow: hidden;
+    //overflow-y: scroll;
+    //background-color: cadetblue;
   }
 
   .bottom {
     width: 100%;
-    height: 10%;
+    //height: 10%;
     display: flex;
     justify-content: center;
     align-items: center;
