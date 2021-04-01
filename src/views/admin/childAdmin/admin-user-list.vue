@@ -8,10 +8,12 @@
         <el-input
           size="medium"
           placeholder="请输入搜索内容"
-          v-model="input">
+          v-model="input"
+          @keydown.enter.native="searchClick"
+        >
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
-        <el-button type="mini">搜索</el-button>
+        <el-button type="mini" @click="searchClick">搜索</el-button>
       </div>
     </div>
     <div class="content">
@@ -127,7 +129,6 @@ export default {
       userList: [],//从api.js中获取到的数组
       showList: [],//每页显示的数组
       //权限选项
-      value: '',
       options: [{
         value: '1',
         label: '创建任务'
@@ -163,6 +164,7 @@ export default {
         resUserList.push(val)
       })
       this.userList = resUserList
+      console.log(this.userList)
       this.loading = false//结束缓冲
     },
     //每页显示多少条
@@ -184,7 +186,6 @@ export default {
       }
       pageList = this.userList.slice((val - 1) * this.pageSize, val * this.pageSize)
       this.showList = pageList
-      console.log(`当前页: ${val}`);
     },
     //编辑任务
     EditUser(row) {
@@ -208,6 +209,25 @@ export default {
       row.edit_password = row.password
       row.edit = false
     },
+    //点击搜索
+    async searchClick() {
+      let searchList = []
+      let search = []
+      let res = await $api.getUserByName(this.input)//将通过用户行搜索到的对应的对象拿到
+      if (res.code === 200) {//判断返回是否成功：200->请求成功；3->用户不存在
+        searchList.push(res.data)//先将对象放进数组中
+        searchList.map((val, index) => {//在对数组里进行补充，这样就可以进行编辑
+          val['index'] = index+1
+          val['edit'] = false
+          val['edit_password'] = ''
+          val['edit_role'] = ''
+          search.push(val)
+        })
+      }else {
+        searchList = []//若不成功则数组为空，用户可点击分页序号返回默认显示列表
+      }
+      this.showList = searchList//这时显示搜索的数组
+    }
   },
 }
 </script>
