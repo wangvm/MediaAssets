@@ -7,8 +7,10 @@
       <div class="top_find">
         <el-input
           size="medium"
-          placeholder="请输入搜索内容"
-          v-model="input">
+          placeholder="请输入搜索用户的账号"
+          v-model="input"
+          @keydown.enter.native="searchClick"
+        >
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
         <el-button type="mini">搜索</el-button>
@@ -30,6 +32,13 @@
             label="账号">
           </el-table-column>
           <el-table-column
+            prop="createTime"
+            label="账号">
+            <template slot-scope="scope">
+              {{changeDate(scope.row.createTime)}}
+            </template>
+          </el-table-column>
+          <el-table-column
             prop="password"
             label="密码">
             <template slot-scope="scope">
@@ -48,9 +57,9 @@
             <template slot-scope="scope">
               <span v-if="!scope.row.edit">
                 {{
-                  scope.row.role === '1' ? '创建任务' :
-                    scope.row.role === '2' ? '编目' :
-                      scope.row.role ==='0' ? '审核': '未设置'
+                  scope.row.role == '1' ? '创建任务' :
+                    scope.row.role == '2' ? '编目' :
+                      scope.row.role =='3' ? '审核': '未设置'
                 }}
               </span>
               <span v-else>
@@ -104,7 +113,7 @@
         :page-sizes="pageSizes"
         :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="6">
+        :total="userList.length">
       </el-pagination>
     </div>
   </el-card>
@@ -149,6 +158,7 @@ export default {
       this.loading = true//开始缓冲
       let res = await $api.getUserList()
       let userList = res.data
+      console.log(userList)
       this.addAttr(userList)
       this.handleSizeChange(this.pageSize)
     },
@@ -184,7 +194,6 @@ export default {
       }
       pageList = this.userList.slice((val - 1) * this.pageSize, val * this.pageSize)
       this.showList = pageList
-      console.log(`当前页: ${val}`);
     },
     //编辑任务
     EditUser(row) {
@@ -201,6 +210,8 @@ export default {
       row.edit_password !== '' ?
         row.password = row.edit_password
         : row.edit_password = row.password
+      row.edit_role = row.role
+      $api.updateUser(row.uid, row.password, row.edit_role)
       row.edit = false
     },
     //取消修改任务
@@ -208,6 +219,31 @@ export default {
       row.edit_password = row.password
       row.edit = false
     },
+    //点击搜索
+    async searchClick() {
+      let searchList = []
+      let search = []
+      let res = await $api.getUserByName(this.input)//将通过用户行搜索到的对应的对象拿到
+      if (res.code === 200) {//判断返回是否成功：200->请求成功；3->用户不存在
+        searchList.push(res.data)//先将对象放进数组中
+        searchList.map((val, index) => {//在对数组里进行补充，这样就可以进行编辑
+          val['index'] = index+1
+          val['edit'] = false
+          val['edit_password'] = ''
+          val['edit_role'] = ''
+          search.push(val)
+        })
+      }else {
+        searchList = []//若不成功则数组为空，用户可点击分页序号返回默认显示列表
+      }
+      this.showList = searchList//这时显示搜索的数组
+    },
+    //创建时间戳
+    changeDate(time) {
+      let date = new Date(time)
+      let showTime = date.getFullYear() + '-' + (date.getMonth() * 1 + 1) + '-' + date.getDate()
+      return showTime
+    }
   },
 }
 </script>
