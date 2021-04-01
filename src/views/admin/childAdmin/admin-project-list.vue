@@ -26,6 +26,9 @@
           <el-table-column
             prop="index"
             label="序号">
+            <template slot-scope="scope">
+              {{scope.row.index - (page - 1) * pageSize}}
+            </template>
           </el-table-column>
           <el-table-column
             prop="projectName"
@@ -34,6 +37,13 @@
           <el-table-column
             prop="pid"
             label="项目ID">
+          </el-table-column>
+          <el-table-column
+            prop="createTime"
+            label="创建时间">
+            <template slot-scope="scope">
+              {{changeDate(scope.row.createTime)}}
+            </template>
           </el-table-column>
           <el-table-column
             prop="status"
@@ -87,24 +97,25 @@ export default {
   data() {
     return {
       currentPage: 1,//默认显示第几页
+      page: '1',//目前所在页数
       input: '',//搜索康输入的值
       pageSize: 2,//默认每页显示多少条
       pageSizes: [2, 3, 4, 6],//每页显示多少条有哪些选项
       loading: false,//表格loading
 
       ProjectList: [
-        {index: 1, pid: 202101, projectName: '项目1 ',status: '1'},
-        {index: 2, pid: 202101, projectName: '项目2 ',status: '2'},
-        {index: 3, pid: 202101, projectName: '项目3 ',status: '1'},
-        {index: 4, pid: 202101, projectName: '项目4 ',status: '3'},
-        {index: 5, pid: 202101, projectName: '项目5 ',status: '2'},
-        {index: 6, pid: 202101, projectName: '项目6 ',status: '2'},
-        {index: 7, pid: 202101, projectName: '项目7 ',status: '1'},
-        {index: 8, pid: 202101, projectName: '项目8 ',status: '3'},
-        {index: 9, pid: 202101, projectName: '项目9 ',status: '3'},
-        {index: 10, pid: 202101, projectName: '项目10 ',status: '1'},
-        {index: 11, pid: 202101, projectName: '项目11 ',status: '2'},
-        {index: 12, pid: 202101, projectName: '项目12 ',status: '1'},
+        {index: 1, pid: 202101, projectName: '项目1 ',status: '1', createTime: 1617083983317},
+        {index: 2, pid: 202101, projectName: '项目2 ',status: '2', createTime: 1617084018253},
+        {index: 3, pid: 202101, projectName: '项目3 ',status: '1', createTime: 1617083983317},
+        {index: 4, pid: 202101, projectName: '项目4 ',status: '3', createTime: 1617084018253},
+        {index: 5, pid: 202101, projectName: '项目5 ',status: '2', createTime: 1614840350338},
+        {index: 6, pid: 202101, projectName: '项目6 ',status: '2', createTime: 1617083983317},
+        {index: 7, pid: 202101, projectName: '项目7 ',status: '1', createTime: 1614840350338},
+        {index: 8, pid: 202101, projectName: '项目8 ',status: '3', createTime: 1617083983317},
+        {index: 9, pid: 202101, projectName: '项目9 ',status: '3', createTime: 1614840350338},
+        {index: 10, pid: 202101, projectName: '项目10 ',status: '1', createTime: 1614840350338},
+        {index: 11, pid: 202101, projectName: '项目11 ',status: '2', createTime: 1615909112645},
+        {index: 12, pid: 202101, projectName: '项目12 ',status: '1', createTime: 1617083983317},
       ],//从api.js中获取到的数组
       showList: [],//每页显示的数组
       //权限选项
@@ -154,6 +165,7 @@ export default {
     },
     //切换到第几页
     handleCurrentChange(val) {
+      this.page = val
       let pageList = []
       let num = Math.ceil(this.ProjectList.length / this.pageSize)//向上取整（取请求数组长度/每页显示的条数）= 第几页
       if(val === num) {//若页数=最后一页
@@ -195,6 +207,13 @@ export default {
       // }
       this.showList = searchList//这时显示搜索的数组
     },
+    //创建时间戳
+    changeDate(time) {
+      let date = new Date(time)
+      let showTime = date.getFullYear() + '-' + (date.getMonth() * 1 + 1) + '-' + date.getDate()
+      return showTime
+    },
+
   },
 }
 </script>

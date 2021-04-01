@@ -26,6 +26,9 @@
           <el-table-column
             prop="index"
             label="序号">
+            <template slot-scope="scope">
+              {{scope.row.index - (page - 1) * pageSize}}
+            </template>
           </el-table-column>
           <el-table-column
             prop="username"
@@ -33,7 +36,7 @@
           </el-table-column>
           <el-table-column
             prop="createTime"
-            label="账号">
+            label="创建时间">
             <template slot-scope="scope">
               {{changeDate(scope.row.createTime)}}
             </template>
@@ -127,6 +130,7 @@ export default {
   data() {
     return {
       currentPage: 1,//默认显示第几页
+      page: '1',//目前是第几页
       input: '',//搜索康输入的值
       edit: '',//是否点击编辑，Boolean
       pageSize: 2,//默认每页显示多少条
@@ -158,7 +162,6 @@ export default {
       this.loading = true//开始缓冲
       let res = await $api.getUserList()
       let userList = res.data
-      console.log(userList)
       this.addAttr(userList)
       this.handleSizeChange(this.pageSize)
     },
@@ -185,6 +188,7 @@ export default {
     },
     //切换到第几页
     handleCurrentChange(val) {
+      this.page = val
       let pageList = []
       let num = Math.ceil(this.userList.length / this.pageSize)//向上取整（取请求数组长度/每页显示的条数）= 第几页
       if(val === num) {//若页数=最后一页
