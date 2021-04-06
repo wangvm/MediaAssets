@@ -51,9 +51,9 @@
             <template slot-scope="scope">
               <span>
                 {{
-                  scope.row.status === '1' ? '创建任务' :
-                    scope.row.status === '2' ? '编目' :
-                      scope.row.status === '0' ? '审核' : '未设置'
+                  scope.row.status === 1 ? '新创建' :
+                    scope.row.status === 2 ? '编辑中' :
+                      scope.row.status === 3 ? '已完成' : '未设置'
                 }}
               </span>
             </template>
@@ -104,30 +104,30 @@ export default {
       loading: false,//表格loading
 
       ProjectList: [
-        {index: 1, pid: 202101, projectName: '项目1 ',status: '1', createTime: 1617083983317},
-        {index: 2, pid: 202101, projectName: '项目2 ',status: '2', createTime: 1617084018253},
-        {index: 3, pid: 202101, projectName: '项目3 ',status: '1', createTime: 1617083983317},
-        {index: 4, pid: 202101, projectName: '项目4 ',status: '3', createTime: 1617084018253},
-        {index: 5, pid: 202101, projectName: '项目5 ',status: '2', createTime: 1614840350338},
-        {index: 6, pid: 202101, projectName: '项目6 ',status: '2', createTime: 1617083983317},
-        {index: 7, pid: 202101, projectName: '项目7 ',status: '1', createTime: 1614840350338},
-        {index: 8, pid: 202101, projectName: '项目8 ',status: '3', createTime: 1617083983317},
-        {index: 9, pid: 202101, projectName: '项目9 ',status: '3', createTime: 1614840350338},
-        {index: 10, pid: 202101, projectName: '项目10 ',status: '1', createTime: 1614840350338},
-        {index: 11, pid: 202101, projectName: '项目11 ',status: '2', createTime: 1615909112645},
-        {index: 12, pid: 202101, projectName: '项目12 ',status: '1', createTime: 1617083983317},
+        {index: 1, pid: 202101, projectName: '项目1 ',status: 1, createTime: 1617083983317},
+        {index: 2, pid: 202101, projectName: '项目2 ',status: 3, createTime: 1617084018253},
+        {index: 3, pid: 202101, projectName: '项目3 ',status: 2, createTime: 1617083983317},
+        {index: 4, pid: 202101, projectName: '项目4 ',status: 0, createTime: 1617084018253},
+        {index: 5, pid: 202101, projectName: '项目5 ',status: 2, createTime: 1614840350338},
+        {index: 6, pid: 202101, projectName: '项目6 ',status: 0, createTime: 1617083983317},
+        {index: 7, pid: 202101, projectName: '项目7 ',status: 1, createTime: 1614840350338},
+        {index: 8, pid: 202101, projectName: '项目8 ',status: 3, createTime: 1617083983317},
+        {index: 9, pid: 202101, projectName: '项目9 ',status: 3, createTime: 1614840350338},
+        {index: 10, pid: 202101, projectName: '项目10 ',status: 1, createTime: 1614840350338},
+        {index: 11, pid: 202101, projectName: '项目11 ',status: 2, createTime: 1615909112645},
+        {index: 12, pid: 202101, projectName: '项目12 ',status: 0, createTime: 1617083983317},
       ],//从api.js中获取到的数组
       showList: [],//每页显示的数组
       //权限选项
       options: [{
         value: '1',
-        label: '创建任务'
+        label: '新创建'
       }, {
         value: '2',
-        label: '编目'
+        label: '编辑中'
       }, {
         value: '3',
-        label: '审核'
+        label: '已完成'
       }],
     };
   },
