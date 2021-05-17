@@ -12,43 +12,27 @@
           </div>
         </div>
         <div class="login-show">
-          <div class="form" v-if="loginType">
-            <div class="form-title">用户登录</div>
+          <div class="form">
+            <div class="form-title">{{loginTypeTitle}}</div>
             <div class="form-input">
               <el-input placeholder="请输入账号" v-model="username">
-                <template slot="prepend">账 号：</template>
+                <template slot="prepend">{{loginTypeUsername}}</template>
               </el-input>
             </div>
             <div class="form-input">
               <el-input placeholder="请输入密码" v-model="password" show-password>
-                <template slot="prepend">密 码：</template>
+                <template slot="prepend">{{loginTypePassword}}</template>
               </el-input>
             </div>
-            <div class="form-button">
-              <el-button class="button-login" type="primary" @click="loginAndRegisterClick">
-                登录
-              </el-button>
-            </div>
-          </div>
-          <div class="form" v-else>
-            <div class="form-title">用户注册</div>
-            <div class="form-input">
-              <el-input placeholder="请输入账号" v-model="username">
-                <template slot="prepend">新 的 账 号：</template>
-              </el-input>
-            </div>
-            <div class="form-input">
-              <el-input placeholder="请输入密码" v-model="password" show-password>
-                <template slot="prepend">新 的 密 码：</template>
-              </el-input>
-            </div>
-            <div class="form-input">
+            <div class="form-input" v-if="!loginType">
               <el-input placeholder="请再次输入密码" v-model="password1" show-password>
                 <template slot="prepend">确 认 密 码：</template>
               </el-input>
             </div>
             <div class="form-button">
-              <el-button class="button-register" type="danger" @click="loginAndRegisterClick">注册</el-button>
+              <el-button :class="loginTypeButtonClassName" type="primary" @click="loginAndRegisterClick">
+                {{loginTypeButtonContent}}
+              </el-button>
             </div>
           </div>
         </div>
@@ -90,6 +74,23 @@
 				password1: '',//注册验证密码
 			}
 		},
+		computed: {
+			loginTypeTitle() {
+				return this.loginType ? '用户登录' : '用户注册'
+			},
+			loginTypeUsername() {
+				return this.loginType ? '账 号：' : '新 的 账 号：'
+			},
+			loginTypePassword() {
+				return this.loginType ? '密 码：' : '新 的 密 码：'
+			},
+			loginTypeButtonClassName() {
+				return this.loginType ? 'button-login' : 'button-register'
+			},
+			loginTypeButtonContent() {
+				return this.loginType ? '登录' : '注册'
+			}
+		},
 		methods: {
 			// 登录注册切换
 			changeLoginType(type) {
@@ -116,27 +117,35 @@
 			},
 			// 登录
 			async login() {
-				const {username, password} = this
-				let resLogin = await $api.login(username, password)
-				if (resLogin.code === 200) {
-					let token = resLogin.data.token
-					let loginType = 0
-					setUserToken(token)
-					setLoginType(loginType)
-          this.$store.commit('updateLoginType',getLoginType())
-					this.$store.commit('setToken', getUserToken())
-					this.$router.push('/admin')
+				try {
+					const {username, password} = this
+					let resLogin = await $api.login(username, password)
+					if (resLogin.code === 200) {
+						let token = resLogin.data.token
+						let loginType = 0
+						setUserToken(token)
+						setLoginType(loginType)
+						this.$store.commit('updateLoginType', getLoginType())
+						this.$store.commit('setToken', getUserToken())
+						this.$router.push('/admin')
+					}
+					this.initFormData()
+				} catch (e) {
+					this.$message.error(e)
 				}
-				this.initFormData()
 			},
 			// 注册
 			async register() {
 				const {username, password, password1} = this
 				if (password !== password1)
 					return this.$message.error('两次密码不一致')
-        let resRegister = await $api.register([{username, password}])
-				resRegister.code === 200 && this.changeLoginType('login')
-				this.initFormData()
+				try{
+					let resRegister = await $api.register([{username, password}])
+					resRegister.code === 200 && this.changeLoginType('login')
+					this.initFormData()
+        }catch (e) {
+          this.$message.error(e)
+				}
 			},
 			// 初始化input值
 			initFormData() {
