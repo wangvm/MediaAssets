@@ -2,7 +2,7 @@ import axios from "axios"
 import {Message} from 'element-ui'
 import {getUserToken} from "../config/storage"
 
-let baseUrl = 'http://121.196.100.229:8080'
+let baseUrl = 'http://121.196.100.229:8080/mediaasserts'
 // let baseUrl = 'http://192.168.3.206:8080'
 
 
