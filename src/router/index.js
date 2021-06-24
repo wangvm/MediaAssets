@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import admin from "../views/admin/admin"
 // test
-import Home from "../views/Home"
+import Home from "@/views/Home"
 
 Vue.use(VueRouter)
 
@@ -10,55 +9,55 @@ const routes = [
 	{
 		path: '/',
 		name: 'home',
-		component: () => import('../views/home/home')
+		component: () => import('@/views/home/home')
 	},
 	{
 		path: '/admin',
 		name: 'admin',
-		component: () => import('../views/admin/admin'),
+		component: () => import('@/views/admin/admin'),
 		redirect: '/admin/home',
 		children: [
 			{
 				path: '/admin/home',
-				component: () => import('../views/admin/childAdmin/admin-home'),
+				component: () => import('@/views/admin/childAdmin/admin-home'),
 			},
 			{
 				path: '/admin/projectList',
-				component: () => import('../views/admin/childAdmin/admin-project-list'),
+				component: () => import('@/views/admin/childAdmin/admin-project-list'),
 			},
 			{
 				path: '/admin/projectCreate',
-				component: () => import('../views/admin/childAdmin/admin-project-create'),
+				component: () => import('@/views/admin/childAdmin/admin-project-create'),
 			},
 			{
 				path: '/admin/userList',
-				component: () => import('../views/admin/childAdmin/admin-user-list'),
+				component: () => import('@/views/admin/childAdmin/admin-user-list'),
 			},
 			{
 				path: '/admin/userCreate',
-				component: () => import('../views/admin/childAdmin/admin-user-create'),
+				component: () => import('@/views/admin/childAdmin/admin-user-create'),
 			}
 		]
 	},
 	{
 		path: '/edit',
 		name: 'edit',
-		component: () => import('../views/edit/edit'),
+		component: () => import('@/views/edit/edit'),
 		children: [
 			{
 				path: 'task',
 				name: 'task',
-				component: () => import('../views/edit/childEdit/edit-task'),
+				component: () => import('@/views/edit/childEdit/edit-task'),
 			},
 			{
 				path: 'check',
 				name: 'check',
-				component: () => import('../views/edit/childEdit/edit-check'),
+				component: () => import('@/views/edit/childEdit/edit-check'),
 			},
 			{
 				path: 'video',
 				name: 'video',
-				component: () => import('../views/edit/childEdit/edit-video'),
+				component: () => import('@/views/edit/childEdit/edit-video'),
 			}
 		]
 	},

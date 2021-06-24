@@ -2,8 +2,8 @@ import axios from "axios"
 import { Message } from 'element-ui'
 import { getUserToken } from "../config/storage"
 
-// let baseUrl = 'http://121.196.100.229:8080/mediaasserts'
-let baseUrl = 'http://192.168.3.206:8080'
+let baseUrl = 'http://121.196.100.229:8080/mediaasserts'
+// let baseUrl = 'http://192.168.3.206:8080'
 
 
 let instance = axios.create({
@@ -36,10 +36,8 @@ export default function (url, data, method = 'GET') {
           'token': localStorage.getItem('token') || null
         }, params: data
       })
-      //promise = axios.get(baseUrl + url, {params: data})
     } else {
       promise = instance.post(baseUrl + url, data)
-      //promise = axios.post(baseUrl + url, data)
     }
     promise.then(res => {
       Message.info(res.data.message)

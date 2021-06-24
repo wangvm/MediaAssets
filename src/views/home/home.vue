@@ -76,8 +76,8 @@
 </template>
 
 <script>
-import { setUserToken, setLoginType } from "../../config/storage";
-import $api from "../../network/api";
+import { setUserToken, setLoginType } from "@/config/storage";
+import $api from "@/network/api";
 import { mapMutations } from "vuex";
 
 export default {
@@ -108,7 +108,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations(["updateLoginType", "setToken"]),
+    ...mapMutations("common", ["updateLoginType", "setToken"]),
     // 登录注册切换
     changeLoginType(type) {
       switch (type) {
@@ -125,7 +125,6 @@ export default {
     // 登录注册-前端验证
     loginAndRegisterClick() {
       const { username, password } = this;
-      // todo 此处还能再优化下
       if (!username) return this.$message.error("账号不能为空");
       if (!password) return this.$message.error("密码不能为空");
       this.loginType ? this.login() : this.register();
@@ -137,6 +136,7 @@ export default {
         let resLogin = await $api.login(username, password);
         if (resLogin.code === 200) {
           let token = resLogin.data.token;
+          // TODO 关于loginType的值 admin:0;user:1创建；user:2编目; user:3审核
           let loginType = 0;
           setUserToken(token);
           setLoginType(loginType);
@@ -176,7 +176,7 @@ export default {
   position: relative;
   height: 100vh;
   min-width: 1000px;
-  background-image: url("../../assets/images/login-bg.jpg");
+  background-image: url("~@/assets/images/login-bg.jpg");
   overflow: hidden;
   background-repeat: no-repeat;
 
