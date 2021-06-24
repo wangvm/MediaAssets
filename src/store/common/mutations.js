@@ -1,14 +1,14 @@
 export default {
-  updateLoginType(state, pre) {
-    state.loginType = pre
+  updateLoginType(state, val) {
+    state.loginType = val
   },
-  updateCurrentMenu(state, pre) {
-    state.currentMenu = pre
+  updateCurrentMenu(state, val) {
+    state.currentMenu = val
   },
-  setToken(state, token) {
-    state.token = token
+  setToken(state, val) {
+    state.token = val
   },
-  delToken(state) {
-    state.token = ''
+  setProjectList(state, val) {
+    state.projectList = val
   }
 }

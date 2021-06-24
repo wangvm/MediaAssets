@@ -22,39 +22,25 @@
           :data="showList"
           tooltip-effect="dark"
           style="width: 100%"
-          v-loading="loading">
-          <el-table-column
-            prop="index"
-            label="序号">
+          v-loading="loading"
+        >
+          <el-table-column prop="index" label="序号">
             <template slot-scope="scope">
-              {{scope.row.index - (page - 1) * pageSize}}
+              {{ scope.row.index }}
             </template>
           </el-table-column>
-          <el-table-column
-            prop="projectName"
-            label="项目名称">
+          <el-table-column prop="projectName" label="项目名称">
           </el-table-column>
-          <el-table-column
-            prop="pid"
-            label="项目ID">
-          </el-table-column>
-          <el-table-column
-            prop="createTime"
-            label="创建时间">
+          <el-table-column prop="pid" label="项目ID"> </el-table-column>
+          <el-table-column prop="createTime" label="创建时间">
             <template slot-scope="scope">
-              {{changeDate(scope.row.createTime)}}
+              {{ changeDate(scope.row.createTime) }}
             </template>
           </el-table-column>
-          <el-table-column
-            prop="status"
-            label="进度">
+          <el-table-column prop="status" label="进度">
             <template slot-scope="scope">
               <span>
-                {{
-                  scope.row.status === 1 ? '新创建' :
-                    scope.row.status === 2 ? '编辑中' :
-                      scope.row.status === 3 ? '已完成' : '未设置'
-                }}
+                {{ projectStatus[scope.row.status].label }}
               </span>
             </template>
           </el-table-column>
@@ -63,12 +49,14 @@
               <el-button
                 size="small"
                 type="text"
-                @click="enterProject(scope.row)">进入项目
+                @click="enterProject(scope.row)"
+                >进入项目
               </el-button>
               <el-button
                 size="small"
                 type="text"
-                @click.native.prevent="deleteProject(scope.row)">删除项目
+                @click.native.prevent="deleteProject(scope.row)"
+                >删除项目
               </el-button>
             </template>
           </el-table-column>
@@ -83,114 +71,113 @@
         :page-sizes="pageSizes"
         :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="ProjectList.length">
+        :total="projectList.length"
+      >
       </el-pagination>
     </div>
   </el-card>
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
 import $api from "@/network/api";
+import { projectStatus } from "@/constants/common";
 
 export default {
   name: "adminProjectList",
   data() {
     return {
-      currentPage: 1,//默认显示第几页
-      page: '1',//目前所在页数
-      input: '',//搜索康输入的值
-      pageSize: 2,//默认每页显示多少条
-      pageSizes: [2, 3, 4, 6],//每页显示多少条有哪些选项
-      loading: false,//表格loading
+      currentPage: 1, //默认显示第几页
+      page: "1", //目前所在页数
+      input: "", //搜索康输入的值
+      pageSize: 5, //默认每页显示多少条
+      pageSizes: [5, 10, 15, 20], //每页显示多少条有哪些选项
+      loading: false, //表格loading
 
-      ProjectList: [
-        {index: 1, pid: 202101, projectName: '项目1 ',status: 1, createTime: 1617083983317},
-        {index: 2, pid: 202101, projectName: '项目2 ',status: 3, createTime: 1617084018253},
-        {index: 3, pid: 202101, projectName: '项目3 ',status: 2, createTime: 1617083983317},
-        {index: 4, pid: 202101, projectName: '项目4 ',status: 0, createTime: 1617084018253},
-        {index: 5, pid: 202101, projectName: '项目5 ',status: 2, createTime: 1614840350338},
-        {index: 6, pid: 202101, projectName: '项目6 ',status: 0, createTime: 1617083983317},
-        {index: 7, pid: 202101, projectName: '项目7 ',status: 1, createTime: 1614840350338},
-        {index: 8, pid: 202101, projectName: '项目8 ',status: 3, createTime: 1617083983317},
-        {index: 9, pid: 202101, projectName: '项目9 ',status: 3, createTime: 1614840350338},
-        {index: 10, pid: 202101, projectName: '项目10 ',status: 1, createTime: 1614840350338},
-        {index: 11, pid: 202101, projectName: '项目11 ',status: 2, createTime: 1615909112645},
-        {index: 12, pid: 202101, projectName: '项目12 ',status: 0, createTime: 1617083983317},
-      ],//从api.js中获取到的数组
-      showList: [],//每页显示的数组
+      ProjectList: [], //从api.js中获取到的数组
+      showList: [], //每页显示的数组
       //权限选项
-      options: [{
-        value: '1',
-        label: '新创建'
-      }, {
-        value: '2',
-        label: '编辑中'
-      }, {
-        value: '3',
-        label: '已完成'
-      }],
+      projectStatus,
+      options: [
+        {
+          value: "1",
+          label: "新创建",
+        },
+        {
+          value: "2",
+          label: "编辑中",
+        },
+        {
+          value: "3",
+          label: "已完成",
+        },
+      ],
     };
   },
-  created() {
-    this.getProjectList()//初始化数组信息
-    this.handleSizeChange(this.pageSize)
+  async created() {
+    await this.initProjectList(); //初始化数组信息
+  },
+  computed: {
+    ...mapState("common", ["projectList"]),
+    getCreatedTime(time) {
+      return time;
+    },
   },
   methods: {
+    ...mapActions("common", ["getProjectList"]),
     //获取到信息
-    async getProjectList() {
-      // this.loading = true//开始缓冲
-      let res = await $api.getProjectList()
-      console.log(res)
-      let ProjectList = res.data
-      this.addAttr(ProjectList)
-      this.handleSizeChange(this.pageSize)
-    },
-    //添加(属性)信息项
-    addAttr(list) {
-      let resProjectList = []
-      list.map((val, index) => {
-        val['index'] = index + 1
-        resProjectList.push(val)
-      })
-      // this.ProjectList = resProjectList
-      // this.loading = false//结束缓冲
+    async initProjectList() {
+      this.loading = true; //开始缓冲
+      await this.getProjectList();
+      this.handleSizeChange(this.pageSize);
+      this.loading = false; //结束缓冲
     },
     //每页显示多少条
     handleSizeChange(val) {
-      let show = []
+      let show = [];
       //判断请求到的数组长度是否小于等于每页显示的数组条数：是->显示的数组=请求道的数组；否->显示的数组=请求的数组slice（第几页-1， 显示多少组）
-      this.ProjectList.length <= val ? show = this.ProjectList : show = this.ProjectList.slice(this.currentPage - 1, val)
-      this.pageSize = val//此时需更新每页显示多少条
-      this.showList = show
+      this.projectList.length <= val
+        ? (show = this.projectList)
+        : (show = this.projectList.slice(this.currentPage - 1, val));
+      this.pageSize = val; //此时需更新每页显示多少条
+      this.showList = show;
     },
     //切换到第几页
     handleCurrentChange(val) {
-      this.page = val
-      let pageList = []
-      let num = Math.ceil(this.ProjectList.length / this.pageSize)//向上取整（取请求数组长度/每页显示的条数）= 第几页
-      if(val === num) {//若页数=最后一页
-        if (this.ProjectList.length % this.pageSize !== 0) {//若最后一页不满，则显示剩余条数
-          pageList = this.ProjectList.slice((val - 1) * this.pageSize, this.ProjectList.length - (val - 1) * this.pageSize)
+      this.page = val;
+      let pageList = [];
+      let num = Math.ceil(this.projectList.length / this.pageSize); //向上取整（取请求数组长度/每页显示的条数）= 第几页
+      if (val === num) {
+        //若页数=最后一页
+        if (this.projectList.length % this.pageSize !== 0) {
+          //若最后一页不满，则显示剩余条数
+          pageList = this.projectList.slice(
+            (val - 1) * this.pageSize,
+            this.projectList.length - (val - 1) * this.pageSize
+          );
         }
       }
-      pageList = this.ProjectList.slice((val - 1) * this.pageSize, val * this.pageSize)
-      this.showList = pageList
+      pageList = this.projectList.slice(
+        (val - 1) * this.pageSize,
+        val * this.pageSize
+      );
+      this.showList = pageList;
     },
     //进入项目
     enterProject() {
       // task = 任务 check = 审核 video = 编目
-      this.$router.push({name: 'task', params: {projectName: 'aa'}})
+      this.$router.push({ name: "task", params: { projectName: "aa" } });
     },
     //删除项目
     async deleteProject(currentProject) {
-      console.log(currentProject)
-      let pid = currentProject.pid
-      let resDeleteProject = await $api.deleteProject(pid)
-      console.log(resDeleteProject)
+      console.log(currentProject);
+      let pid = currentProject.pid;
+      let resDeleteProject = await $api.deleteProject(pid);
+      console.log(resDeleteProject);
     },
     //点击搜索
     async searchClick() {
-      let searchList = []
+      let searchList = [];
       // let search = []
       // let res = await $api.getProjectById(this.input)//将通过用户行搜索到的对应的对象拿到
       // if (res.code === 200) {//判断返回是否成功：200->请求成功；3->用户不存在
@@ -205,17 +192,21 @@ export default {
       // }else {
       //   searchList = []//若不成功则数组为空，用户可点击分页序号返回默认显示列表
       // }
-      this.showList = searchList//这时显示搜索的数组
+      this.showList = searchList; //这时显示搜索的数组
     },
     //创建时间戳
     changeDate(time) {
-      let date = new Date(time)
-      let showTime = date.getFullYear() + '-' + (date.getMonth() * 1 + 1) + '-' + date.getDate()
-      return showTime
+      let date = new Date(time);
+      let showTime =
+        date.getFullYear() +
+        "-" +
+        (date.getMonth() * 1 + 1) +
+        "-" +
+        date.getDate();
+      return showTime;
     },
-
   },
-}
+};
 </script>
 
 <style scoped lang="less">

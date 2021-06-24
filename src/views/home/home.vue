@@ -76,9 +76,8 @@
 </template>
 
 <script>
-import { setUserToken, setLoginType } from "@/config/storage";
+import { mapState, mapActions } from "vuex";
 import $api from "@/network/api";
-import { mapMutations } from "vuex";
 
 export default {
   name: "home",
@@ -91,6 +90,7 @@ export default {
     };
   },
   computed: {
+    ...mapState("common", ["token"]),
     loginTypeTitle() {
       return this.loginType ? "用户登录" : "用户注册";
     },
@@ -108,7 +108,7 @@ export default {
     },
   },
   methods: {
-    ...mapMutations("common", ["updateLoginType", "setToken"]),
+    ...mapActions("common", ["userLogin"]),
     // 登录注册切换
     changeLoginType(type) {
       switch (type) {
@@ -131,23 +131,11 @@ export default {
     },
     // 登录
     async login() {
-      try {
-        const { username, password } = this;
-        let resLogin = await $api.login(username, password);
-        if (resLogin.code === 200) {
-          let token = resLogin.data.token;
-          // TODO 关于loginType的值 admin:0;user:1创建；user:2编目; user:3审核
-          let loginType = 0;
-          setUserToken(token);
-          setLoginType(loginType);
-          this.updateLoginType(loginType);
-          this.setToken(token);
-          this.$router.push("/admin");
-        }
-        this.initFormData();
-      } catch (e) {
-        this.$message.error(e);
-      }
+      const { username, password } = this;
+      const params = { username, password };
+      await this.userLogin(params);
+      if (this.token) this.$router.push("/admin");
+      this.initFormData();
     },
     // 注册
     async register() {
