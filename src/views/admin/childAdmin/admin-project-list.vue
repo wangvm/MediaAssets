@@ -1,14 +1,14 @@
 <template>
   <el-card class="admin-project-list">
-    <div class="top">
-      <div class="top_title">
-        <span>项目列表</span>
+    <div class="header">
+      <div class="header-title" @click="initProjectList">
+        项目列表
       </div>
-      <div class="top_find">
+      <div class="header-search">
         <el-input
           size="medium"
-          placeholder="请输入搜索项目的ID"
-          v-model="input"
+          placeholder="请输入项目名称"
+          v-model="searchValue"
           @keydown.enter.native="searchClick"
         >
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
@@ -18,46 +18,57 @@
     </div>
     <div class="content">
       <div class="content_table">
-        <el-table
-          :data="showList"
-          tooltip-effect="dark"
-          style="width: 100%"
-          v-loading="loading"
-        >
-          <el-table-column prop="index" label="序号">
-            <template slot-scope="scope">
-              {{ scope.row.index }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="projectName" label="项目名称">
-          </el-table-column>
-          <el-table-column prop="pid" label="项目ID"> </el-table-column>
+        <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
+          <el-table-column prop="index" label="序号" />
+          <el-table-column prop="projectName" label="项目名称" />
           <el-table-column prop="createTime" label="创建时间">
             <template slot-scope="scope">
-              {{ changeDate(scope.row.createTime) }}
+              {{ dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm") }}
             </template>
           </el-table-column>
           <el-table-column prop="status" label="进度">
             <template slot-scope="scope">
-              <span>
+              <span
+                class="project-status"
+                :class="['project-status-' + scope.row.status]"
+              >
                 {{ projectStatus[scope.row.status].label }}
               </span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button
-                size="small"
-                type="text"
-                @click="enterProject(scope.row)"
-                >进入项目
-              </el-button>
-              <el-button
-                size="small"
-                type="text"
-                @click.native.prevent="deleteProject(scope.row)"
-                >删除项目
-              </el-button>
+              <el-tooltip
+                class="item"
+                effect="light"
+                content="进入项目"
+                placement="left"
+              >
+                <el-button
+                  size="small"
+                  type="primary"
+                  icon="el-icon-edit"
+                  circle
+                  @click="enterProject(scope.row)"
+                ></el-button>
+              </el-tooltip>
+              <el-tooltip
+                v-if="loginType === '0'"
+                class="item"
+                effect="light"
+                content="删除项目"
+                placement="right"
+              >
+                <h1>{{ scope.row.status }}</h1>
+                <el-button
+                  size="small"
+                  type="danger"
+                  icon="el-icon-delete"
+                  circle
+                  @click.native.prevent="deleteProject(scope.row)"
+                  :disabled="projectStatus[scope.row.status].value === '-1'"
+                ></el-button>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>
@@ -80,6 +91,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
+import { debounce } from "lodash";
 import $api from "@/network/api";
 import { projectStatus } from "@/constants/common";
 
@@ -89,7 +101,7 @@ export default {
     return {
       currentPage: 1, //默认显示第几页
       page: "1", //目前所在页数
-      input: "", //搜索康输入的值
+      searchValue: "", //搜索康输入的值
       pageSize: 5, //默认每页显示多少条
       pageSizes: [5, 10, 15, 20], //每页显示多少条有哪些选项
       loading: false, //表格loading
@@ -98,49 +110,30 @@ export default {
       showList: [], //每页显示的数组
       //权限选项
       projectStatus,
-      options: [
-        {
-          value: "1",
-          label: "新创建",
-        },
-        {
-          value: "2",
-          label: "编辑中",
-        },
-        {
-          value: "3",
-          label: "已完成",
-        },
-      ],
     };
   },
   async created() {
     await this.initProjectList(); //初始化数组信息
   },
   computed: {
-    ...mapState("common", ["projectList"]),
-    getCreatedTime(time) {
-      return time;
-    },
+    ...mapState("common", ["projectList", "loginType"]),
   },
   methods: {
     ...mapActions("common", ["getProjectList"]),
     //获取到信息
-    async initProjectList() {
+    initProjectList: debounce(async function() {
       this.loading = true; //开始缓冲
       await this.getProjectList();
       this.handleSizeChange(this.pageSize);
       this.loading = false; //结束缓冲
-    },
+    }, 300),
     //每页显示多少条
     handleSizeChange(val) {
-      let show = [];
+      this.pageSize = val; //此时需更新每页显示多少条
       //判断请求到的数组长度是否小于等于每页显示的数组条数：是->显示的数组=请求道的数组；否->显示的数组=请求的数组slice（第几页-1， 显示多少组）
       this.projectList.length <= val
-        ? (show = this.projectList)
-        : (show = this.projectList.slice(this.currentPage - 1, val));
-      this.pageSize = val; //此时需更新每页显示多少条
-      this.showList = show;
+        ? (this.showList = this.projectList)
+        : (this.showList = this.projectList.slice(this.currentPage - 1, val));
     },
     //切换到第几页
     handleCurrentChange(val) {
@@ -164,46 +157,45 @@ export default {
       this.showList = pageList;
     },
     //进入项目
-    enterProject() {
-      // task = 任务 check = 审核 video = 编目
-      this.$router.push({ name: "task", params: { projectName: "aa" } });
+    enterProject(val) {
+      this.$router.push({
+        name: "task",
+        params: { projectName: val.projectName },
+      });
     },
     //删除项目
     async deleteProject(currentProject) {
-      console.log(currentProject);
-      let pid = currentProject.pid;
-      let resDeleteProject = await $api.deleteProject(pid);
-      console.log(resDeleteProject);
+      this.loading = true;
+      try {
+        await $api.deleteProject(currentProject.pid);
+      } catch (e) {
+        this.$message.error(e);
+      }
+      await this.initProjectList();
+      this.loading = false;
     },
     //点击搜索
     async searchClick() {
-      let searchList = [];
-      // let search = []
-      // let res = await $api.getProjectById(this.input)//将通过用户行搜索到的对应的对象拿到
-      // if (res.code === 200) {//判断返回是否成功：200->请求成功；3->用户不存在
-      //   searchList.push(res.data)//先将对象放进数组中
-      //   searchList.map((val, index) => {//在对数组里进行补充，这样就可以进行编辑
-      //     val['index'] = index+1
-      //     val['edit'] = false
-      //     val['edit_password'] = ''
-      //     val['edit_role'] = ''
-      //     search.push(val)
-      //   })
-      // }else {
-      //   searchList = []//若不成功则数组为空，用户可点击分页序号返回默认显示列表
+      this.loading = true;
+      // TODO
+      // let searchList = [];
+      // let res = await $api.getProjectById(this.searchValue); //将通过用户行搜索到的对应的对象拿到
+      // if (res.code === 200) {
+      //   //判断返回是否成功：200->请求成功；3->用户不存在
+      //   searchList.push(res.data); //先将对象放进数组中
+      //   searchList.map((val, index) => {
+      //     //在对数组里进行补充，这样就可以进行编辑
+      //     val["index"] = index + 1;
+      //     val["edit"] = false;
+      //     val["edit_password"] = "";
+      //     val["edit_role"] = "";
+      //     search.push(val);
+      //   });
+      // } else {
+      //   searchList = []; //若不成功则数组为空，用户可点击分页序号返回默认显示列表
       // }
-      this.showList = searchList; //这时显示搜索的数组
-    },
-    //创建时间戳
-    changeDate(time) {
-      let date = new Date(time);
-      let showTime =
-        date.getFullYear() +
-        "-" +
-        (date.getMonth() * 1 + 1) +
-        "-" +
-        date.getDate();
-      return showTime;
+      // this.showList = searchList; //这时显示搜索的数组
+      this.loading = false;
     },
   },
 };
@@ -211,34 +203,57 @@ export default {
 
 <style scoped lang="less">
 .admin-project-list {
-  width: 100%;
-
-  .top {
-    width: 100%;
+  .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgb(235, 235, 235);
+    padding: 10px 0;
 
-    .top_title {
-      margin-left: 1%;
+    .header-title {
+      font-size: 17px;
+      cursor: pointer;
+      user-select: none;
     }
 
-    .top_find {
-      margin-right: 5%;
+    .header-title:hover {
+      color: #409eff;
+    }
+
+    .header-search {
       display: flex;
     }
   }
 
-  .content {
-    width: 100%;
-  }
-
   .bottom {
-    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 20px;
   }
+}
+
+.project-status {
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: lighter;
+  cursor: default;
+  user-select: none;
+}
+
+.project-status--1 {
+  background: #f56c6c;
+}
+
+.project-status-1 {
+  background: #909399;
+}
+
+.project-status-2 {
+  background: #e6a23c;
+}
+
+.project-status-3 {
+  background: #67c23a;
 }
 </style>

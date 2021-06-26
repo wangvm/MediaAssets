@@ -2,21 +2,22 @@
   <div id="app">
     <keep-alive>
       <transition name="fade">
-        <router-view/>
+        <router-view />
       </transition>
     </keep-alive>
   </div>
 </template>
 
 <script>
-
 export default {
-  name: 'App',
+  name: "App",
   created() {
-    console.log('%c\u2615这是一条后台的消息：f12进来瞅啥，快出去',
-        "background:black;color:white;border-radius:10px;padding:5px 10px;cursor:default;")
-  }
-}
+    console.log(
+      "%c\u2615这是一条后台的消息：f12进来瞅啥，快出去",
+      "background:black;color:white;border-radius:10px;padding:5px 10px;cursor:default;"
+    );
+  },
+};
 </script>
 
 <style lang="less">
@@ -29,11 +30,12 @@ a {
   text-decoration: none;
 }
 
-.fade-enter-active, .fade-leave-avtive {
-  transition: opacity 1.5s
+.fade-enter-active,
+.fade-leave-avtive {
+  transition: opacity 1.5s;
 }
-.fade-enter, .fade-leave-to {
-  opacity: 0.1%
+.fade-enter,
+.fade-leave-to {
+  opacity: 0.1%;
 }
-
 </style>

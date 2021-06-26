@@ -40,7 +40,7 @@ export default function (url, data, method = 'GET') {
       promise = instance.post(baseUrl + url, data)
     }
     promise.then(res => {
-      Message.info(res.data.message)
+      Message.success(res.data.message)
       resolve(res.data)
     }).catch(err => {
       Message.error(err.data.message)

@@ -7,7 +7,6 @@ export default {
     try {
       const { username, password } = params
       let resLogin = await $api.login(username, password);
-      console.log(resLogin);
       if (resLogin.code === 200) {
         let token = resLogin.data.token;
         let loginType = resLogin.data.role;

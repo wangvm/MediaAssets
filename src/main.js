@@ -7,6 +7,9 @@ import less from 'less'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import VueParticles from 'vue-particles'
+import dayjs from "dayjs"
+
+Vue.prototype.dayjs = dayjs;//可以全局使用dayjs
 
 Vue.config.productionTip = false
 Vue.use(less)
