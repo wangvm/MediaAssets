@@ -5,12 +5,17 @@
         <router-view />
       </transition>
     </keep-alive>
+    <SubmitBug />
   </div>
 </template>
 
 <script>
+import SubmitBug from "@/components/submit-bug";
 export default {
   name: "App",
+  components: {
+    SubmitBug,
+  },
   created() {
     console.log(
       "%c\u2615这是一条后台的消息：f12进来瞅啥，快出去",
