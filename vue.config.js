@@ -3,13 +3,16 @@ const path = require("path");
 const isProduction = process.env.NODE_ENV !== 'development';
 // gzip压缩
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
-
+// 代码压缩
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
 
 const cdn = {
   productionSourceMap: false, // 关闭生产环境的 source map
+  // 去掉hash 
+  filenameHashing: true,
   // 忽略打包的第三方库
   externals: {
     vue: 'Vue',
@@ -36,6 +39,13 @@ module.exports = {
   chainWebpack: config => {
     config.resolve.alias
       .set("@", resolve("src"))
+    config.module
+      .rule('min-image')
+      .test(/\.(png|jpe?g|gif)(\?.*)?$/)
+      .use('image-webpack-loader')
+      .loader('image-webpack-loader')
+      .options({ disable: process.env.NODE_ENV == 'development' ? true : false })//此处为ture的时候不会启用压缩处理,目的是为了开发模式下调试速度更快,网上错误示例直接写为disable:true,如果不去查看文档肯定是要被坑的
+      .end()
     // 配置cdn引入
     config.plugin('html').tap((args) => {
       args[0].cdn = cdn;
@@ -80,6 +90,24 @@ module.exports = {
             },
           },
         },
+        minimizer: [
+          new UglifyJsPlugin({
+            uglifyOptions: {
+              output: { // 删除注释
+                comments: false
+              },
+              //生产环境自动删除console
+              compress: {
+                //warnings: false, // 若打包错误，则注释这行
+                drop_debugger: true,  //清除 debugger 语句
+                drop_console: true,   //清除console语句
+                pure_funcs: ['console.log']
+              }
+            },
+            sourceMap: false,
+            parallel: true
+          })
+        ]
       }
     }
   },
