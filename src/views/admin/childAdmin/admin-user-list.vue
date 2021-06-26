@@ -1,182 +1,134 @@
 <template>
-  <el-card class="admin-user-list">
-    <div class="top">
-      <div class="top_title">
-        <span>用户列表</span>
-      </div>
-      <div class="top_find">
-        <el-input
-          size="medium"
-          placeholder="请输入搜索用户的账号"
-          v-model="input"
-          @keydown.enter.native="searchClick"
-        >
-          <i slot="prefix" class="el-input__icon el-icon-search"></i>
-        </el-input>
-        <el-button type="mini">搜索</el-button>
-      </div>
-    </div>
-    <div class="content">
-      <div class="content_table">
-        <el-table
-          :data="showList"
-          tooltip-effect="dark"
-          style="width: 100%"
-          v-loading="loading"
-        >
-          <el-table-column prop="index" label="序号">
-            <template slot-scope="scope">
-              {{ scope.row.index - (page - 1) * pageSize }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="username" label="账号"> </el-table-column>
-          <el-table-column prop="createTime" label="创建时间">
-            <template slot-scope="scope">
-              {{ changeDate(scope.row.createTime) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="password" label="密码">
-            <template slot-scope="scope">
-              <span v-if="!scope.row.edit">******</span>
-              <span v-else>
-                <el-input
-                  :placeholder="scope.row.password"
-                  v-model="scope.row.edit_password"
-                  show-password
+  <AdminList
+    :init-project-list="initUserList"
+    :list="userList"
+    @change-show-list="changeShowList"
+    title="用户列表"
+    placeholder="请输入用户名称"
+  >
+    <div class="content_table">
+      <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
+        <el-table-column prop="index" label="序号" />
+        <el-table-column prop="username" label="账号"> </el-table-column>
+        <el-table-column prop="password" label="密码">
+          <template slot-scope="scope">
+            <span v-if="!scope.row.edit">
+              {{ scope.row.password }}
+            </span>
+            <span v-else>
+              <el-input v-model="scope.row.edit_password" />
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间">
+          <template slot-scope="scope">
+            {{ dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm") }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="role" label="权限">
+          <template slot-scope="scope">
+            <span
+              v-if="!scope.row.edit"
+              class="user-role"
+              :class="['user-role-' + scope.row.role]"
+            >
+              {{ userType[scope.row.role].label }}
+            </span>
+            <span v-else>
+              <el-select v-model="scope.row.role" clearable>
+                <el-option
+                  v-for="item in userType"
+                  :key="item.key"
+                  :label="item.label"
+                  :value="item.key"
                 >
-                </el-input>
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="role" label="权限">
-            <template slot-scope="scope">
-              <span v-if="!scope.row.edit">
-                {{
-                  scope.row.role === 1
-                    ? "创建任务"
-                    : scope.row.role === 2
-                    ? "编目"
-                    : scope.row.role === 3
-                    ? "审核"
-                    : "未设置"
-                }}
-              </span>
-              <span v-else>
-                <el-select
-                  v-model="scope.row.role"
-                  clearable
-                  placeholder="请选择"
-                >
-                  <el-option
-                    v-for="item in options"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  >
-                  </el-option>
-                </el-select>
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button
-                size="small"
-                type="text"
-                v-if="!scope.row.edit"
-                @click="EditUser(scope.row)"
-                >编辑
-              </el-button>
-              <el-button
-                size="small"
-                type="text"
-                v-if="!scope.row.edit"
-                @click.native.prevent="deleteUser(scope.row)"
-                >删除
-              </el-button>
-              <el-button
-                size="small"
-                type="text"
-                v-if="scope.row.edit"
-                @click="deterMine(scope.$index, scope.row)"
-                >确定
-              </el-button>
-              <el-button
-                size="small"
-                type="text"
-                v-if="scope.row.edit"
-                @click="cancelClick(scope.$index, scope.row)"
-                >取消
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </div>
+                </el-option>
+              </el-select>
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button
+              size="small"
+              type="text"
+              v-if="!scope.row.edit"
+              @click="EditUser(scope.row)"
+              >编辑
+            </el-button>
+            <el-button
+              size="small"
+              type="text"
+              v-if="!scope.row.edit"
+              @click.native.prevent="deleteUser(scope.row)"
+              >删除
+            </el-button>
+            <el-button
+              size="small"
+              type="text"
+              v-if="scope.row.edit"
+              @click="deterMine(scope.$index, scope.row)"
+              >确定
+            </el-button>
+            <el-button
+              size="small"
+              type="text"
+              v-if="scope.row.edit"
+              @click="cancelClick(scope.$index, scope.row)"
+              >取消
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
-    <div class="bottom">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="pageSizes"
-        :page-size="pageSize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="userList.length"
-      >
-      </el-pagination>
-    </div>
-  </el-card>
+  </AdminList>
 </template>
 
 <script>
+import AdminList from "@/components/admin-list";
 import $api from "@/network/api";
+import { debounce } from "lodash";
+import { userType } from "@/constants/common";
+import { mapState, mapActions } from "vuex";
 
 export default {
   name: "adminUserList",
+  components: {
+    AdminList,
+  },
   data() {
     return {
-      currentPage: 1, //默认显示第几页
-      page: "1", //目前是第几页
       input: "", //搜索康输入的值
       edit: "", //是否点击编辑，Boolean
-      pageSize: 2, //默认每页显示多少条
-      pageSizes: [2, 3, 4, 6], //每页显示多少条有哪些选项
       loading: false, //表格loading
 
-      userList: [], //从api.js中获取到的数组
       showList: [], //每页显示的数组
       //权限选项
       value: "",
-      options: [
-        {
-          value: "1",
-          label: "创建任务",
-        },
-        {
-          value: "2",
-          label: "编目",
-        },
-        {
-          value: "3",
-          label: "审核",
-        },
-      ],
+      userType,
     };
   },
-  created() {
-    this.getUserList(); //初始化数组信息
+  async created() {
+    await this.initUserList(); //初始化数组信息
+  },
+  computed: {
+    ...mapState("common", ["userList"]),
   },
   methods: {
+    ...mapActions("common", ["getUserList"]),
     //获取到信息
-    async getUserList() {
+    initUserList: debounce(async function() {
       this.loading = true; //开始缓冲
-      let res = await $api.getUserList();
-      let userList = res.data;
-      this.addAttr(userList);
-      this.handleSizeChange(this.pageSize);
+      await this.getUserList();
+      this.handleSizeChange(5);
+      this.loading = false; //结束缓冲
+    }, 300),
+    changeShowList(val) {
+      this.showList = val;
     },
     //添加(属性)信息项
     addAttr(list) {
+      this.loading = true;
       let resUserList = [];
       list.map((val, index) => {
         val["edit"] = false;
@@ -198,33 +150,13 @@ export default {
       this.pageSize = val; //此时需更新每页显示多少条
       this.showList = show;
     },
-    //切换到第几页
-    handleCurrentChange(val) {
-      this.page = val;
-      let pageList = [];
-      let num = Math.ceil(this.userList.length / this.pageSize); //向上取整（取请求数组长度/每页显示的条数）= 第几页
-      if (val === num) {
-        //若页数=最后一页
-        if (this.userList.length % this.pageSize !== 0) {
-          //若最后一页不满，则显示剩余条数
-          pageList = this.userList.slice(
-            (val - 1) * this.pageSize,
-            this.userList.length - (val - 1) * this.pageSize
-          );
-        }
-      }
-      pageList = this.userList.slice(
-        (val - 1) * this.pageSize,
-        val * this.pageSize
-      );
-      this.showList = pageList;
-    },
     //编辑任务
     EditUser(row) {
       row.edit = true;
     },
     //删除任务
     async deleteUser(currentUser) {
+      console.log(currentUser);
       let uid = currentUser.uid;
       let resDeleteUser = await $api.deleteUser(uid);
       console.log(resDeleteUser);
@@ -265,51 +197,37 @@ export default {
       }
       this.showList = searchList; //这时显示搜索的数组
     },
-    //创建时间戳
-    changeDate(time) {
-      let date = new Date(time);
-      let showTime =
-        date.getFullYear() +
-        "-" +
-        (date.getMonth() * 1 + 1) +
-        "-" +
-        date.getDate();
-      return showTime;
-    },
   },
 };
 </script>
 
 <style scoped lang="less">
-.admin-user-list {
-  width: 100%;
+.user-role {
+  padding: 5px 10px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-weight: lighter;
+  cursor: default;
+  user-select: none;
+}
 
-  .top {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid rgb(235, 235, 235);
+.user-role-0 {
+  background: #f56c6c;
+}
 
-    .top_title {
-      margin-left: 1%;
-    }
+.user-role-1 {
+  background: #909399;
+}
 
-    .top_find {
-      margin-right: 5%;
-      display: flex;
-    }
-  }
+.user-role-2 {
+  background: #e6a23c;
+}
 
-  .content {
-    width: 100%;
-  }
+.user-role-3 {
+  background: #67c23a;
+}
 
-  .bottom {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+.user-role-4 {
+  background: #b14b67;
 }
 </style>

@@ -33,5 +33,26 @@ export default {
     } catch (e) {
       this.$catch = e
     }
+  },
+
+  // 获取用户列表
+  async getUserList({ commit, state }) {
+    try {
+      let res = await $api.getUserList();
+      let userList = []
+      res.data.forEach((val, index) => {
+        let options = {
+          index: index + 1,
+          "edit": false,
+          "index": index + 1,
+          "edit_password": val.password,
+          "edit_role": val.role,
+        }
+        userList.push({ ...val, ...options })
+      })
+      commit('setUserList', userList)
+    } catch (e) {
+      this.$catch = e
+    }
   }
 }

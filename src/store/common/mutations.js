@@ -10,5 +10,8 @@ export default {
   },
   setProjectList(state, val) {
     state.projectList = val
+  },
+  setUserList(state, val) {
+    state.userList = val
   }
 }
