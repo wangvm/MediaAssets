@@ -39,8 +39,8 @@ export default {
       this.setToken("");
       this.updateLoginType("");
       this.updateCurrentMenu("");
-      this.$router.replace("/");
       this.$message.success("退出成功");
+      this.$router.replace("/");
     },
   },
 };
