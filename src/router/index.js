@@ -43,6 +43,7 @@ const routes = [
 		path: '/edit',
 		name: 'edit',
 		component: () => import('@/views/edit/edit'),
+		redirect: '/edit/task',
 		children: [
 			{
 				path: 'task',
