@@ -28,10 +28,11 @@ const cdn = {
 }
 
 module.exports = {
-  publicPath: '../', // 基本路径
+  publicPath: './', // 基本路径
+  // publicPath: '../', // 基本路径
   outputDir: 'dist', // 输出文件目录
   assetsDir: 'static',
-  indexPath: './public/index.html',
+  indexPath: './index.html',
   chainWebpack: config => {
     config.resolve.alias
       .set("@", resolve("src"))
@@ -81,5 +82,17 @@ module.exports = {
         },
       }
     }
+  },
+  devServer: {
+    overlay: {
+      warnings: false,
+      errors: false,
+    },
+    open: true,
+    // host: 'localhost',
+    host: '0.0.0.0',
+    port: 8081,
+    https: false,
+    hotOnly: true,
   },
 }
