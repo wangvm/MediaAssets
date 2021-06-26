@@ -2,10 +2,11 @@
   <el-card class="create-user">
     <div slot="header" class="clearfix">
       <span
-        >创建用户<span style="color: red;font-weight: bold;margin-left: 20px;"
-          >注：账号为空不会创建用户</span
-        ></span
-      >
+        >创建用户
+        <span class="user-create-tip">
+          注：账号为空不会创建用户
+        </span>
+      </span>
       <el-button
         style="float: right; padding: 3px 5px"
         type="primary"
@@ -20,9 +21,9 @@
       >
     </div>
     <template v-for="(item, index) in createList">
-      <el-divider :key="index" content-position="center"
-        ><p class="item-title">用户{{ index + 1 }}</p></el-divider
-      >
+      <el-divider :key="index" content-position="center">
+        <p class="item-title">用户{{ index + 1 }}</p>
+      </el-divider>
       <div :key="index" class="create-item">
         <el-input
           class="item-input"
@@ -45,12 +46,13 @@
           placeholder="请选择权限"
           filterable
           class="item-select"
+          clearable
         >
           <el-option
-            v-for="selectItem in selectOptions"
-            :key="selectItem.value"
+            v-for="selectItem in userType"
+            :key="selectItem.key"
             :label="selectItem.label"
-            :value="selectItem.value"
+            :value="selectItem.key"
           >
           </el-option>
         </el-select>
@@ -77,7 +79,12 @@
         <i class="el-icon-upload"></i>
         <div class="el-upload__text"><em>点击选择文件上传</em></div>
         <div class="el-upload__tip" slot="tip">
-          只能上传csv文件，且第一列为账号，第二列为密码
+          <div>
+            <p>只能上传csv文件，且第一列为账号，第二列为密码</p>
+            <p>
+              注：尽量避免通过修改后缀的形式生成csv文件，推荐打开excel保存为csv格式
+            </p>
+          </div>
         </div>
         <img src="@/assets/images/csvRules.jpg" alt="" />
       </el-upload>
@@ -89,28 +96,17 @@
 </template>
 
 <script>
-import $api from "../../../network/api";
+import $api from "@/network/api";
 import XLSX from "xlsx";
+import { debounce } from "lodash";
+import { userType } from "@/constants/common";
 
 export default {
   name: "admin-user-create",
   data() {
     return {
       createList: [],
-      selectOptions: [
-        {
-          value: "1",
-          label: "创建任务",
-        },
-        {
-          value: "2",
-          label: "编目",
-        },
-        {
-          value: "3",
-          label: "审核",
-        },
-      ],
+      userType,
       dialogVisible: false,
       ifUploadLoading: false,
     };
@@ -121,16 +117,18 @@ export default {
   methods: {
     // 初始化创建列表
     initUserList() {
-      this.createList = [
-        // {username: '', password: '', role: ''},
-      ];
+      this.createList = [{ username: "", password: "", role: 4 }];
     },
     // 增加创建用户 +号按钮
     addItem() {
-      this.createList.push({ username: "", password: "", role: "" });
+      this.createList.push({ username: "", password: "", role: 4 });
     },
     // 创建用户按钮
-    createUser() {
+    createUser: debounce(async function() {
+      if (this.createList.length === 1 && this.createList[0].username === "") {
+        this.$message.error("注册信息为空");
+        return;
+      }
       let repeatIndex = this.repeatItem(this.createList);
       if (repeatIndex[0] !== repeatIndex[1])
         return this.$message.error(
@@ -139,19 +137,20 @@ export default {
       let emptyPasswordIndex = this.emptyPassword(this.createList);
       if (emptyPasswordIndex !== -1)
         return this.$message.error(`用户${emptyPasswordIndex * 1 + 1}密码为空`);
-      let resList = this.filterItem(this.createList).map((val) => {
+      let userList = this.filterItem(this.createList).map((val) => {
         return {
           username: val.username,
           password: val.password,
           role: val.role,
         };
       });
-      console.log(resList);
-      // todo 列表注册待调通
-      // 创建成功/失败
-      let code = 200;
-      code === 200 && this.initUserList();
-    },
+      try {
+        let res = await $api.register(userList);
+        if (res.code === 200) this.initUserList();
+      } catch (e) {
+        this.$catch(e);
+      }
+    }, 300),
     // 判断用户名是否重复
     repeatItem(list) {
       let usernameList = [];
@@ -209,7 +208,7 @@ export default {
       let sheetList = Object.keys(data.Sheets.Sheet1).slice(2, -1);
       let columnNum = 2;
       for (let i = 0; i < sheetList.length; i += columnNum) {
-        let obj = { username: "", password: "", role: "" };
+        let obj = { username: "", password: "", role: 4 };
         obj.username = data.Sheets.Sheet1[sheetList[i]].w;
         obj.password = data.Sheets.Sheet1[sheetList[i + 1]].w;
         res.push(obj);
@@ -251,5 +250,11 @@ export default {
   .upload-demo {
     text-align: center;
   }
+}
+
+.user-create-tip {
+  color: red;
+  font-weight: bold;
+  margin-left: 20px;
 }
 </style>

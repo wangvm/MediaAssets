@@ -40,3 +40,9 @@ export function getUserToken() {
 export function removeUserToken() {
 	localStorage.removeItem(USER_TOKEN)
 }
+
+export function removeAllSessionStorage() {
+	removeLoginType()
+	removeCurrentMenu()
+	removeUserToken()
+}

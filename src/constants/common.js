@@ -1,12 +1,29 @@
 const userType = {
   /** 管理 */
-  0: 'admin',
+  0: {
+    key: 0,
+    label: '管理员',
+  },
   /** 创建任务 */
-  1: 'task',
+  1: {
+    key: 1,
+    label: '创建任务',
+  },
   /** 编目 */
-  2: 'check',
+  2: {
+    key: 2,
+    label: '编目',
+  },
   /** 审核 */
-  3: 'video'
+  3: {
+    key: 3,
+    label: '审核',
+  },
+  /** 未设置权限 */
+  4: {
+    key: 4,
+    label: '未设置权限'
+  }
 }
 
 const projectStatus = {

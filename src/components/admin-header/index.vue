@@ -12,11 +12,17 @@
 </template>
 
 <script>
-import { removeLoginType, removeCurrentMenu } from "../../config/storage";
+import { mapMutations } from "vuex";
+import { removeAllSessionStorage } from "@/config/storage";
 
 export default {
   name: "adminHeader",
   methods: {
+    ...mapMutations("common", [
+      "setToken",
+      "updateLoginType",
+      "updateCurrentMenu",
+    ]),
     exitClick() {
       this.$confirm("是否退出，请确认?", "提示", {
         confirmButtonText: "退出",
@@ -29,8 +35,10 @@ export default {
         .catch(() => {});
     },
     exitAdmin() {
-      removeLoginType();
-      removeCurrentMenu();
+      removeAllSessionStorage();
+      this.setToken("");
+      this.updateLoginType("");
+      this.updateCurrentMenu("");
       this.$router.replace("/");
       this.$message.success("退出成功");
     },

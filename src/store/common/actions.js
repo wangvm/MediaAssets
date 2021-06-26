@@ -4,6 +4,7 @@ import { setUserToken, setLoginType } from "@/config/storage";
 export default {
   // 用户登录
   async userLogin({ commit, state }, params) {
+    commit('setToken', '')
     try {
       const { username, password } = params
       let resLogin = await $api.login(username, password);
