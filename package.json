@@ -11,8 +11,6 @@
     "core-js": "^3.6.5",
     "dayjs": "^1.10.5",
     "element-ui": "^2.15.1",
-    "less": "^2.7.3",
-    "less-loader": "^7.1.0",
     "lodash": "^4.17.21",
     "vue": "^2.6.11",
     "vue-particles": "^1.0.9",
@@ -25,7 +23,10 @@
     "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
+    "compression-webpack-plugin": "^5.0.2",
     "koa2-cors": "^2.0.6",
+    "less": "^2.7.3",
+    "less-loader": "^7.1.0",
     "vue-template-compiler": "^2.6.11"
   }
 }
