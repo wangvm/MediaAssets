@@ -5,7 +5,7 @@
     @select="getCurrentMenu"
   >
     <header class="menu-title">
-      <img class="menu-logo" src=" @/assets/images/logo.png" alt="" />
+      <img class="menu-logo" src="@/assets/images/logo.png" alt="" />
       <span>媒资管理系统</span>
     </header>
     <template v-for="(item, index) in menuList">

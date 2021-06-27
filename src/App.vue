@@ -26,18 +26,11 @@ export default {
 </script>
 
 <style lang="less">
-* {
-  margin: 0;
-  padding: 0;
-}
-
-a {
-  text-decoration: none;
-}
+@import "~@/assets/css/common.css";
 
 .fade-enter-active,
 .fade-leave-avtive {
-  transition: opacity 1.5s;
+  transition: opacity 0.5s;
 }
 .fade-enter,
 .fade-leave-to {
