@@ -73,8 +73,7 @@
         action="null"
         multiple
         :limit="1"
-        :on-change="uploadCSV"
-        :before-upload="beforeUploadCSV"
+        :on-change="upload"
       >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text"><em>点击选择文件上传</em></div>
@@ -97,7 +96,6 @@
 
 <script>
 import $api from "@/network/api";
-import XLSX from "xlsx";
 import { debounce } from "lodash";
 import { userType } from "@/constants/common";
 
@@ -180,40 +178,10 @@ export default {
       });
       return emptyList.length === 0 ? -1 : emptyList[0];
     },
-    uploadCSV(file) {
-      let fileInfo = file.raw;
-      let reader = new FileReader();
-      reader.onload = (e) => {
-        let data = e.target.result;
-        let resData = XLSX.read(data, { type: "binary" });
-        let csvData = this.changeCSV(resData);
-        this.createList = [...this.createList, ...csvData];
-        this.ifUploadLoading = false;
-        this.dialogVisible = false;
-      };
-      reader.readAsText(fileInfo);
-    },
-    beforeUploadCSV() {
-      this.ifUploadLoading = true;
-      return false;
-    },
-    changeCSV(data) {
-      let range = data.Sheets.Sheet1["!ref"].split(":");
-      if (range[0].charAt(0) !== "A" || range[1].charAt(0) !== "B") {
-        this.ifUploadLoading = false;
-        this.dialogVisible = false;
-        return this.$message.error("csv数据格式错误，请重新上传");
-      }
-      let res = [];
-      let sheetList = Object.keys(data.Sheets.Sheet1).slice(2, -1);
-      let columnNum = 2;
-      for (let i = 0; i < sheetList.length; i += columnNum) {
-        let obj = { username: "", password: "", role: 4 };
-        obj.username = data.Sheets.Sheet1[sheetList[i]].w;
-        obj.password = data.Sheets.Sheet1[sheetList[i + 1]].w;
-        res.push(obj);
-      }
-      return res;
+    upload(file) {
+      // TODO
+      console.log(file);
+      this.ifUploadLoading = false;
     },
   },
 };
