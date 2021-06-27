@@ -1,15 +1,19 @@
 <template>
   <div>
-    主页
+    <div ref="statistics"></div>
   </div>
 </template>
 
 <script>
-    export default {
-        name: "adminHome"
-    }
+export default {
+  name: "adminHome",
+  mounted() {
+    this.initStatistics();
+  },
+  methods: {
+    initStatistics() {},
+  },
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
