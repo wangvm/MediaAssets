@@ -113,7 +113,7 @@ export default {
     //进入项目
     enterProject(val) {
       this.$router.push({
-        name: "edit",
+        name: "task",
         params: { projectName: val.projectName },
       });
     },
