@@ -86,7 +86,7 @@
             </p>
           </div>
         </div>
-        <img src="@/assets/images/csvRules.jpg" alt="" />
+        <img v-lazy="require('@/assets/images/csvRules.jpg')" alt="" />
       </el-upload>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>

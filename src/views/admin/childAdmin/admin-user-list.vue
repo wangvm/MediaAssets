@@ -52,28 +52,28 @@
             <el-button
               size="small"
               type="text"
-              v-if="!scope.row.edit"
+              v-show="!scope.row.edit"
               @click="EditUser(scope.row)"
               >编辑
             </el-button>
             <el-button
               size="small"
               type="text"
-              v-if="!scope.row.edit"
+              v-show="!scope.row.edit"
               @click.native.prevent="deleteUser(scope.row)"
               >删除
             </el-button>
             <el-button
               size="small"
               type="text"
-              v-if="scope.row.edit"
+              v-show="scope.row.edit"
               @click="deterMine(scope.$index, scope.row)"
               >确定
             </el-button>
             <el-button
               size="small"
               type="text"
-              v-if="scope.row.edit"
+              v-show="scope.row.edit"
               @click="cancelClick(scope.$index, scope.row)"
               >取消
             </el-button>
