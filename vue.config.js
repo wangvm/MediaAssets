@@ -51,6 +51,9 @@ module.exports = {
       args[0].cdn = cdn;
       return args;
     });
+    config
+      .plugin('webpack-bundle-analyzer')
+      .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
   },
   configureWebpack: (config) => {
     // 忽略打包配置
