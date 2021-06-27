@@ -91,6 +91,7 @@ export default {
     initMenu(getMenu) {
       let menuList = [];
       getMenu.map((val) => {
+        // TODO 目录优化
         if (val.value.slice(1, 2) === "0") {
           let children = [];
           getMenu.map((cval) => {
