@@ -30,6 +30,28 @@ const cdn = {
   css: []
 }
 
+//  自定义设置
+const customOptions = {
+  mozjpeg: {
+    progressive: true,
+    quality: 50
+  },
+  optipng: {
+    enabled: true,
+  },
+  pngquant: {
+    quality: [0.5, 0.65],
+    speed: 4
+  },
+  gifsicle: {
+    interlaced: false,
+  },
+  // 不支持WEBP就不要写这一项
+  webp: {
+    quality: 75
+  }
+}
+
 module.exports = {
   publicPath: './', // 基本路径
   // publicPath: '../', // 基本路径
@@ -39,13 +61,11 @@ module.exports = {
   chainWebpack: config => {
     config.resolve.alias
       .set("@", resolve("src"))
-    config.module
-      .rule('min-image')
-      .test(/\.(png|jpe?g|gif)(\?.*)?$/)
+    config.module.rule('images')
+      .test(/\.(png|jpe?g|gif|svg)(\?.*)?$/)
       .use('image-webpack-loader')
       .loader('image-webpack-loader')
-      .options({ disable: process.env.NODE_ENV == 'development' ? true : false })//此处为ture的时候不会启用压缩处理,目的是为了开发模式下调试速度更快,网上错误示例直接写为disable:true,如果不去查看文档肯定是要被坑的
-      .end()
+      .options(customOptions)
     // 配置cdn引入
     config.plugin('html').tap((args) => {
       args[0].cdn = cdn;
