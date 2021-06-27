@@ -11,6 +11,7 @@ import dayjs from "dayjs"
 Vue.prototype.dayjs = dayjs;//可以全局使用dayjs
 
 Vue.config.productionTip = false
+
 Vue.use(less)
 Vue.use(VueParticles)
 

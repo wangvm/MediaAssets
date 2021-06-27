@@ -29,6 +29,7 @@ import {
   setCurrentMenu,
 } from "@/config/storage";
 import menuConfig from "@/config/menu-config";
+import { userType } from "@/constants/common";
 
 export default {
   name: "admin",
@@ -69,7 +70,7 @@ export default {
       let loginType = this.loginType;
       let getMenu = [];
       //rol值为admin:0;user:1创建；user:2编目; user:3审核
-      if (loginType === "0") {
+      if (loginType === userType["0"].key.toString()) {
         getMenu = [
           { name: "主页", value: "00" },
           { name: "项目管理", value: "10" },

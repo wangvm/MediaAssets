@@ -98,7 +98,6 @@ export default {
   },
   data() {
     return {
-      input: "", //搜索康输入的值
       edit: "", //是否点击编辑，Boolean
       loading: false, //表格loading
 
@@ -175,27 +174,6 @@ export default {
     cancelClick(index, row) {
       row.edit_password = row.password;
       row.edit = false;
-    },
-    //点击搜索
-    async searchClick() {
-      let searchList = [];
-      let search = [];
-      let res = await $api.getUserByName(this.input); //将通过用户行搜索到的对应的对象拿到
-      if (res.code === 200) {
-        //判断返回是否成功：200->请求成功；3->用户不存在
-        searchList.push(res.data); //先将对象放进数组中
-        searchList.map((val, index) => {
-          //在对数组里进行补充，这样就可以进行编辑
-          val["index"] = index + 1;
-          val["edit"] = false;
-          val["edit_password"] = "";
-          val["edit_role"] = "";
-          search.push(val);
-        });
-      } else {
-        searchList = []; //若不成功则数组为空，用户可点击分页序号返回默认显示列表
-      }
-      this.showList = searchList; //这时显示搜索的数组
     },
   },
 };

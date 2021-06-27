@@ -1,5 +1,5 @@
 <template>
-  <div class="submit-bug">
+  <div class="submit-bug" v-if="!isHome">
     <el-tooltip class="item" effect="dark" content="提交bug" placement="left">
       <i class="bug-icon el-icon-question" @click="showDialog" />
     </el-tooltip>
@@ -35,6 +35,11 @@ export default {
         message: "",
       },
     };
+  },
+  computed: {
+    isHome() {
+      return this.$route.path === "/";
+    },
   },
   methods: {
     showDialog() {
