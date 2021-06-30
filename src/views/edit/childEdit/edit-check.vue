@@ -143,6 +143,9 @@
 </template>
 
 <script>
+  /*
+  * 目前处于点击左侧显示右侧对应信息
+  * */
   import videoPlayer from "@/components/video-player/video-player";
 
   let id = 2;
