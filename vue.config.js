@@ -54,7 +54,6 @@ const customOptions = {
 
 module.exports = {
   publicPath: './', // 基本路径
-  // publicPath: '../', // 基本路径
   outputDir: 'dist', // 输出文件目录
   assetsDir: 'static',
   indexPath: './index.html',
@@ -140,7 +139,6 @@ module.exports = {
       errors: false,
     },
     open: true,
-    // host: 'localhost',
     host: '0.0.0.0',
     port: 8081,
     https: false,

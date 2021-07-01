@@ -51,21 +51,11 @@ export function getIfLogin() {
 }
 
 export function removeIfLogin() {
-	localStorage.removeItem(IFLOGIN)
-}
-N
-localStorage.removeItem(IF_LOGIN)
+	localStorage.removeItem(IF_LOGIN)
 }
 
-// 保存当前菜单值
-export function setCurrentMenu(currentMenu) {
-	localStorage.setItem(CURRENT_MENU, currentMenu)
-}
-
-export function getCurrentMenu() {
-	return localStorage.getItem(CURRENT_MENU)
-}
-
-export function removeCurrentMenu() {
-	localStorage.removeItem(CURRENT_MENU)
+export function removeAllSessionStorage() {
+	removeCurrentMenu()
+	removeIfLogin()
+	removeUserToken()
 }
