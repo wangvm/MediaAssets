@@ -47,9 +47,9 @@ const customOptions = {
     interlaced: false,
   },
   // 不支持WEBP就不要写这一项
-  webp: {
-    quality: 75
-  }
+  // webp: {
+  //   quality: 75
+  // }
 }
 
 module.exports = {

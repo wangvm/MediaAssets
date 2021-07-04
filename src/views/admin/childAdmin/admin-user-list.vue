@@ -87,7 +87,7 @@
 <script>
 import AdminList from "@/components/admin-list";
 import $api from "@/network/api";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { userType } from "@/constants/common";
 import { mapState, mapActions } from "vuex";
 

@@ -1,8 +1,8 @@
 import request from "./request"
 
 const $api = {
-    login: (username, password) => request('/login', { username, password }, 'POST'),
-    register: (userList) => request('/register', { userList }, 'POST'),
+    login: (id, password) => request('/login', { id, password }, 'POST'),
+    register: (userList) => request('/user/add', { userList }, 'POST'),
     logout: () => request('/logout'),
 
     // 获取用户列表

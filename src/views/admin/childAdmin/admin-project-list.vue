@@ -67,7 +67,7 @@
 
 <script>
 import { mapState, mapActions } from "vuex";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import AdminList from "@/components/admin-list";
 import $api from "@/network/api";
 import { projectStatus } from "@/constants/common";

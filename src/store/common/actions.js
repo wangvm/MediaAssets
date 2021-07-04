@@ -6,8 +6,8 @@ export default {
   async userLogin({ commit, state }, params) {
     commit('setToken', '')
     try {
-      const { username, password } = params
-      let resLogin = await $api.login(username, password);
+      const { username:id, password } = params
+      let resLogin = await $api.login(id, password);
       if (resLogin.code === 200) {
         let token = resLogin.data.token;
         let loginType = resLogin.data.role;

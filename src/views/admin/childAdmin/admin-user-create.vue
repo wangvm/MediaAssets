@@ -85,7 +85,7 @@
             </p>
           </div>
         </div>
-        <img src="@/assets/images/csvRules.jpg" alt="" />
+        <img v-lazy="require('@/assets/images/csvRules.jpg')" alt="" />
       </el-upload>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -96,7 +96,7 @@
 
 <script>
 import $api from "@/network/api";
-import { debounce } from "lodash";
+import { debounce } from "lodash-es";
 import { userType } from "@/constants/common";
 
 export default {
