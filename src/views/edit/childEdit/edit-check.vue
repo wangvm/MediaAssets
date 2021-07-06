@@ -133,6 +133,7 @@
       <div class="home-right-img">
         <el-card class="img-item"
                  v-for="item in CatalogImages"
+                 :key="item.id"
                  shadow="hover">
           <img :src="item.img" alt="图片加载错误，请检查网络" class="img">
           <span>{{item.title}}</span>
