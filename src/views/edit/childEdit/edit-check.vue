@@ -85,7 +85,7 @@
                 {{ scope.row.result }}
             </span>
             <span slot-scope="scope" v-else>
-                <el-select v-model="scope.row.value" placeholder="" clearable>
+                <el-select v-model="scope.row.value" placeholder="" size="mini" clearable>
                   <el-option
                       v-for="item in options"
                       :key="item.value"
