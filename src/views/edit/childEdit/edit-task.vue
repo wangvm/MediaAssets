@@ -117,7 +117,12 @@
       enterProject(val) {
         this.$router.push({
           name: "check",
-          params: {projectName: val.projectName},
+          //跳转路由时传递编目名称和edit状态true(审核)
+          query:{
+            edit: true,
+            editName: val.projectName
+            //当数据更改好后，将其改成：editName: val.editName
+          }
         });
       },
       //删除项目
@@ -143,7 +148,14 @@
             type: 'success',
             message: '你的编目名称是: ' + value,
           });
-          this.$router.push('check');
+          //跳转路由时传递编目名称和edit状态false(编目)
+          this.$router.push({
+            path:'check',
+            query:{
+              edit: false,
+              editName: value
+            }
+          });
         }).catch(() => {
           this.$message({
             type: 'info',

@@ -10,13 +10,13 @@ import dayjs from "dayjs"
 
 Vue.prototype.dayjs = dayjs;//可以全局使用dayjs
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
-Vue.use(less)
-Vue.use(VueParticles)
+Vue.use(less);
+Vue.use(VueParticles);
 
 new Vue({
     router,
     store,
     render: h => h(App)
-}).$mount('#app')
+}).$mount('#app');

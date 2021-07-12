@@ -114,7 +114,11 @@ export default {
     enterProject(val) {
       this.$router.push({
         name: "task",
-        params: { projectName: val.projectName },
+        //将params改为query是因为params在页面刷新后会丢失传递参数
+        query: {
+          state: 'project',
+          projectName: val.projectName
+        },
       });
     },
     //删除项目
