@@ -78,7 +78,7 @@
 <script>
 import { mapState, mapActions } from "vuex";
 import $api from "@/network/api";
-import {debounce} from 'lodash-es'
+import { debounce } from "lodash-es";
 
 export default {
   name: "home",
@@ -124,12 +124,12 @@ export default {
       }
     },
     // 登录注册-前端验证
-    loginAndRegisterClick:debounce(function(){
+    loginAndRegisterClick: debounce(function() {
       const { username, password } = this;
       if (!username) return this.$message.error("账号不能为空");
       if (!password) return this.$message.error("密码不能为空");
       this.loginType ? this.login() : this.register();
-    },300),
+    }, 300),
     // 登录
     async login() {
       const { username, password } = this;
