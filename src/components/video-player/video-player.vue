@@ -1,7 +1,3 @@
-<!--videoInfo: {-->
-<!--url: require('@/assets/video/test.mp4'),-->
-<!--frameRate: 25-->
-<!--}-->
 <template>
   <el-card shadow="hover">
     <div
@@ -10,117 +6,35 @@
       @keydown="videoPlayerKeyEvent"
       onselectstart="return false;"
     >
-      <!--     video 播放器       -->
       <div class="video_content">
-        <!--http://10.1.71.155/static/video/test.mp4-->
-        <!--@/assets/video/test.mp4-->
         <video
           class="player"
           ref="player"
-          src="@/assets/video/test.mp4"
+          :src="url"
           width="100%"
           height="100%"
-          preload="auto"
+          :preload="preload"
           @canplaythrough="videoEvent('canplaythrough')"
           @playing="videoEvent('playing')"
           @pause="videoEvent('pause')"
           @ended="videoEvent('end')"
           @mouseover="videoEvent('mouseover')"
           @mouseout="videoEvent('mouseout')"
-        ></video>
-        <video
-          v-show="false"
-          ref="playerPreview"
-          src="@/assets/video/test.mp4"
-          width="100%"
-          height="100%"
-        ></video>
+        />
       </div>
       <div class="video_btn">
-        <!--     i：按钮封装       -->
-        <i
-          v-show="!ifPlay"
-          class="playerBtn el-icon-video-play"
-          title="播放(空格)"
-          type="play-circle"
-          @click="playerBtnEvent('play')"
-        />
-        <i
-          v-show="ifPlay"
-          class="playerBtn el-icon-video-pause"
-          title="暂停(空格)"
-          type="pause-circle"
-          @click="playerBtnEvent('pause')"
-        />
-        <i
-          class="playerBtn el-icon-refresh-left"
-          title="停止(Enter)"
-          type="undo"
-          @click="playerBtnEvent('stop')"
-        />
+        <template v-for="(item, index) in playBtnConfig">
+          <i
+            :key="index"
+            class="playerBtn"
+            :class="item.icon"
+            :title="item.title"
+            @click="item.fn(self)"
+          />
+        </template>
         <div class="time-box">
           <span class="time" title="时:分:秒:帧" ref="time">00:00:00:00</span>
         </div>
-        <i
-          class="playerBtn el-icon-arrow-left"
-          title="上一帧(方向左)"
-          type="step-backward"
-          @click="playerBtnEvent('back')"
-        />
-        <i
-          class="playerBtn el-icon-arrow-right"
-          title="下一帧(方向右)"
-          type="step-forward"
-          @click="playerBtnEvent('forward')"
-        />
-        <i
-          class="playerBtn el-icon-sort-down"
-          title="入点"
-          type="login"
-          @click="logEvent('login')"
-        />
-        <i
-          class="playerBtn el-icon-sort-up"
-          title="出点"
-          type="logout"
-          @click="logEvent('logout')"
-        />
-        <i
-          class="playerBtn el-icon-sort"
-          title="清除入点和出点"
-          type="close"
-          @click="logEvent('logRemove')"
-        />
-        <i
-          class="playerBtn el-icon-caret-bottom"
-          title="跳转至入点"
-          type="vertical-align-bottom"
-          @click="logEvent('toLogin')"
-        />
-        <i
-          class="playerBtn el-icon-caret-top"
-          title="跳转至出点"
-          type="vertical-align-top"
-          @click="logEvent('toLogout')"
-        />
-        <!--     input：调节声音大小       -->
-        <i
-          class="playerBtn el-icon-s-operation"
-          title="音量(上下方向控制音量)"
-          type="customer-service"
-          @click="volumeEvent('volumeClick')"
-        />
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value="100"
-          ref="range"
-          @mousedown="volumeEvent('mouseDown')"
-          @mousemove="volumeEvent('mouseMove')"
-          @mouseup="volumeEvent('mouseUp')"
-        />
-        <!--     progress 进度条封装       -->
         <div class="progress">
           <progress
             ref="progress"
@@ -136,9 +50,8 @@
             @mouseleave="progressMouseLeave"
           >
           </progress>
-          <span class="login" ref="login"></span>
-          <span class="logout" ref="logout"></span>
-          <img class="video_preview" ref="preview" src="" />
+          <span class="login" ref="login" />
+          <span class="logout" ref="logout" />
         </div>
       </div>
     </div>
@@ -146,27 +59,38 @@
 </template>
 
 <script>
+import timeFormat from "./utils/timeFormat";
+import { playBtnConfig } from "./constants/video.config";
 export default {
   name: "videoPlayer",
   data() {
     return {
+      self: null,
+      playBtnConfig,
       player: null, //视频播放器
-      playerPreview: null, //视频进度条预览
+      isPlay: false,
       ifLoad: false, //视频是否加载完成
-      ifPlay: false, //播放暂停切换
       timer: null, //播放器定时器
       ifPreviewMouseDown: false, //进度条实时变化
-      ifPreview: false, //进度条预览图
-      ifVolumeMouseDown: false, //音量实时变化
     };
   },
   props: {
-    videoInfo: Object,
+    url: {
+      required: true,
+      type: String,
+    },
+    frameRate: {
+      required: true,
+      type: Number,
+    },
+    preload: {
+      type: String,
+      default: "auto",
+    },
   },
-  created() {},
   mounted() {
     this.player = this.$refs.player;
-    this.playerPreview = this.$refs.playerPreview;
+    this.self = this;
     this.player.addEventListener("keydown", this.videoPlayerKeyEvent);
   },
   destroyed() {
@@ -182,27 +106,23 @@ export default {
   },
   methods: {
     videoPlayerKeyEvent(event) {
-      let myVid = this.player;
-      // console.log(event.key)
-      if (event.key === " " && this.ifPlay === false) {
-        this.playerBtnEvent("play");
-      } else if (event.key === " " && this.ifPlay === true) {
-        this.playerBtnEvent("pause");
-      } else if (event.key === "Enter") {
-        this.playerBtnEvent("stop");
-      } else if (event.key === "ArrowLeft") {
-        this.playerBtnEvent("back");
-      } else if (event.key === "ArrowRight") {
-        this.playerBtnEvent("forward");
-      } else if (event.key === "ArrowUp") {
-        this.$refs.range.value++;
-        myVid.volume = this.$refs.range.value / 100;
-      } else if (event.key === "ArrowDown") {
-        this.$refs.range.value--;
-        myVid.volume = this.$refs.range.value / 100;
+      switch (event.key) {
+        case " ":
+          !this.isPlay
+            ? playBtnConfig.play.fn(this)
+            : playBtnConfig.pause.fn(this);
+          break;
+        case "Enter":
+          playBtnConfig.stop.fn(this);
+          break;
+        case "ArrowLeft":
+          playBtnConfig.backward.fn(this);
+          break;
+        case "ArrowRight":
+          playBtnConfig.forward.fn(this);
+          break;
       }
     },
-    //warning 设置定时器让播放器静音播放1s解决刷新进页面第一次播放前1s卡顿的问题
     videoEvent(status) {
       switch (status) {
         case "canplaythrough":
@@ -215,10 +135,10 @@ export default {
             this.timer = setInterval(() => {
               this.$refs.time.innerText = timeFormat(
                 this.player.currentTime,
-                this.videoInfo.frameRate
+                this.frameRate
               );
               this.$refs.progress.value = this.player.currentTime;
-            }, this.videoInfo.frameRate);
+            }, this.frameRate);
           }
           break;
         case "pause":
@@ -227,56 +147,16 @@ export default {
           this.timer = null;
           this.$refs.time.innerText = timeFormat(
             this.player.currentTime,
-            this.videoInfo.frameRate
+            this.frameRate
           );
           break;
         case "end":
           //视频播放完成
-          this.ifPlay = false;
           this.player.currentTime = 0;
           this.$refs.progress.value = this.player.currentTime;
           this.$refs.time.innerText = timeFormat(
             this.player.currentTime,
-            this.videoInfo.frameRate
-          );
-          break;
-      }
-    },
-    playerBtnEvent(status) {
-      //播放器 播放，暂停，停止
-      switch (status) {
-        case "play":
-          this.ifPlay = true;
-          this.player.play();
-          break;
-        case "pause":
-          this.ifPlay = false;
-          this.player.pause();
-          break;
-        case "stop":
-          this.player.currentTime = 0;
-          this.ifPlay = false;
-          this.player.pause();
-          this.$refs.progress.value = this.player.currentTime;
-          this.$refs.time.innerText = timeFormat(
-            this.player.currentTime,
-            this.videoInfo.frameRate
-          );
-          break;
-        case "back":
-          this.player.currentTime -= 1 / this.videoInfo.frameRate;
-          this.$refs.progress.value = this.player.currentTime;
-          this.$refs.time.innerText = timeFormat(
-            this.player.currentTime,
-            this.videoInfo.frameRate
-          );
-          break;
-        case "forward":
-          this.player.currentTime += 1 / this.videoInfo.frameRate;
-          this.$refs.progress.value = this.player.currentTime;
-          this.$refs.time.innerText = timeFormat(
-            this.player.currentTime,
-            this.videoInfo.frameRate
+            this.frameRate
           );
           break;
       }
@@ -302,10 +182,9 @@ export default {
           this.$refs.progress.value = this.player.currentTime;
           this.$refs.time.innerText = timeFormat(
             this.player.currentTime,
-            this.videoInfo.frameRate
+            this.frameRate
           );
           this.player.pause();
-          this.ifPlay = false;
           break;
         case "toLogout":
           let right = isNaN(parseFloat(this.$refs.logout.style.right))
@@ -316,13 +195,11 @@ export default {
           this.$refs.progress.value = this.player.currentTime;
           this.$refs.time.innerText = timeFormat(
             this.player.currentTime,
-            this.videoInfo.frameRate
+            this.frameRate
           );
           this.player.pause();
-          this.ifPlay = false;
           break;
       }
-
       function ifLoginSmall(login, logout, ifLogin, value) {
         let leftLog = isNaN(parseFloat(login.style.left))
           ? 0
@@ -354,12 +231,8 @@ export default {
       this.$refs.progress.value = this.player.currentTime;
       this.$refs.time.innerText = timeFormat(
         this.player.currentTime,
-        this.videoInfo.frameRate
+        this.frameRate
       );
-    },
-    progressMouseEnter() {
-      this.ifPreview = true;
-      this.$refs.preview.style.display = "block";
     },
     progressMouseDown() {
       this.ifPreviewMouseDown = true;
@@ -372,104 +245,15 @@ export default {
         this.$refs.progress.value = this.player.currentTime;
         this.$refs.time.innerText = timeFormat(
           this.player.currentTime,
-          this.videoInfo.frameRate
+          this.frameRate
         );
-      }
-      if (this.ifPreview) {
-        let canvas = document.createElement("canvas"); // 创建一个画布
-        canvas.width = 100;
-        canvas.height = 50;
-        this.playerPreview.currentTime =
-          (this.player.duration * event.offsetX) /
-          this.$refs.progress.offsetWidth;
-        canvas
-          .getContext("2d")
-          .drawImage(this.playerPreview, 0, 0, canvas.width, canvas.height); // getContext:设置画布环境；drawImage:画画
-        this.$refs.preview.src = canvas.toDataURL("image/png"); // 获取图片的url
-        this.$refs.preview.style.left = event.offsetX - 50 + "px";
       }
     },
     progressMouseUp() {
       this.ifPreviewMouseDown = false;
     },
-    progressMouseLeave() {
-      this.ifPreview = false;
-      this.$refs.preview.style.display = "none";
-    },
-    //改变播放视频声音大小
-    volumeEvent(status) {
-      let myVid = this.player;
-      let value = this.$refs.range.value;
-      switch (status) {
-        case "volumeClick":
-          if (!myVid.muted) {
-            myVid.muted = true;
-            this.$refs.range.value = 0;
-          } else {
-            myVid.muted = false;
-            this.$refs.range.value = 100;
-          }
-          break;
-        case "mouseDown":
-          this.ifVolumeMouseDown = true;
-          break;
-        case "mouseMove":
-          if (this.ifVolumeMouseDown) {
-            myVid.volume = value / 100;
-          }
-          break;
-        case "mouseUp":
-          this.ifVolumeMouseDown = false;
-          break;
-      }
-    },
-    // btnClick() {
-    //     //入点，出点时间
-    //     let left = isNaN(parseFloat(this.$refs.login.style.left)) ? 0 : parseFloat(this.$refs.login.style.left)
-    //     let right = isNaN(parseFloat(this.$refs.logout.style.right)) ? 0 : parseFloat(this.$refs.logout.style.right)
-    //     console.log('入点时间', this.player.duration * left / 100)
-    //     console.log(timeFormat(this.player.duration * left / 100, this.videoInfo.frameRate))
-    //     console.log('出点时间', this.player.duration - this.player.duration * right / 100)
-    //     console.log(timeFormat(this.player.duration - this.player.duration * right / 100, this.videoInfo.frameRate))
-    // }
   },
 };
-
-//时分秒帧转换
-function timeFormat(time, frameRate) {
-  let timeStr = "";
-  let stringFormat = (i) => {
-    //if i<10 return '0'+i else return i
-    return i < 10 ? `0${i}` : `${i}`;
-  };
-  let stringFrame = (i) => {
-    let res = parseInt(i * frameRate);
-    return res < 10 ? `0${res}` : `${res}`;
-  };
-  let minuteTime = 0;
-  let secondTime = 0;
-  let hourTime = 0;
-  let setTime = parseInt(time);
-  let setFrame = time - parseInt(time);
-  if (setTime < 60) {
-    timeStr = `00:00:${stringFormat(setTime)}:${stringFrame(setFrame)}`;
-  } else if (setTime >= 60 && setTime < 3600) {
-    minuteTime = parseInt(setTime / 60);
-    secondTime = parseInt(setTime % 60);
-    timeStr = `00:${stringFormat(minuteTime)}:${stringFormat(
-      secondTime
-    )}:${stringFrame(setFrame)}`;
-  } else if (setTime >= 3600) {
-    let _time = parseInt(setTime % 3600);
-    hourTime = parseInt(setTime / 3600);
-    minuteTime = parseInt(_time / 60);
-    secondTime = parseInt(_time % 60);
-    timeStr = `${stringFormat(hourTime)}:${stringFormat(
-      minuteTime
-    )}:${stringFormat(secondTime)}:${stringFrame(setFrame)}`;
-  }
-  return timeStr;
-}
 </script>
 
 <style scoped lang="less">
@@ -480,6 +264,7 @@ function timeFormat(time, frameRate) {
   width: 100%;
   height: 100%;
   min-width: 500px;
+  outline: none;
   /*更改1：给整个div标签外套入一个卡片样式，以下的样式先注释*/
   /*box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);*/
   /*padding: 10px;*/
@@ -596,15 +381,6 @@ function timeFormat(time, frameRate) {
         position: absolute;
         top: 15px;
         left: -14px;
-      }
-
-      .video_preview {
-        width: 100px;
-        height: 50px;
-        position: absolute;
-        top: -50px;
-        left: -50px;
-        display: none;
       }
     }
   }
