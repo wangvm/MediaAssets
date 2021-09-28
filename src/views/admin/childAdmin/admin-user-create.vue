@@ -3,9 +3,7 @@
     <div slot="header" class="clearfix">
       <span
         >创建用户
-        <span class="user-create-tip">
-          注：账号为空不会创建用户
-        </span>
+        <span class="user-create-tip"> 注：账号为空不会创建用户 </span>
       </span>
       <el-button
         style="float: right; padding: 3px 5px"
@@ -27,9 +25,16 @@
       <div :key="index" class="create-item">
         <el-input
           class="item-input"
-          v-model="item.username"
+          v-model="item.id"
           clearable
           placeholder="请输入账号"
+          prefix-icon="el-icon-paperclip"
+        />
+        <el-input
+          class="item-input"
+          v-model="item.username"
+          clearable
+          placeholder="请输入用户名"
           prefix-icon="el-icon-user"
         />
         <el-input
@@ -42,7 +47,7 @@
           prefix-icon="el-icon-warning-outline"
         />
         <el-select
-          v-model="item.role"
+          v-model="item.authority"
           placeholder="请选择权限"
           filterable
           class="item-select"
@@ -115,15 +120,23 @@ export default {
   methods: {
     // 初始化创建列表
     initUserList() {
-      this.createList = [{ username: "", password: "", role: 4 }];
+      this.createList = [{ id: "", username: "", password: "", authority: 4 }];
     },
     // 增加创建用户 +号按钮
     addItem() {
-      this.createList.push({ username: "", password: "", role: 4 });
+      this.createList.push({
+        id: "",
+        username: "",
+        password: "",
+        authority: 4,
+      });
     },
     // 创建用户按钮
-    createUser: debounce(async function() {
-      if (this.createList.length === 1 && this.createList[0].username === "") {
+    createUser: debounce(async function () {
+      if (
+        this.createList.length === 1 &&
+        (this.createList[0].id === "" && this.createList[0].username)
+      ) {
         this.$message.error("注册信息为空");
         return;
       }
@@ -137,9 +150,10 @@ export default {
         return this.$message.error(`用户${emptyPasswordIndex * 1 + 1}密码为空`);
       let userList = this.filterItem(this.createList).map((val) => {
         return {
+          id: val.id,
           username: val.username,
           password: val.password,
-          role: val.role,
+          authority: val.authority,
         };
       });
       try {
@@ -151,28 +165,26 @@ export default {
     }, 300),
     // 判断用户名是否重复
     repeatItem(list) {
-      let usernameList = [];
+      let idList = [];
       let repeatIndex = [-1, -1];
       Object.keys(list).forEach((val) => {
-        if (list[val].username === "") return;
-        let index = usernameList.findIndex(
-          (name) => name === list[val].username
-        );
+        if (list[val].id === "") return;
+        let index = idList.findIndex((name) => name === list[val].id);
         index === -1
-          ? usernameList.push(list[val].username)
+          ? idList.push(list[val].id)
           : (repeatIndex = [index, parseInt(val)]);
       });
       return repeatIndex;
     },
     // 过滤用户名为空的信息
     filterItem(list) {
-      return list.filter((val) => val.username !== "");
+      return list.filter((val) => val.id !== "" && val.username !== "");
     },
     // 判断密码是否为空
     emptyPassword(list) {
       let emptyList = [];
       Object.keys(list).forEach((val) => {
-        list[val].username !== "" &&
+        list[val].id !== "" &&
           list[val].password === "" &&
           emptyList.push(parseInt(val));
       });

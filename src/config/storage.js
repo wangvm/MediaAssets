@@ -1,6 +1,6 @@
 const LOGIN_TYPE = 'loginType'
 const CURRENT_MENU = 'currentMenu'
-const USER_TOKEN = 'userToken'
+// const USER_TOKEN = 'userToken'
 
 // 判断登录状态
 export function setLoginType(loginType) {
@@ -29,17 +29,17 @@ export function removeCurrentMenu() {
 }
 
 //保存token
-export function setUserToken(token) {
-	localStorage.setItem(USER_TOKEN, token)
-}
+// export function setUserToken(token) {
+// 	localStorage.setItem(USER_TOKEN, token)
+// }
 
-export function getUserToken() {
-	return localStorage.getItem(USER_TOKEN)
-}
+// export function getUserToken() {
+// 	return localStorage.getItem(USER_TOKEN)
+// }
 
-export function removeUserToken() {
-	localStorage.removeItem(USER_TOKEN)
-}
+// export function removeUserToken() {
+// 	localStorage.removeItem(USER_TOKEN)
+// }
 
 // 判断登录状态
 export function setIfLogin(bool) {
@@ -57,5 +57,5 @@ export function removeIfLogin() {
 export function removeAllSessionStorage() {
 	removeCurrentMenu()
 	removeIfLogin()
-	removeUserToken()
+	// removeUserToken()
 }

@@ -25,7 +25,6 @@ import adminHeader from "@/components/admin-header";
 import {
   getCurrentMenu,
   getLoginType,
-  getUserToken,
   setCurrentMenu,
 } from "@/config/storage";
 import menuConfig from "@/config/menu-config";
@@ -46,31 +45,28 @@ export default {
     ...mapState("common", ["currentMenu", "loginType"]),
   },
   created() {
-    this.initUserToken();
     this.getMenuList();
   },
   methods: {
     ...mapMutations("common", [
-      "setToken",
       "updateLoginType",
       "updateCurrentMenu",
     ]),
     initUserToken() {
-      let userToken = getUserToken();
       let loginType = getLoginType();
-      if (!userToken) {
-        this.$message.error("登录超时，请重新登录");
-        this.$router.push("/");
-      } else {
-        this.setToken(userToken);
-        this.updateLoginType(loginType);
-      }
+      // if (!userToken) {
+      //   this.$message.error("登录超时，请重新登录");
+      //   this.$router.push("/");
+      // } else {
+      //   this.setToken(userToken);
+      //   this.updateLoginType(loginType);
+      // }
     },
     getMenuList() {
       let loginType = this.loginType;
       let getMenu = [];
-      //rol值为admin:0;user:1创建；user:2编目; user:3审核
-      if (loginType === userType["0"].key.toString()) {
+      //authority值为admin:0;user:1创建；user:2编目; user:3审核
+      if (loginType.toString() === userType["0"].key.toString()) {
         getMenu = [
           { name: "主页", value: "00" },
           { name: "项目管理", value: "10" },

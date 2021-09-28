@@ -4,17 +4,17 @@ import { setUserToken, setLoginType } from "@/config/storage";
 export default {
   // 用户登录
   async userLogin({ commit, state }, params) {
-    commit('setToken', '')
+    // commit('setToken', '')
     try {
-      const { username:id, password } = params
+      const { id: id, password } = params
       let resLogin = await $api.login(id, password);
       if (resLogin.code === 200) {
-        let token = resLogin.data.token;
-        let loginType = resLogin.data.role;
-        setUserToken(token);
-        setLoginType(loginType)
+        // let token = resLogin.data.token;
+        let loginType = resLogin.data.authority;
+        // setUserToken(token);
+        setLoginType(loginType);
         commit('updateLoginType', loginType)
-        commit('setToken', token)
+        // commit('setToken', token)
       }
     } catch (e) {
       this.$catch = e
@@ -46,7 +46,7 @@ export default {
           "edit": false,
           "index": index + 1,
           "edit_password": val.password,
-          "edit_role": val.role,
+          "edit_authority": val.authority,
         }
         userList.push({ ...val, ...options })
       })
