@@ -4,12 +4,41 @@
       <div class="header-title" @click="initProjectList">{{ title }}</div>
       <div class="header-search">
         <el-input
+          class="search-input"
           size="medium"
           :placeholder="placeholder"
           v-model="searchValue"
           @keydown.enter.native="searchClick"
+          clearable
         >
-          <i slot="prefix" class="el-input__icon el-icon-search"></i>
+          <el-select
+            class="search-select"
+            v-model="select"
+            slot="prepend"
+            placeholder="请选择"
+          >
+            <el-option
+              v-show="placeholder == '请输入项目名称'"
+              :label="item.label"
+              :value="item.value"
+              v-for="item in Project"
+              :key="item.value"
+            ></el-option>
+            <el-option
+              v-show="placeholder == '请输入用户名称'"
+              :label="item.label"
+              :value="item.value"
+              v-for="item in User"
+              :key="item.value"
+            ></el-option>
+            <el-option
+              v-show="placeholder == '请输入编目名称'"
+              :label="item.label"
+              :value="item.value"
+              v-for="item in Task"
+              :key="item.value"
+            ></el-option>
+          </el-select>
         </el-input>
         <el-button type="mini" @click="searchClick">搜索</el-button>
       </div>
@@ -33,6 +62,7 @@
 </template>
 
 <script>
+import { mapActions } from "vuex";
 export default {
   name: "AdminLIst",
   data() {
@@ -42,6 +72,29 @@ export default {
       searchValue: "", //搜索康输入的值
       pageSize: 5, //默认每页显示多少条
       pageSizes: [5, 10, 15, 20], //每页显示多少条有哪些选项
+      select: this.placeholder === "请输入用户名称" ? 4 : 7,
+      Project: [
+        { value: 1, label: "项目名" },
+        { value: 2, label: "项目类别" },
+        { value: 3, label: "项目状态" },
+        { value: 4, label: "起始时间" },
+        { value: 5, label: "结束时间" },
+        { value: 6, label: "组长账号" },
+        { value: 7, label: "全部内容" },
+      ],
+      User: [
+        { value: 1, label: "账号" },
+        { value: 2, label: "姓名" },
+        { value: 3, label: "权限" },
+        { value: 4, label: "全部内容" },
+      ],
+      Task: [
+        { value: 1, label: "任务名" },
+        { value: 2, label: "所属项目名" },
+        { value: 3, label: "任务状态" },
+        { value: 4, label: "编目员账号" },
+        { value: 5, label: "审核员账号" },
+      ],
     };
   },
   props: {
@@ -65,6 +118,7 @@ export default {
     },
   },
   methods: {
+    ...mapActions("common", ["getUserList", "getProjectList"]),
     //每页显示多少条
     handleSizeChange(val) {
       this.pageSize = val; //此时需更新每页显示多少条
@@ -99,6 +153,61 @@ export default {
     },
     //点击搜索
     async searchClick() {
+      let content = {
+        state: "",
+        searchValue: "",
+      };
+      if (this.placeholder === "请输入用户名称") {
+        if (this.select === 1) {
+          content.state = "id";
+          content.searchValue = this.searchValue;
+          await this.getUserList(content);
+        } else if (this.select === 2) {
+          content.state = "name";
+          content.searchValue = this.searchValue;
+          await this.getUserList(content);
+        } else if (this.select === 3) {
+          content.state = "authority";
+          content.searchValue = this.searchValue;
+          await this.getUserList(content);
+        } else if (this.select === 4) {
+          content.state = "all";
+          content.searchValue = this.searchValue;
+          await this.getUserList(content);
+        }
+      } else if (this.placeholder === "请输入项目名称") {
+        console.log("搜搜项目");
+        if (this.select === 1) {
+          content.state = "name";
+          content.searchValue = this.searchValue;
+          await this.getProjectList(content);
+        } else if (this.select === 2) {
+          content.state = "category";
+          content.searchValue = this.searchValue;
+          await this.getProjectList(content);
+        } else if (this.select === 3) {
+          content.state = "status";
+          content.searchValue = this.searchValue;
+          await this.getProjectList(content);
+        } else if (this.select === 4) {
+          content.state = "start";
+          content.searchValue = this.searchValue;
+          await this.getProjectList(content);
+        } else if (this.select === 5) {
+          content.state = "end";
+          content.searchValue = this.searchValue;
+          await this.getProjectList(content);
+        } else if (this.select === 6) {
+          content.state = "leader";
+          content.searchValue = this.searchValue;
+          await this.getProjectList(content);
+        } else if (this.select === 7) {
+          content.state = "all";
+          content.searchValue = this.searchValue;
+          await this.getProjectList(content);
+        }
+      } else if (this.placeholder === "请输入编目名称") {
+      }
       // TODO 搜索部分要弄
       // let searchList = [];
       // let res = await $api.getProjectById(this.searchValue); //将通过用户行搜索到的对应的对象拿到
@@ -142,6 +251,12 @@ export default {
 
     .header-search {
       display: flex;
+      .search-input {
+        width: 30em;
+        .search-select {
+          width: 9em;
+        }
+      }
     }
   }
 

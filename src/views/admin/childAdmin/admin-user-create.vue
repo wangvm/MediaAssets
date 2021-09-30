@@ -75,7 +75,7 @@
       <el-upload
         v-loading="ifUploadLoading"
         class="upload-demo"
-        action="null"
+        action="http://121.196.100.229:8080/mam/user/add/file"
         multiple
         :limit="1"
         :on-change="upload"
@@ -90,7 +90,7 @@
             </p>
           </div>
         </div>
-        <img v-lazy="require('@/assets/images/csvRules.jpg')" alt="" />
+        <img v-lazy="require('@/assets/images/csvRules.png')" alt="" />
       </el-upload>
       <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取 消</el-button>
@@ -135,7 +135,8 @@ export default {
     createUser: debounce(async function () {
       if (
         this.createList.length === 1 &&
-        (this.createList[0].id === "" && this.createList[0].username)
+        this.createList[0].id === "" &&
+        this.createList[0].username
       ) {
         this.$message.error("注册信息为空");
         return;

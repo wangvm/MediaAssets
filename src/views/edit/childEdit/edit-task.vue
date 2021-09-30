@@ -49,7 +49,7 @@
                 content="删除项目"
                 placement="right"
             >
-              <h1>{{ scope.row.status }}</h1>
+              <!-- <h1>{{ scope.row.status }}</h1> -->
               <el-button
                   size="small"
                   type="danger"

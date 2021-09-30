@@ -40,6 +40,9 @@ export default function (url, data, method = 'GET') {
     }
     promise.then(res => {
       console.log(res);
+      // if (res.data.code !== 200) {
+      //   Message.error(res.data.message)
+      // }
       res.data.code === 200 ?
         Message.success(res.data.message)
         : Message.error(res.data.message)

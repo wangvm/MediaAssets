@@ -8,48 +8,103 @@
   >
     <div class="content_table">
       <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
-        <el-table-column prop="index" label="序号" />
-        <el-table-column prop="projectName" label="项目名称" />
-        <el-table-column prop="createTime" label="创建时间">
+        <el-table-column prop="index" label="序号" fixed="left" width="100" />
+        <el-table-column prop="projectName" label="项目名称" width="200">
+          <template slot-scope="scope">
+            <span v-if="!scope.row.edit">
+              {{ scope.row.projectName }}
+            </span>
+            <span v-else>
+              <el-input
+                v-model="scope.row.edit_projectName"
+                placeholder="请输入用户名"
+                clearable
+              />
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="leaderId" label="组长账号" width="200">
+          <template slot-scope="scope">
+            <span v-if="!scope.row.edit">
+              {{ scope.row.leaderId }}
+            </span>
+            <span v-else>
+              <el-input
+                v-model="scope.row.edit_leaderId"
+                placeholder="请输组长账号"
+                clearable
+              />
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="200">
           <template slot-scope="scope">
             {{ dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm") }}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="进度">
+        <el-table-column prop="category" label="类别" width="200">
+          <template slot-scope="scope">
+            <span v-if="!scope.row.edit">
+              {{ scope.row.category }}
+            </span>
+            <span v-else>
+              <el-input
+                v-model="scope.row.edit_category"
+                placeholder="请输类别"
+                clearable
+              />
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="进度" width="200">
           <template slot-scope="scope">
             <span
+              v-if="!scope.row.edit"
               class="project-status"
               :class="['project-status-' + scope.row.status]"
             >
               {{ projectStatus[scope.row.status].label }}
             </span>
+            <span v-else>
+              <el-select v-model="scope.row.edit_status">
+                <el-option
+                  v-for="item in projectStatus"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作">
+        <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-tooltip
+              v-if="!scope.row.edit"
               class="item"
               effect="light"
-              content="进入项目"
+              content="编辑项目"
               placement="left"
             >
               <el-button
+                v-if="!scope.row.edit"
                 size="small"
                 type="primary"
                 icon="el-icon-edit"
                 circle
-                @click="enterProject(scope.row)"
+                @click.native="editProject(scope.row)"
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === '0'"
+              v-if="!scope.row.edit"
               class="item"
               effect="light"
               content="删除项目"
-              placement="right"
+              placement="bottom"
             >
-              <h1>{{ scope.row.status }}</h1>
               <el-button
+                v-if="!scope.row.edit"
                 size="small"
                 type="danger"
                 icon="el-icon-delete"
@@ -58,6 +113,54 @@
                 :disabled="projectStatus[scope.row.status].value === '-1'"
               ></el-button>
             </el-tooltip>
+            <el-tooltip
+              v-if="!scope.row.edit"
+              class="item"
+              effect="light"
+              content="进入项目"
+              placement="right"
+            >
+              <el-button
+                v-if="!scope.row.edit"
+                size="small"
+                type="warning"
+                icon="el-icon-s-promotion"
+                circle
+                @click.native="enterProject(scope.row)"
+              ></el-button>
+            </el-tooltip>
+            <el-tooltip
+              v-if="scope.row.edit"
+              class="item"
+              effect="light"
+              content="保存修改"
+              placement="left"
+            >
+              <el-button
+                v-show="scope.row.edit"
+                size="small"
+                type="success"
+                icon="el-icon-check"
+                @click.native="saveEdit(scope.$index, scope.row)"
+                circle
+              ></el-button
+            ></el-tooltip>
+            <el-tooltip
+              v-if="scope.row.edit"
+              class="item"
+              effect="light"
+              content="取消"
+              placement="right"
+            >
+              <el-button
+                v-if="scope.row.edit"
+                size="small"
+                type="info"
+                icon="el-icon-close"
+                @click.native="cancleEdit(scope.row)"
+                circle
+              ></el-button
+            ></el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -87,20 +190,33 @@ export default {
   computed: {
     ...mapState("common", ["projectList", "loginType"]),
   },
+  watch: {
+    projectList: "updateProjectList",
+  },
   async created() {
     await this.initProjectList(); //初始化数组信息
   },
   methods: {
     ...mapActions("common", ["getProjectList"]),
     //获取到信息
-    initProjectList: debounce(async function() {
+    initProjectList: debounce(async function () {
+      let content = {
+        state: "all",
+        searchValue: "",
+      };
       this.loading = true; //开始缓冲
-      await this.getProjectList();
+      await this.getProjectList(content);
       this.handleSizeChange(5);
       this.loading = false; //结束缓冲
+      console.log(this.projectList);
     }, 300),
     changeShowList(val) {
       this.showList = val;
+    },
+    updateProjectList() {
+      this.loading = true; //开始缓冲
+      this.handleSizeChange(5);
+      this.loading = false; //结束缓冲
     },
     // TODO 此处封装有问题，建议最后由后端实现分页
     handleSizeChange(val) {
@@ -117,11 +233,41 @@ export default {
         params: { projectName: val.projectName },
       });
     },
+    editProject(row) {
+      console.log(row);
+      row.edit = true;
+    },
+    async saveEdit(index, row) {
+      if (row.edit_projectName === "") {
+        row.edit_projectName = row.projectName;
+      }
+      if (row.edit_leaderId === "") {
+        row.edit_leaderId = row.leaderId;
+      }
+      if (row.edit_category === "") {
+        row.edit_category = row.category;
+      }
+      if (row.edit_status === "") {
+        row.edit_status = row.status;
+      }
+      let resProject = await $api.updateProject(
+        row.edit_projectName,
+        row.edit_leaderId,
+        row.edit_category,
+        row.edit_status
+      );
+      row.edit = false;
+      this.initProjectList();
+    },
+    cancleEdit(row) {
+      row.edit = false;
+    },
     //删除项目
     async deleteProject(currentProject) {
+      console.log(currentProject);
       this.loading = true;
       try {
-        await $api.deleteProject(currentProject.pid);
+        await $api.deleteProject(currentProject.projectName);
       } catch (e) {
         this.$message.error(e);
       }
