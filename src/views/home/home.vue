@@ -17,9 +17,14 @@
         <div class="login-show">
           <div class="form">
             <div class="form-title">{{ loginTypeTitle }}</div>
+            <div class="form-input" v-if="!loginType">
+              <el-input placeholder="请输入用户名" v-model="username" clearable>
+                <template slot="prepend">用 户 名 ：</template>
+              </el-input>
+            </div>
             <div class="form-input">
-              <el-input placeholder="请输入账号" v-model="username">
-                <template slot="prepend">{{ loginTypeUsername }}</template>
+              <el-input placeholder="请输入账号" v-model="id">
+                <template slot="prepend">{{ loginTypeId }}</template>
               </el-input>
             </div>
             <div class="form-input">
@@ -85,17 +90,18 @@ export default {
   data() {
     return {
       loginType: true, //登录类型 true=登录 false=注册
-      username: "", //账号
+      username: "", //用户名
+      id: null, //账号
       password: "", //密码
       password1: "", //注册验证密码
     };
   },
   computed: {
-    ...mapState("common", ["token"]),
+    ...mapState("common", ["loginType"]),
     loginTypeTitle() {
       return this.loginType ? "用户登录" : "用户注册";
     },
-    loginTypeUsername() {
+    loginTypeId() {
       return this.loginType ? "账 号：" : "新 的 账 号：";
     },
     loginTypePassword() {
@@ -124,34 +130,47 @@ export default {
       }
     },
     // 登录注册-前端验证
-    loginAndRegisterClick: debounce(function() {
-      const { username, password } = this;
-      if (!username) return this.$message.error("账号不能为空");
+    loginAndRegisterClick: debounce(function () {
+      const { id, password } = this;
+      if (!id) return this.$message.error("账号不能为空");
       if (!password) return this.$message.error("密码不能为空");
       this.loginType ? this.login() : this.register();
     }, 300),
     // 登录
     async login() {
-      const { username, password } = this;
-      const params = { username, password };
-      await this.userLogin(params);
-      if (this.token) this.$router.push("/admin");
-      this.initFormData();
+      let retNum = /^\d*$/;
+      const { id, password } = this;
+      const params = { id, password };
+      if (retNum.test(id)) {
+        await this.userLogin(params);
+        if (this.loginType != "") this.$router.push("/admin");
+        this.initFormData();
+      } else {
+        this.$message.error("请输入正确格式的账号123");
+      }
     },
     // 注册
     async register() {
-      const { username, password, password1 } = this;
+      let retNum = /^\d*$/;
+      const { id, username, password, password1 } = this;
       if (password !== password1) return this.$message.error("两次密码不一致");
-      try {
-        let resRegister = await $api.register([{ username, password }]);
-        resRegister.code === 200 && this.changeLoginType("login");
-        this.initFormData();
-      } catch (e) {
-        this.$message.error(e);
+      if (retNum.test(id)) {
+        try {
+          let resRegister = await $api.register([
+            { id, username, password, authority: "1" },
+          ]);
+          resRegister.code === 200 && this.changeLoginType("login");
+          this.initFormData();
+        } catch (e) {
+          this.$message.error(e);
+        }
+      } else {
+        this.$message.error("请输入正确格式的账号");
       }
     },
     // 初始化input值
     initFormData() {
+      this.id = null;
       this.username = "";
       this.password = "";
       this.password1 = "";

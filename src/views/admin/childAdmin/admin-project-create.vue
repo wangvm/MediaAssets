@@ -7,6 +7,7 @@
 
 <script>
 import { debounce } from "lodash-es";
+import $api from "@/network/api";
 export default {
   name: "adminProjectCreate",
   data() {
@@ -15,10 +16,14 @@ export default {
     };
   },
   methods: {
-    createProject: debounce(function() {
+    createProject: debounce(function () {
       if (this.projectName === "") {
         this.$message.error("项目名不能为空");
         return;
+      } else {
+        let res = $api.createProject(this.projectName);
+        console.log(res);
+        this.projectName = "";
       }
       //TODO 项目创建
       console.log(this.projectName);

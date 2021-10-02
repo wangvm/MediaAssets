@@ -35,17 +35,12 @@
         </el-table>
       </div>
       <div class="home-right-img">
-        <el-card
-          class="img-item"
-          v-for="(item, index) in CatalogImages"
-          :key="index"
-          shadow="hover"
-        >
-          <!-- <img
+        <el-card class="img-item" v-for="item in CatalogImages" shadow="hover">
+          <img
             :v-lazy="require(item.img)"
             alt="图片加载错误，请检查网络"
             class="img"
-          /> -->
+          />
           <span>{{ item.title }}</span>
         </el-card>
       </div>
@@ -122,7 +117,7 @@ export default {
     },
 
     //左下角节目信息
-    getList: async function() {
+    getList: async function () {
       this.loading = true;
       let newTableData1 = [
         {

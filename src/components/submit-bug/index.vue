@@ -26,6 +26,7 @@
 </template>
 
 <script>
+import $api from "@/network/api";
 export default {
   name: "SubmitBug",
   data() {
@@ -34,6 +35,7 @@ export default {
       form: {
         message: "",
       },
+      title: "测试反馈",
     };
   },
   computed: {
@@ -45,10 +47,21 @@ export default {
     showDialog() {
       this.dialogFormVisible = true;
     },
-    submitBug() {
+    async submitBug() {
       console.log(this.form.message);
-      this.dialogFormVisible = false;
-      this.$message.success("感谢提交反馈");
+      // await $api.AddFeedback([
+      //   { title: this.title, details: this.form.message },
+      // ]);
+      try {
+        let title = this.title;
+        let details = this.form.message;
+        let addFeedback = await $api.AddFeedback([{ title, details }]);
+        console.log(addFeedback);
+      } catch (e) {
+        this.$message.error(e);
+      }
+      // this.dialogFormVisible = false;
+      // this.$message.success("感谢提交反馈");
     },
   },
 };

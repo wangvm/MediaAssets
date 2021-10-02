@@ -14,6 +14,7 @@
 <script>
 import { mapMutations } from "vuex";
 import { removeAllSessionStorage } from "@/config/storage";
+import $api from "@/network/api";
 
 export default {
   name: "adminHeader",
@@ -34,11 +35,21 @@ export default {
         })
         .catch(() => {});
     },
-    exitAdmin() {
-      removeAllSessionStorage();
-      this.setToken("");
-      this.updateLoginType("");
-      this.updateCurrentMenu("");
+    async exitAdmin() {
+      // try {
+      //   await $api.logout(res => {
+      //     console.log(res);
+      //   }).catch(err => {
+      //     console.log(err);
+      //   })
+      // } catch (e) {
+      //   this.$message.error(e);
+      // }
+
+      // removeAllSessionStorage();
+      // // this.setToken("");
+      // this.updateLoginType("");
+      // this.updateCurrentMenu("");
       this.$message.success("退出成功");
       this.$router.replace("/");
     },

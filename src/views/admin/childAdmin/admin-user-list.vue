@@ -9,14 +9,36 @@
     <div class="content_table">
       <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
         <el-table-column prop="index" label="序号" />
-        <el-table-column prop="username" label="账号"> </el-table-column>
+        <el-table-column prop="username" label="姓名">
+          <template slot-scope="scope">
+            <span v-if="!scope.row.edit">
+              {{ scope.row.username }}
+            </span>
+            <span v-else>
+              <el-input
+                v-model="scope.row.edit_username"
+                placeholder="请输入用户名"
+                clearable
+              />
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="password" label="密码">
           <template slot-scope="scope">
             <span v-if="!scope.row.edit">
-              {{ scope.row.password }}
+              {{ "********" }}
             </span>
             <span v-else>
-              <el-input v-model="scope.row.edit_password" />
+              <el-input
+                v-model="scope.row.edit_oldpassword"
+                placeholder="请输入原密码"
+                clearable
+              />
+              <el-input
+                v-model="scope.row.edit_newpassword"
+                placeholder="请输入新密码"
+                clearable
+              />
             </span>
           </template>
         </el-table-column>
@@ -25,17 +47,17 @@
             {{ dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm") }}
           </template>
         </el-table-column>
-        <el-table-column prop="role" label="权限">
+        <el-table-column prop="authority" label="权限">
           <template slot-scope="scope">
             <span
               v-if="!scope.row.edit"
               class="user-role"
-              :class="['user-role-' + scope.row.role]"
+              :class="['user-role-' + scope.row.authority]"
             >
-              {{ userType[scope.row.role].label }}
+              {{ userType[scope.row.authority].label }}
             </span>
             <span v-else>
-              <el-select v-model="scope.row.role" clearable>
+              <el-select v-model="scope.row.authority">
                 <el-option
                   v-for="item in userType"
                   :key="item.key"
@@ -69,6 +91,13 @@
               v-show="scope.row.edit"
               @click="deterMine(scope.$index, scope.row)"
               >确定
+            </el-button>
+            <el-button
+              size="small"
+              type="text"
+              v-show="scope.row.edit"
+              @click="resetClick(scope.$index, scope.row)"
+              >重置
             </el-button>
             <el-button
               size="small"
@@ -110,35 +139,52 @@ export default {
   async created() {
     await this.initUserList(); //初始化数组信息
   },
+  watch: {
+    userList: "updateUserList",
+  },
   computed: {
     ...mapState("common", ["userList"]),
   },
   methods: {
     ...mapActions("common", ["getUserList"]),
     //获取到信息
-    initUserList: debounce(async function() {
+    initUserList: debounce(async function () {
+      let content = {
+        state: "all",
+        searchValue: "",
+      };
       this.loading = true; //开始缓冲
-      await this.getUserList();
+      await this.getUserList(content);
       this.handleSizeChange(5);
       this.loading = false; //结束缓冲
     }, 300),
     changeShowList(val) {
       this.showList = val;
     },
-    //添加(属性)信息项
-    addAttr(list) {
-      this.loading = true;
-      let resUserList = [];
-      list.map((val, index) => {
-        val["edit"] = false;
-        val["index"] = index + 1;
-        val["edit_password"] = "";
-        val["edit_role"] = "";
-        resUserList.push(val);
-      });
-      this.userList = resUserList;
+    updateUserList() {
+      this.loading = true; //开始缓冲
+      this.handleSizeChange(5);
       this.loading = false; //结束缓冲
     },
+    // //添加(属性)信息项
+    // addAttr(list) {
+    //   console.log(111);
+    //   this.loading = true;
+    //   let resUserList = [];
+    //   list.map((val, index) => {
+    //     val["edit"] = false;
+    //     val["index"] = index + 1;
+    //     val["edit_username"] = "";
+    //     val["edit_oldpassword"] = "";
+    //     val["edit_newpassword"] = "";
+    //     val["edit_password"] = "";
+    //     val["edit_authority"] = "";
+    //     resUserList.push(val);
+    //   });
+    //   this.userList = resUserList;
+    //   console.log(this.userList);
+    //   this.loading = false; //结束缓冲
+    // },
     //每页显示多少条
     handleSizeChange(val) {
       let show = [];
@@ -152,22 +198,45 @@ export default {
     //编辑任务
     EditUser(row) {
       row.edit = true;
+      // let name = row.username;
+      // row.edit_username = name;
     },
     //删除任务
     async deleteUser(currentUser) {
-      console.log(currentUser);
-      let uid = currentUser.uid;
-      let resDeleteUser = await $api.deleteUser(uid);
-      console.log(resDeleteUser);
+      let id = currentUser.id;
+      let resDeleteUser = await $api.deleteUser(id);
+      if (resDeleteUser.code === 200) {
+        this.initUserList();
+      }
     },
     //确认修改任务
     deterMine(index, row) {
-      row.edit_password !== ""
-        ? (row.password = row.edit_password)
-        : (row.edit_password = row.password);
-      row.edit_role = row.role;
-      $api.updateUser(row.uid, row.password, row.edit_role);
+      if (
+        row.username !== row.edit_username &&
+        row.edit_username !== undefined
+      ) {
+        let resUsername = $api.updateUsername(row.id, row.edit_username);
+      }
+      if (
+        row.edit_newpassword !== undefined &&
+        row.edit_newpassword !== undefined
+      ) {
+        let resPassword = $api.updateUserPassword(
+          row.id,
+          row.edit_oldpassword,
+          row.edit_newpassword
+        );
+      }
+      if (row.edit_authority !== row.authority) {
+        let resAuthority = $api.updateAuthority(row.id, row.edit_authority);
+      }
+      row.edit = false;
       this.getUserList();
+    },
+    resetClick(index, row) {
+      let resetPwd = $api.resetPassword(row.id, "123");
+      row.password = "123";
+      row.edit_password = row.password;
       row.edit = false;
     },
     //取消修改任务

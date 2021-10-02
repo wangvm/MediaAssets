@@ -5,21 +5,22 @@ import { getUserToken } from "../config/storage"
 let baseUrl = 'http://121.196.100.229:8080/mam'
 // let baseUrl = 'http://192.168.3.206:8080'
 
-
 let instance = axios.create({
   headers: {},
   baseURL: baseUrl,
   crossDomain: true,
   withCredentials: false,
 })
+
+// axios.defaults.withCredentials = true
 //http request拦截器
 instance.interceptors.request.use(
   config => {
-    const token = getUserToken()
+    // const token = getUserToken()
     //debugger
-    if (token) {//判断是否存在token，如果存在则每个http header都加上token
-      config.headers.token = token
-    }
+    // if (token) {//判断是否存在token，如果存在则每个http header都加上token
+    //   config.headers.token = token
+    // }
     return config
   },
   err => {
@@ -32,14 +33,16 @@ export default function (url, data, method = 'GET') {
     let promise
     if (method === 'GET') {
       promise = instance.get(baseUrl + url, {
-        headers: {
-          'token': localStorage.getItem('token') || null
-        }, params: data
+        params: data
       })
     } else {
       promise = instance.post(baseUrl + url, data)
     }
     promise.then(res => {
+      console.log(res);
+      // if (res.data.code !== 200) {
+      //   Message.error(res.data.message)
+      // }
       res.data.code === 200 ?
         Message.success(res.data.message)
         : Message.error(res.data.message)
