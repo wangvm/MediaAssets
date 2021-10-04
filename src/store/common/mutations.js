@@ -13,5 +13,12 @@ export default {
   },
   setUserList(state, val) {
     state.userList = val
+  },
+  setTaskList(state, val) {
+    state.taskList = val
+  },
+  setFeedbackList(state, val) {
+    state.feedbackList = val
+    console.log(val);
   }
 }

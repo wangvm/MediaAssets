@@ -49,7 +49,26 @@ const projectStatus = {
   },
 }
 
+const feedbackStatus = {
+  /** 删除状态 */
+  'completed': {
+    value: "completed",
+    label: "完成",
+  },
+  /** 新创建状态 */
+  'all': {
+    value: "all",
+    label: "新创建",
+  },
+  /** 完成状态 */
+  'pending': {
+    value: "pending",
+    label: "处理中",
+  },
+}
+
 export {
   userType,
-  projectStatus
+  projectStatus,
+  feedbackStatus
 }

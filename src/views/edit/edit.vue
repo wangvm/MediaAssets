@@ -3,7 +3,9 @@
     <div slot="header" class="clearfix">
       <el-page-header class="edit-header" @back="goBack">
         <template slot="content">
-          <span v-if="this.$route.query.state">项目名称：{{ this.$route.query.projectName }}</span>
+          <span v-if="this.$route.query.state === 'project'"
+            >项目名称：{{ this.$route.query.projectName }}</span
+          >
           <span v-else>编目名称：{{ this.$route.query.editName }}</span>
         </template>
       </el-page-header>
@@ -19,9 +21,9 @@ export default {
     goBack() {
       // this.$router.push("/admin/projectList");
       // this.$router.go(-1);
-      if(this.$route.name ==='task') {
+      if (this.$route.path === "/edit/task") {
         this.$router.push("/admin/projectList");
-      }else if(this.$route.name === 'check') {
+      } else if (this.$route.path === "edit/check") {
         this.$router.push("/edit/task");
       }
     },

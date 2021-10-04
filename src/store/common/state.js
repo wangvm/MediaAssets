@@ -5,5 +5,7 @@ export default () => ({
   // token: '',
   // 管理部分
   projectList: [],
-  userList: []
+  userList: [],
+  taskList: [],
+  feedbackList: [],
 })

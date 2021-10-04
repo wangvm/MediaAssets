@@ -49,8 +49,12 @@ const $api = {
 
     // 批量添加任务
     addTask: (taskList) => request('/task/add', { taskList }, 'POST'),
+    // 删除任务
+    deleteTask: (taskName) => request('/task/delete', { taskName }, 'POST'),
+    // 更改任务
+    updateTask: (taskName, status, cataloger, auditor, videoId, catalogId) => request('/task/update', { taskName, status, cataloger, auditor, videoId, catalogId }, 'POST'),
     // 任务查询
-    getTaskList: () => request('/task/search'),
+    getTaskAllList: () => request('/task/search'),
     // 根据任务名查询
     getTaskByName: (name) => request('/task/search', { name }),
     // 根据任务名查询
@@ -65,7 +69,7 @@ const $api = {
     // 添加反馈
     AddFeedback: (title, details) => request('/feedback', { title, details }, 'POST'),
     // 查询反馈
-    QueryFeedback: () => request('/feedback'),
+    QueryFeedback: (status) => request('/feedback', { status }),
     // 完成反馈
     CompleteFeedback: (feedbackId) => request('/feedback/completed', { feedbackId }, 'POST'),
 }
