@@ -44,19 +44,12 @@ const routes = [
 		redirect: '/edit/task',
 		children: [
 			{
-				path: 'task',
-				name: 'task',
+				path: '/edit/task',
 				component: () => import('@/views/edit/childEdit/edit-task'),
 			},
 			{
-				path: 'check',
-				name: 'check',
+				path: '/edit/check',
 				component: () => import('@/views/edit/childEdit/edit-check'),
-			},
-			{
-				path: 'video',
-				name: 'video',
-				component: () => import('@/views/edit/childEdit/edit-video'),
 			}
 		]
 	},

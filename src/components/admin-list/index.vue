@@ -38,6 +38,13 @@
               v-for="item in Task"
               :key="item.value"
             ></el-option>
+            <el-option
+              v-show="placeholder == '请输入反馈状态'"
+              :label="item.label"
+              :value="item.value"
+              v-for="item in feedback"
+              :key="item.value"
+            ></el-option>
           </el-select>
         </el-input>
         <el-button type="mini" @click="searchClick">搜索</el-button>
@@ -94,6 +101,12 @@ export default {
         { value: 3, label: "任务状态" },
         { value: 4, label: "编目员账号" },
         { value: 5, label: "审核员账号" },
+        { value: 6, label: "全部内容" },
+      ],
+      feedback: [
+        { value: 1, label: "完成" },
+        { value: 2, label: "处理中" },
+        { value: 3, label: "全部内容" },
       ],
     };
   },
@@ -118,7 +131,12 @@ export default {
     },
   },
   methods: {
-    ...mapActions("common", ["getUserList", "getProjectList"]),
+    ...mapActions("common", [
+      "getUserList",
+      "getProjectList",
+      "getTaskList",
+      "getFeedbackList",
+    ]),
     //每页显示多少条
     handleSizeChange(val) {
       this.pageSize = val; //此时需更新每页显示多少条
@@ -160,72 +178,62 @@ export default {
       if (this.placeholder === "请输入用户名称") {
         if (this.select === 1) {
           content.state = "id";
-          content.searchValue = this.searchValue;
-          await this.getUserList(content);
         } else if (this.select === 2) {
           content.state = "name";
-          content.searchValue = this.searchValue;
-          await this.getUserList(content);
         } else if (this.select === 3) {
           content.state = "authority";
-          content.searchValue = this.searchValue;
-          await this.getUserList(content);
         } else if (this.select === 4) {
           content.state = "all";
-          content.searchValue = this.searchValue;
-          await this.getUserList(content);
         }
+        content.searchValue = this.searchValue;
+        await this.getUserList(content);
       } else if (this.placeholder === "请输入项目名称") {
-        console.log("搜搜项目");
+        console.log("搜索项目");
         if (this.select === 1) {
           content.state = "name";
-          content.searchValue = this.searchValue;
-          await this.getProjectList(content);
         } else if (this.select === 2) {
           content.state = "category";
-          content.searchValue = this.searchValue;
-          await this.getProjectList(content);
         } else if (this.select === 3) {
           content.state = "status";
-          content.searchValue = this.searchValue;
-          await this.getProjectList(content);
         } else if (this.select === 4) {
           content.state = "start";
-          content.searchValue = this.searchValue;
-          await this.getProjectList(content);
         } else if (this.select === 5) {
           content.state = "end";
-          content.searchValue = this.searchValue;
-          await this.getProjectList(content);
         } else if (this.select === 6) {
           content.state = "leader";
-          content.searchValue = this.searchValue;
-          await this.getProjectList(content);
         } else if (this.select === 7) {
           content.state = "all";
-          content.searchValue = this.searchValue;
-          await this.getProjectList(content);
         }
+        content.searchValue = this.searchValue;
+        await this.getProjectList(content);
       } else if (this.placeholder === "请输入编目名称") {
+        console.log("搜索项目");
+        if (this.select === 1) {
+          content.state = "name";
+        } else if (this.select === 2) {
+          content.state = "project";
+        } else if (this.select === 3) {
+          content.state = "status";
+        } else if (this.select === 4) {
+          content.state = "cataloger";
+        } else if (this.select === 5) {
+          content.state = "auditor";
+        } else if (this.select === 6) {
+          content.state = "all";
+        }
+        content.searchValue = this.searchValue;
+        await this.getTaskList(content);
+      } else if (this.placeholder === "请输入反馈状态") {
+        if (this.select === 1) {
+          content.state = "completed";
+        } else if (this.select === 2) {
+          content.state = "pending";
+        } else if (this.select === 3) {
+          content.state = "all";
+        }
+        content.searchValue = this.searchValue;
+        await this.getFeedbackList(content);
       }
-      // TODO 搜索部分要弄
-      // let searchList = [];
-      // let res = await $api.getProjectById(this.searchValue); //将通过用户行搜索到的对应的对象拿到
-      // if (res.code === 200) {
-      //   //判断返回是否成功：200->请求成功；3->用户不存在
-      //   searchList.push(res.data); //先将对象放进数组中
-      //   searchList.map((val, index) => {
-      //     //在对数组里进行补充，这样就可以进行编辑
-      //     val["index"] = index + 1;
-      //     val["edit"] = false;
-      //     val["edit_password"] = "";
-      //     val["edit_role"] = "";
-      //     search.push(val);
-      //   });
-      // } else {
-      //   searchList = []; //若不成功则数组为空，用户可点击分页序号返回默认显示列表
-      // }
-      // this.showList = searchList; //这时显示搜索的数组
     },
   },
 };

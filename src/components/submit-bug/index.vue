@@ -55,13 +55,13 @@ export default {
       try {
         let title = this.title;
         let details = this.form.message;
-        let addFeedback = await $api.AddFeedback([{ title, details }]);
-        console.log(addFeedback);
+        console.log(typeof details);
+        let addFeedback = await $api.AddFeedback(title, details);
       } catch (e) {
         this.$message.error(e);
       }
-      // this.dialogFormVisible = false;
-      // this.$message.success("感谢提交反馈");
+      this.dialogFormVisible = false;
+      this.$message.success("感谢提交反馈");
     },
   },
 };

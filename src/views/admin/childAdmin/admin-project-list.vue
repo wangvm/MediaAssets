@@ -228,10 +228,16 @@ export default {
     },
     //进入项目
     enterProject(val) {
-      this.$router.push({
-        name: "task",
-        params: { projectName: val.projectName },
-      });
+      this.$router
+        .push({
+          path: "/edit/task",
+          query: { projectName: val.projectName, state: "project" },
+        })
+        .catch((err) => {});
+
+      // this.$router.replace({ name: "task" }).catch((err) => {
+      //   console.log(err);
+      // });
     },
     editProject(row) {
       console.log(row);
@@ -256,6 +262,7 @@ export default {
         row.edit_category,
         row.edit_status
       );
+      console.log(resProject);
       row.edit = false;
       this.initProjectList();
     },

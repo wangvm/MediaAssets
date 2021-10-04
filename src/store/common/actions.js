@@ -91,5 +91,68 @@ export default {
     } catch (e) {
       this.$catch = e
     }
+  },
+
+  // 获取任务列表
+  async getTaskList({ commit, state }, content) {
+    try {
+      let res;
+      // let res = await $api.getUserList();
+      if (content.state === "all" || content.searchValue === '') {
+        res = await $api.getTaskAllList();
+      } else if (content.state === "project") {
+        res = await $api.getTaskById(content.searchValue);
+      } else if (content.state === "name") {
+        res = await $api.getTaskByName(content.searchValue);
+      } else if (content.state === "status") {
+        res = await $api.getTaskByStatus(content.searchValue);
+      } else if (content.state === "cataloger") {
+        res = await $api.getTaskByCataloger(content.searchValue);
+      } else if (content.state === "auditor") {
+        res = await $api.getTaskByAuditor(content.searchValue);
+      }
+      let taskList = []
+      res.data.forEach((val, index) => {
+        let options = {
+          "edit": false,
+          "index": index + 1,
+          "edit_status": '',
+          "edit_cataloger": '',
+          "edit_auditor": '',
+          "edit_videoId": '',
+          "edit_catalogId": '',
+        }
+        taskList.push({ ...val, ...options })
+      })
+      console.log(taskList);
+      commit('setTaskList', taskList)
+    } catch (e) {
+      this.$catch = e
+    }
+  },
+
+  // 获取反馈列表
+  async getFeedbackList({ commit, state }, content) {
+    try {
+      let res;
+      if (content.state === "all") {
+        res = await $api.QueryFeedback("");
+      } else if (content.state === "completed") {
+        res = await $api.QueryFeedback("completed");
+      } else if (content.state === "pending") {
+        res = await $api.QueryFeedback("pending");
+      }
+      let feedbackList = []
+      res.data.forEach((val, index) => {
+        let options = {
+          "index": index + 1,
+        }
+        feedbackList.push({ ...val, ...options })
+      })
+      console.log(feedbackList);
+      commit('setFeedbackList', feedbackList)
+    } catch (e) {
+      this.$catch = e
+    }
   }
 }
