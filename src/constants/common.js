@@ -49,8 +49,36 @@ const projectStatus = {
   },
 }
 
-const feedbackStatus = {
+const taskStatus = {
   /** 删除状态 */
+  '-1': {
+    value: "-1",
+    label: "终止",
+  },
+  /** 新创建状态 */
+  '1': {
+    value: "1",
+    label: "新创建",
+  },
+  /** 编目状态 */
+  '2': {
+    value: "2",
+    label: "编辑中",
+  },
+  /** 完成状态 */
+  '3': {
+    value: "3",
+    label: "已完成",
+  },
+  /** 审核状态 */
+  '4': {
+    value: "4",
+    label: "审核中",
+  },
+}
+
+const feedbackStatus = {
+  /** 完成状态 */
   'completed': {
     value: "completed",
     label: "完成",
@@ -60,7 +88,7 @@ const feedbackStatus = {
     value: "all",
     label: "新创建",
   },
-  /** 完成状态 */
+  /** 处理状态 */
   'pending': {
     value: "pending",
     label: "处理中",
@@ -70,5 +98,6 @@ const feedbackStatus = {
 export {
   userType,
   projectStatus,
+  taskStatus,
   feedbackStatus
 }

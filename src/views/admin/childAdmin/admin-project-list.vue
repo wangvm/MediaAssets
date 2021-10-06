@@ -169,7 +169,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 import { debounce } from "lodash-es";
 import AdminList from "@/components/admin-list";
 import $api from "@/network/api";
@@ -198,6 +198,7 @@ export default {
   },
   methods: {
     ...mapActions("common", ["getProjectList"]),
+    ...mapMutations("common", ["setProjectName", "setTitleStats"]),
     //获取到信息
     initProjectList: debounce(async function () {
       let content = {
@@ -208,7 +209,6 @@ export default {
       await this.getProjectList(content);
       this.handleSizeChange(5);
       this.loading = false; //结束缓冲
-      console.log(this.projectList);
     }, 300),
     changeShowList(val) {
       this.showList = val;
@@ -231,10 +231,14 @@ export default {
       this.$router
         .push({
           path: "/edit/task",
-          query: { projectName: val.projectName, state: "project" },
+          query: {
+            projectName: val.projectName,
+            //  state: "project"
+          },
         })
         .catch((err) => {});
-
+      this.setProjectName(val.projectName);
+      this.setTitleStats(false);
       // this.$router.replace({ name: "task" }).catch((err) => {
       //   console.log(err);
       // });

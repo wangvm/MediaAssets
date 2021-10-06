@@ -49,8 +49,10 @@ const $api = {
 
     // 批量添加任务
     addTask: (taskList) => request('/task/add', { taskList }, 'POST'),
+    // 上传视频
+    fileUpload: (file, taskName) => request('/file/upload', { file, taskName }, 'POST'),
     // 删除任务
-    deleteTask: (taskName) => request('/task/delete', { taskName }, 'POST'),
+    deleteTask: (taskName) => request('/task/delete', { taskName }),
     // 更改任务
     updateTask: (taskName, status, cataloger, auditor, videoId, catalogId) => request('/task/update', { taskName, status, cataloger, auditor, videoId, catalogId }, 'POST'),
     // 任务查询
@@ -72,5 +74,10 @@ const $api = {
     QueryFeedback: (status) => request('/feedback', { status }),
     // 完成反馈
     CompleteFeedback: (feedbackId) => request('/feedback/completed', { feedbackId }, 'POST'),
+
+    // 更新编目内容
+    updateCatalog: (catalogList) => request('/catalog/update', {catalogList}, 'POST'),
+    // 搜索编目内容
+    getCatalog:(key, value) => request('/catalog/search', {key, value}, 'POST'),
 }
 export default $api

@@ -8,4 +8,7 @@ export default () => ({
   userList: [],
   taskList: [],
   feedbackList: [],
+  projectName: '',
+  taskName: '',
+  titleStatus: false,
 })

@@ -39,7 +39,7 @@
            @click="logEvent('toLogin')"/>
         <i class="playerBtn el-icon-caret-top" title="跳转至出点" type="vertical-align-top" @click="logEvent('toLogout')"/>
         <!--     input：调节声音大小       -->
-        <i class="playerBtn el-icon-s-operation" title="音量(上下方向控制音量)" type="customer-service"
+        <i class="playerBtn el-icon-scissors" title="音量(上下方向控制音量)" type="customer-service"
            @click="volumeEvent('volumeClick')"/>
         <input type="range" min="0" max="100" value="100" ref="range"
                @mousedown="volumeEvent('mouseDown')"

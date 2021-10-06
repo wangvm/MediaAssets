@@ -22,6 +22,26 @@
               placeholder="请输入任务名"
               prefix-icon="el-icon-s-order"
             />
+            <el-upload
+              class="upload-demo"
+              :action="item.taskName"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :on-progress="test"
+              :on-success="handleSuccess"
+              :before-remove="beforeRemove"
+              :http-request="uploadFile"
+              multiple
+              :limit="1"
+              :on-exceed="handleExceed"
+              :file-list="fileList"
+              name="file"
+            >
+              <el-button size="small" type="primary">点击上传</el-button>
+              <div slot="tip" class="el-upload__tip">
+                只能上传mp4文件，且不超过500kb
+              </div>
+            </el-upload>
           </div>
         </template>
         <div class="add-item">
@@ -56,6 +76,7 @@ export default {
   data() {
     return {
       createList: [],
+      uploadList: [],
     };
   },
   created() {
@@ -75,6 +96,7 @@ export default {
     reduceItem() {
       if (this.createList.length > 1) {
         this.createList.pop();
+        this.uploadList.pop();
       } else {
         this.$message("不能再删了");
       }
@@ -98,15 +120,7 @@ export default {
           taskName: val.taskName,
         };
       });
-      try {
-        let res = await $api.addTask(taskList);
-        if (res.code === 200) {
-          this.$emit("operation", false);
-        }
-      } catch (e) {
-        this.$catch(e);
-        this.$emit("operation", false);
-      }
+      await this.flieUpload(taskList, this.uploadList);
     }, 300),
     // 判断任务名是否重复
     repeatItem(list) {
@@ -126,11 +140,67 @@ export default {
     filterItem(list) {
       return list.filter((val) => val.taskName !== "");
     },
+    flieUpload: _.debounce(function (taskList, uploadList) {
+      console.log(uploadList);
+      let allList = [];
+      let index = 0;
+      while (index < taskList.length) {
+        for (let i in uploadList) {
+          if ((uploadList[i].taskName = taskList[index])) {
+            allList.push({
+              taskName: uploadList[i].taskName.taskName,
+              file: uploadList[i].file,
+            });
+            index++;
+          }
+        }
+      }
+      let sum = 0;
+      for (let j in allList) {
+        let uploadRes = $api.fileUpload(allList[j].file, allList[j].taskName);
+        if (uploadRes.data.code === 200) sum++;
+      }
+      if (sum === allList.length) {
+        try {
+          let res = $api.addTask(taskList);
+          if (res.code === 200) {
+            this.$emit("operation", false);
+          }
+        } catch (e) {
+          this.$catch(e);
+          this.$emit("operation", false);
+        }
+      }
+    }, 500),
     //   阻止点击冒泡事件
     stopClick() {},
     noEnterClick() {
       this.initTaskList();
       this.$emit("operation", false);
+    },
+    // 添加任务上传视频相关操作
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    uploadFile(params) {
+      console.log(params);
+      this.uploadList.push({ taskName: params.action, file: params.file });
+    },
+    handleSuccess(response, file, fileList) {
+      console.log(response, file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${
+          files.length + fileList.length
+        } 个文件`
+      );
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`);
     },
   },
 };
@@ -173,6 +243,21 @@ export default {
       overflow-y: scroll;
       width: 100%;
       height: 54vh;
+      .create-item {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        .item-input {
+          margin-bottom: 1em;
+        }
+        .upload-demo {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+        }
+      }
       .add-item {
         margin-top: 0.5em;
       }
