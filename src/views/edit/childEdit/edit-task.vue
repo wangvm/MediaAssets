@@ -6,7 +6,7 @@
     title="编目列表"
     placeholder="请输入编目名称"
   >
-    <el-button type="primary" @click="newBuilt">新建编目</el-button>
+    <el-button type="primary" @click="newBuilt">新建任务</el-button>
     <div class="content_table">
       <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
         <el-table-column prop="index" label="序号" fixed="left" width="100" />
@@ -24,12 +24,12 @@
               class="project-status"
               :class="['project-status-' + scope.row.status]"
             >
-              {{ projectStatus[scope.row.status].label }}
+              {{ taskStatus[scope.row.status].label }}
             </span>
             <span v-else>
               <el-select v-model="scope.row.edit_status">
                 <el-option
-                  v-for="item in projectStatus"
+                  v-for="item in taskStatus"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -93,7 +93,7 @@
               v-if="!scope.row.edit"
               class="item"
               effect="light"
-              content="编辑项目"
+              content="编辑任务"
               placement="left"
             >
               <el-button
@@ -109,7 +109,7 @@
               v-if="!scope.row.edit"
               class="item"
               effect="light"
-              content="删除项目"
+              content="删除任务"
               placement="bottom"
             >
               <el-button
@@ -119,14 +119,14 @@
                 icon="el-icon-delete"
                 circle
                 @click.native.prevent="deleteTask(scope.row)"
-                :disabled="projectStatus[scope.row.status].value === '-1'"
+                :disabled="taskStatus[scope.row.status].value === '-1'"
               ></el-button>
             </el-tooltip>
             <el-tooltip
               v-if="!scope.row.edit"
               class="item"
               effect="light"
-              content="进入项目"
+              content="进入任务"
               placement="right"
             >
               <el-button
@@ -174,6 +174,11 @@
         </el-table-column>
       </el-table>
       <edit-window v-show="cerateTask" @operation="operationClick" />
+      <edit-enter
+        v-show="enterIn"
+        :taskName="this.newTaskName"
+        @enterIn="enterInClick"
+      />
     </div>
   </AdminList>
 </template>
@@ -183,21 +188,25 @@ import { mapState, mapActions } from "vuex";
 import { debounce } from "lodash";
 import AdminList from "@/components/admin-list";
 import $api from "@/network/api";
-import { projectStatus } from "@/constants/common";
+import { taskStatus } from "@/constants/common";
 import EditWindow from "@/components/edit-window";
+import EditEnter from "@/components/edit-enter";
 
 export default {
   name: "editTask",
   components: {
     AdminList,
     EditWindow,
+    EditEnter,
   },
   data() {
     return {
-      projectStatus,
+      taskStatus,
       loading: false, //表格loading
       showList: [], //每页显示的数组
       cerateTask: false,
+      enterIn: false,
+      newTaskName: "",
     };
   },
   created() {
@@ -245,18 +254,8 @@ export default {
     },
     //进入项目
     enterTask(val) {
-      this.$router
-        .push({
-          path: "/edit/check",
-          //跳转路由时传递编目名称和edit状态true(审核)
-          query: {
-            edit: true,
-            state: "edit",
-            editName: val.projectName,
-            //当数据更改好后，将其改成：editName: val.editName
-          },
-        })
-        .catch((err) => {});
+      this.newTaskName = val.taskName;
+      this.enterIn = true;
     },
     editTask(row) {
       console.log(row);
@@ -301,19 +300,21 @@ export default {
     },
     //删除项目
     async deleteTask(currentProject) {
-      console.log(currentProject);
-      // this.loading = true;
-      // try {
-      //   await $api.deleteTask(currentProject.projectName);
-      // } catch (e) {
-      //   this.$message.error(e);
-      // }
-      // await this.initProjectList();
-      // this.loading = false;
+      this.loading = true;
+      try {
+        await $api.deleteTask(currentProject.taskName);
+      } catch (e) {
+        this.$message.error(e);
+      }
+      await this.initTaskList();
+      this.loading = false;
     },
     // 是否显示添加任务组件
     operationClick(val) {
       this.cerateTask = val;
+    },
+    enterInClick(val) {
+      this.enterIn = val;
     },
     //新建编目任务
     newBuilt() {

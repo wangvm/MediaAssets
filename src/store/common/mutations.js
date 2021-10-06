@@ -20,5 +20,17 @@ export default {
   setFeedbackList(state, val) {
     state.feedbackList = val
     console.log(val);
+  },
+  // 保存编目名以及任务名
+  setProjectName(state, val) {
+    state.projectName = val;
+    console.log(state.projectName);
+  },
+  setTaskName(state, val) {
+    state.taskName = val;
+    console.log(state.taskName);
+  },
+  setTitleStats(state, val) {
+    state.titleStatus = val;
   }
 }

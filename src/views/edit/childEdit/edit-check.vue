@@ -2,804 +2,582 @@
   <div class="home">
     <div class="home-left">
       <div class="home-video">
-        <videoPlayer :video-info="videoInfo"/>
+        <videoPlayer :video-info="videoInfo" />
       </div>
       <el-card class="home-list" shadow="hover">
-        <!--编目-->
-        <el-tree
-            v-if="!this.edit"
-            :data="data"
-            node-key="id"
-            default-expand-all
-            :expand-on-click-node="false">
-          <span
-              class="list-tree-node"
-              @click="listClick(node, data)"
-              slot-scope="{ node, data }"
-          >
-            <span v-if="!data.listEdit"
-            >
-              {{ node.label }}
-            </span>
-            <span v-else>
-              <input
-                  v-model="data.list_edit_label"
-                  class="list-tree-node-input"
-                  placeholder="请输入编辑内容"
-              />
-            </span>
-            <span class="list-tree-node-buttons">
-              <div
-                  @click="() => append(data)"
-                  class="list-tree-node-btn"
-              >
-                <i class="el-icon-plus"></i>
-              </div>
-              <div
-                  @click="() => handleEdit(data, node)"
-                  class="list-tree-node-btn"
-                  v-if="!data.listEdit"
-              >
-                <i class="el-icon-edit"></i>
-              </div>
-              <div
-                  @click="() => handleDefine(node, data)"
-                  class="list-tree-node-btn"
-                  v-else
-              >
-                <i class="el-icon-check"></i>
-              </div>
-              <div
-                  class="list-tree-node-btn"
-                  @click="() => remove(node, data)"
-              >
-                <i class="el-icon-delete"></i>
-              </div>
-            </span>
-          </span>
-        </el-tree>
-        <!--审核-->
         <el-table
-            v-else
-            :data="tableList"
-            border
-            style="width: 100%"
-            row-key="id"
-            @row-click="openDetails"
-            default-expand-all
-            :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
-          <el-table-column
-              prop="name"
-              label="名称">
+          :data="tableData"
+          style="width: 100%"
+          row-key="id"
+          border
+          lazy
+          default-expand-all
+          @row-click="lookClick"
+          :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+        >
+          <el-table-column prop="title" label="标题" width="450">
           </el-table-column>
-          <el-table-column
-              prop="state"
-              label="层次"
-              width="60">
-          </el-table-column>
-          <el-table-column
-              prop="result"
-              label="审核结果"
-              width="100">
-            <span slot-scope="scope" v-if="!scope.row.saveEdit">
-                {{ scope.row.result }}
-            </span>
-            <span slot-scope="scope" v-else>
-                <el-select v-model="scope.row.value" placeholder="" size="mini" clearable>
-                  <el-option
-                      v-for="item in options"
-                      :key="item.value"
-                      :label="item.label"
-                      :value="item.value">
-                  </el-option>
-                </el-select>
-            </span>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-tooltip
+                v-if="scope.row.edit === false"
+                class="item"
+                effect="light"
+                content="编辑"
+                placement="left"
+              >
+                <el-button
+                  type="primary"
+                  size="mini"
+                  icon="el-icon-edit"
+                  @click="editItem(scope.row)"
+                  circle
+                ></el-button>
+              </el-tooltip>
+              <el-tooltip
+                v-if="scope.row.state === '节目'"
+                class="item"
+                effect="light"
+                content="增加"
+                placement="top"
+              >
+                <el-button
+                  type="success"
+                  size="mini"
+                  icon="el-icon-plus"
+                  @click="addItem()"
+                  circle
+                ></el-button>
+              </el-tooltip>
+              <el-tooltip
+                v-if="scope.row.state === '片段'"
+                class="item"
+                effect="light"
+                content="删除"
+                placement="right"
+              >
+                <el-button
+                  type="danger"
+                  size="mini"
+                  icon="el-icon-delete"
+                  @click="deleteItem(scope.row)"
+                  circle
+                ></el-button>
+              </el-tooltip>
+            </template>
           </el-table-column>
         </el-table>
       </el-card>
     </div>
     <div class="home-right">
       <el-card class="home-right-card" shadow="hover">
-        <div class="home-right-btn">
-          <el-button class="btn-item">取消</el-button>
-          <!--编目-->
-          <el-button
-              type="primary"
-              class="btn-item"
-              v-if="!this.edit"
+        <el-form ref="form" :model="form" size="small" label-width="110px">
+          <el-form-item class="right-card-btns">
+            <el-button type="primary" @click="saveClick">保存</el-button>
+            <el-button @click="cancleClick">取消</el-button>
+          </el-form-item>
+          <el-form-item label="正题名">
+            <el-input
+              v-model="form.edit_title"
+              v-show="this.editAndView"
+            ></el-input>
+            <span v-show="!this.editAndView">{{ form.title }}</span>
+          </el-form-item>
+          <el-form-item label="首播日期">
+            <el-date-picker
+              v-model="form.edit_premiereDate"
+              type="date"
+              placeholder="选择日期"
+              v-show="this.editAndView"
+            >
+            </el-date-picker>
+            <span v-show="!this.editAndView">{{ form.premiereDate }}</span>
+          </el-form-item>
+          <el-form-item label="节目类型">
+            <el-select
+              v-model="form.edit_programType"
+              placeholder="请选择活动区域"
+              v-show="this.editAndView"
+            >
+              <el-option label="新闻" value="1"></el-option>
+              <el-option label="综艺" value="2"></el-option>
+            </el-select>
+            <span v-show="!this.editAndView">{{ form.programType }}</span>
+          </el-form-item>
+          <el-form-item label="内容描述">
+            <el-input
+              type="textarea"
+              v-model="form.edit_contentDescription"
+              v-show="this.editAndView"
+            ></el-input>
+            <span v-show="!this.editAndView">{{
+              form.contentDescription
+            }}</span>
+          </el-form-item>
+          <el-form-item label="字幕形式">
+            <el-input
+              v-model="form.edit_subtitleForm"
+              v-show="this.editAndView"
+            ></el-input>
+            <span v-show="!this.editAndView">{{ form.subtitleForm }}</span>
+          </el-form-item>
+          <el-form-item label="创建者名称">
+            <h3>{{ form.taskName }}</h3>
+          </el-form-item>
+          <el-form-item label="其他责任者">
+            <el-input
+              v-model="form.edit_groupMembers"
+              v-show="this.editAndView"
+            ></el-input>
+            <span v-show="!this.editAndView">{{ form.groupMembers }}</span>
+          </el-form-item>
+          <el-form-item label="节目形态">
+            <el-select
+              v-show="this.editAndView"
+              v-model="form.edit_programForm"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="综合" value="1"></el-option>
+              <el-option label="内容" value="2"></el-option>
+              <el-option label="主题" value="3"></el-option>
+              <el-option label="形式" value="4"></el-option>
+            </el-select>
+            <span v-show="!this.editAndView">{{ form.programForm }}</span>
+          </el-form-item>
+          <el-form-item label="栏目">
+            <el-input
+              v-model="form.edit_column"
+              v-show="this.editAndView"
+            ></el-input>
+            <span v-show="!this.editAndView">{{ form.column }}</span>
+          </el-form-item>
+          <el-form-item label="色彩">
+            <el-radio-group v-model="form.edit_color" v-show="this.editAndView">
+              <el-radio label="彩色" value="1"></el-radio>
+              <el-radio label="黑白" value="2"></el-radio>
+            </el-radio-group>
+            <span v-show="!this.editAndView">{{ form.color }}</span>
+          </el-form-item>
+          <el-form-item label="制式">
+            <el-radio-group
+              v-model="form.edit_standard"
+              v-show="this.editAndView"
+            >
+              <el-radio label="PAL" value="1"></el-radio>
+              <el-radio label="NTSC" value="2"></el-radio>
+              <el-radio label="SECAM" value="3"></el-radio>
+            </el-radio-group>
+            <span v-show="!this.editAndView">{{ form.standard }}</span>
+          </el-form-item>
+          <el-form-item label="声道格式">
+            <el-radio-group
+              v-model="form.edit_channelFormat"
+              v-show="this.editAndView"
+            >
+              <el-radio label="单声道" value="1"></el-radio>
+              <el-radio label="双声道" value="2"></el-radio>
+              <el-radio label="立体声" value="3"></el-radio>
+            </el-radio-group>
+            <span v-show="!this.editAndView">{{ form.channelFormat }}</span>
+          </el-form-item>
+          <el-form-item label="画面宽高比">
+            <el-radio-group
+              v-model="form.edit_AspectRatio"
+              v-show="this.editAndView"
+            >
+              <el-radio label="4:3" value="1"></el-radio>
+              <el-radio label="16:9" value="2"></el-radio>
+              <el-radio label="14:9" value="3"></el-radio>
+            </el-radio-group>
+            <span v-show="!this.editAndView">{{ form.AspectRatio }}</span>
+          </el-form-item>
+          <el-form-item label="入点">
+            <el-time-picker
+              v-model="form.edit_entryPoint"
+              :picker-options="{
+                selectableRange: '18:30:00 - 20:30:00',
+              }"
+              placeholder="任意时间点"
+              v-show="this.editAndView"
+            >
+            </el-time-picker>
+            <span v-show="!this.editAndView">{{ form.entryPoint }}</span>
+          </el-form-item>
+          <el-form-item label="时长">
+            <el-time-picker
+              v-model="form.edit_duration"
+              :picker-options="{
+                selectableRange: '18:30:00 - 20:30:00',
+              }"
+              placeholder="任意时间点"
+              v-show="this.editAndView"
+            >
+            </el-time-picker>
+            <span v-show="!this.editAndView">{{ form.duration }}</span>
+          </el-form-item>
+          <el-form-item label="资料获取方式">
+            <el-input
+              v-model="form.edit_AcquisitionMethod"
+              v-show="this.editAndView"
+            ></el-input>
+            <span v-show="!this.editAndView">{{ form.AcquisitionMethod }}</span>
+          </el-form-item>
+          <el-form-item label="资料提供者">
+            <el-input
+              v-model="form.edit_provider"
+              v-show="this.editAndView"
+            ></el-input>
+            <span v-show="!this.editAndView">{{ form.provider }}</span>
+          </el-form-item>
+          <el-form-item
+            label="图片截取"
+            v-model="form.imageList"
+            class="right-card-screenshot"
           >
-            <span @click="saveClick">确定</span>
-          </el-button>
-          <!--审核-->
-          <el-button
-              type="primary"
-              class="btn-item"
-              v-else
-          >
-            <span v-if="!this.saveEdit" @click="modifyClick">审核</span>
-            <span v-else @click="saveClick">确定</span>
-          </el-button>
-        </div>
-        <div class="home-right-text">
-          <!--编目-->
-          <el-table
-              v-if="!this.edit"
-              :data="EditData"
-              style="width: 100%"
-              :show-header="false"
-              border
-              :cell-style="rowStyle">
-            <el-table-column prop="date" width="150">
-            </el-table-column>
-            <el-table-column prop="name">
-              <template slot-scope="scope">
-                <span v-if="!scope.row.list_right_edit">{{scope.row.name}}</span>
-                <el-input
-                    v-else
-                    type="请求出错"
-                    autosize
-                    placeholder="请输入内容"
-                    v-model="scope.row.textarea">
-                </el-input>
-              </template>
-            </el-table-column>
-          </el-table>
-          <!--审核-->
-          <el-table
-              v-else
-              :data="tableData"
-              style="width: 100%"
-              :show-header="false"
-              border
-              :cell-style="rowStyle">
-            <el-table-column prop="date" width="150">
-            </el-table-column>
-            <el-table-column prop="name" class="home-right-text-wrap">
-            </el-table-column>
-          </el-table>
-        </div>
-        <div class="home-right-img">
-          <el-card class="img-item"
-                   v-for="item in CatalogImages"
-                   :key="item.id"
-                   shadow="hover">
-            <img :src="item.img" alt="图片加载错误，请检查网络" class="img">
-            <span>{{item.title}}</span>
-          </el-card>
-        </div>
+            <div class="screenshot-list">
+              <span>iewubfhu</span>
+              <div v-for="item in form.imageList" :key="item.url"></div>
+            </div>
+          </el-form-item>
+        </el-form>
       </el-card>
+    </div>
+    <div class="onload">
+      <el-button type="success" size="small" @click="uploadEdit()"
+        >上传</el-button
+      >
     </div>
   </div>
 </template>
 
 <script>
-  /*
-  * 目前处于点击左侧显示右侧对应信息
-  * */
-  import videoPlayer from "@/components/video-player/video-player";
+/*
+ * 目前处于点击左侧显示右侧对应信息
+ * */
+import videoPlayer from "@/components/video-player/video-player";
 
-  //右上表格默认开始id
-  let id = 2;
-  export default {
-    name: "editCheck",
-    data() {
-      //定义右上表格默认信息
-      const data = [{
-        id: 1,
-        label: '请输入内容',
-        listEdit:false,//左下列表是否处于编辑状态
-        list_edit_label:'',
-        Catalog: [
-          {title: '杭州新闻题目..', img: require('@/assets/images/logo.png')},
-        ],
-        EditData:[
-          {date: "正题名", name: '请编辑内容', textarea:'', list_right_edit:false},
-          {date: "首播日期", name: '1991-5-12', textarea:'', list_right_edit:false},
-          {date: "节目类型", name: '新闻', textarea:'', list_right_edit:false},
-          {date: "内容描述", name: '1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益', textarea:'', list_right_edit:false},
-          {date: "字幕形式", name: '只有画面叠加字幕', textarea:'', list_right_edit:false},
-          {date: "创建者名称", name: '杭州电视台', textarea:'', list_right_edit:false},
-          {date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台', textarea:'', list_right_edit:false},
-          {date: "节目形态", name: '综合', textarea:'', list_right_edit:false},
-          {date: "栏目", name: '杭州新闻', textarea:'', list_right_edit:false},
-          {date: "色彩", name: '彩色', textarea:'', list_right_edit:false},
-          {date: "制式", name: 'PAL', textarea:'', list_right_edit:false},
-          {date: "声道格式", name: '单声道', textarea:'', list_right_edit:false},
-          {date: "画面宽高比", name: '4:3', textarea:'', list_right_edit:false},
-          {date: "入点", name: '00:00:00:19', textarea:'', list_right_edit:false},
-          {date: "时长", name: '00:11:10:12', textarea:'', list_right_edit:false},
-          {date: "资料获取方式", name: '自制', textarea:'', list_right_edit:false},
-          {date: "资料提供者", name: '杭州电视台', textarea:'', list_right_edit:false},
-        ],
-      }];
+export default {
+  name: "editCheck",
+  data() {
+    return {
+      // 限制只能编辑一个
+      isEdit: false,
+      // 查看与编辑模式切换
+      editAndView: false,
+      // 寻找保存的那一个item
+      count: null,
+      state: "",
+      // 标记子元素id
+      index: 10,
+      //播放器
+      videoInfo: {
+        url: "http://121.196.100.229/vod/test.mp4",
+        frameRate: 25,
+      },
+      tableData: [],
 
+      //
+      form: {
+        title: "",
+        premiereDate: "",
+        programType: "",
+        contentDescription: "",
+        subtitleForm: "",
+        taskName: "",
+        groupMembers: "",
+        programForm: "",
+        column: "",
+        color: "",
+        standard: "",
+        channelFormat: "",
+        AspectRatio: "",
+        entryPoint: "",
+        duration: "",
+        AcquisitionMethod: "",
+        provider: "",
+        taskName: "123",
+        imageList: [],
+      },
+    };
+  },
 
-      return {
-        //编目：用作左下列表增删改查
-        data: JSON.parse(JSON.stringify(data)),
+  created() {
+    this.initEditList();
+  },
 
-        //播放器
-        videoInfo: {
-          url: null,
-          frameRate: 25
+  components: {
+    videoPlayer,
+  },
+
+  methods: {
+    // 点击查看详情
+    lookClick(row, column, event) {
+      this.form = row;
+    },
+    // 保存更改
+    saveClick() {
+      if (this.state === "节目") {
+        this.tableData[0].title = this.tableData[0].edit_title;
+        this.tableData[0].premiereDate = this.tableData[0].edit_premiereDate;
+        this.tableData[0].programType = this.tableData[0].edit_programType;
+        this.tableData[0].contentDescription =
+          this.tableData[0].edit_contentDescription;
+        this.tableData[0].subtitleForm = this.tableData[0].edit_subtitleForm;
+        this.tableData[0].taskName = this.tableData[0].edit_taskName;
+        this.tableData[0].groupMembers = this.tableData[0].edit_groupMembers;
+        this.tableData[0].programForm = this.tableData[0].edit_programForm;
+        this.tableData[0].column = this.tableData[0].edit_column;
+        this.tableData[0].color = this.tableData[0].edit_color;
+        this.tableData[0].standard = this.tableData[0].edit_standard;
+        this.tableData[0].channelFormat = this.tableData[0].edit_channelFormat;
+        this.tableData[0].AspectRatio = this.tableData[0].edit_AspectRatio;
+        this.tableData[0].entryPoint = this.tableData[0].edit_entryPoint;
+        this.tableData[0].duration = this.tableData[0].edit_duration;
+        this.tableData[0].AcquisitionMethod =
+          this.tableData[0].edit_AcquisitionMethod;
+        this.tableData[0].provider = this.tableData[0].edit_provider;
+        this.tableData[0].edit = false;
+      } else {
+        for (let i in this.tableData[0].children) {
+          if (this.count === this.tableData[0].children[i].id) {
+            this.tableData[0].children[i].title =
+              this.tableData[0].children[i].edit_title;
+            this.tableData[0].children[i].premiereDate =
+              this.tableData[0].children[i].edit_premiereDate;
+            this.tableData[0].children[i].programType =
+              this.tableData[0].children[i].edit_programType;
+            this.tableData[0].children[i].contentDescription =
+              this.tableData[0].children[i].edit_contentDescription;
+            this.tableData[0].children[i].subtitleForm =
+              this.tableData[0].children[i].edit_subtitleForm;
+            this.tableData[0].children[i].taskName =
+              this.tableData[0].children[i].edit_taskName;
+            this.tableData[0].children[i].groupMembers =
+              this.tableData[0].children[i].edit_groupMembers;
+            this.tableData[0].children[i].programForm =
+              this.tableData[0].children[i].edit_programForm;
+            this.tableData[0].children[i].column =
+              this.tableData[0].children[i].edit_column;
+            this.tableData[0].children[i].color =
+              this.tableData[0].children[i].edit_color;
+            this.tableData[0].children[i].standard =
+              this.tableData[0].children[i].edit_standard;
+            this.tableData[0].children[i].channelFormat =
+              this.tableData[0].children[i].edit_channelFormat;
+            this.tableData[0].children[i].AspectRatio =
+              this.tableData[0].children[i].edit_AspectRatio;
+            this.tableData[0].children[i].entryPoint =
+              this.tableData[0].children[i].edit_entryPoint;
+            this.tableData[0].children[i].duration =
+              this.tableData[0].children[i].edit_duration;
+            this.tableData[0].children[i].AcquisitionMethod =
+              this.tableData[0].children[i].edit_AcquisitionMethod;
+            this.tableData[0].children[i].provider =
+              this.tableData[0].children[i].edit_provider;
+            this.tableData[0].children[i].state =
+              this.tableData[0].children[i].edit_state;
+            this.tableData[0].children[i].edit = false;
+          }
+        }
+      }
+
+      this.state = "";
+      this.count = null;
+      this.editAndView = false;
+      this.isEdit = false;
+    },
+    cancleClick() {},
+    //
+    // 初始化数据
+    initEditList() {
+      // 后续将id写成添加项中的index
+      this.tableData = [
+        {
+          id: 1,
+          title: "默认数据",
+          premiereDate: "",
+          programType: "",
+          contentDescription: "",
+          subtitleForm: "",
+          taskName: "",
+          groupMembers: "",
+          programForm: "",
+          column: "",
+          color: "",
+          standard: "",
+          channelFormat: "",
+          AspectRatio: "",
+          entryPoint: "",
+          duration: "",
+          AcquisitionMethod: "",
+          provider: "",
+          state: "节目",
+          imageList: [],
+          edit: false,
+          edit_title: "",
+          edit_premiereDate: "",
+          edit_programType: "",
+          edit_contentDescription: "",
+          edit_subtitleForm: "",
+          edit_taskName: "",
+          edit_groupMembers: "",
+          edit_programForm: "",
+          edit_column: "",
+          edit_color: "",
+          edit_standard: "",
+          edit_channelFormat: "",
+          edit_AspectRatio: "",
+          edit_entryPoint: "",
+          edit_duration: "",
+          edit_AcquisitionMethod: "",
+          edit_provider: "",
+          children: [],
         },
-
-        loading: true,//实现从后端得到数据时的异步缓冲
-        edit: true,//是否为编辑者，true为审核，false为编目
-        saveEdit: false,//右上角是否确定更改
-
-        //左侧信息
-        tableList: [],
-        //右侧文字表格
-        tableData: [],
-        //编目：编辑右上文字表格
-        EditData:[],
-        //右下图片文字信息
-        CatalogImages: [],
-
-        //审核：选择框
-        options: [{
-          value: '合格',
-          label: '合格'
-        }, {
-          value: '不合格',
-          label: '不合格'
-        }],
-        //审核：选择框绑定的值
-        value: ''
+      ];
+    },
+    // 添加子行
+    addItem() {
+      // 后续将id写成添加项中的index
+      this.tableData[0].children.push({
+        id: this.index,
+        title: "默认数据" + this.index,
+        premiereDate: "",
+        programType: "",
+        contentDescription: "",
+        subtitleForm: "",
+        taskName: "",
+        groupMembers: "",
+        programForm: "",
+        column: "",
+        color: "",
+        standard: "",
+        channelFormat: "",
+        AspectRatio: "",
+        entryPoint: "",
+        duration: "",
+        AcquisitionMethod: "",
+        provider: "",
+        imageList: [],
+        state: "片段",
+        edit: false,
+        edit_title: "",
+        edit_premiereDate: "",
+        edit_programType: "",
+        edit_contentDescription: "",
+        edit_subtitleForm: "",
+        edit_taskName: "",
+        edit_groupMembers: "",
+        edit_programForm: "",
+        edit_column: "",
+        edit_color: "",
+        edit_standard: "",
+        edit_channelFormat: "",
+        edit_AspectRatio: "",
+        edit_entryPoint: "",
+        edit_duration: "",
+        edit_AcquisitionMethod: "",
+        edit_provider: "",
+      });
+      this.index++;
+    },
+    // 删除行
+    deleteItem(row) {
+      for (let i in this.tableData[0].children) {
+        if (row.id === this.tableData[0].children[i].id) {
+          this.tableData[0].children.splice(i, 1);
+        }
       }
     },
-
-    created() {
-      this.getList();//初始化页面数据
-      this.getQuery();//监听路由传递的edit使true(审核)还是false(编目)
-
-      //初始化 编目/审核 及确定按钮
-      this.modifyClick();
-      this.saveClick();
+    // 编辑内容
+    editItem(row) {
+      if (this.isEdit === false) {
+        this.isEdit = true;
+        row.edit = true;
+        this.count = row.id;
+        this.form = row;
+        this.state = row.state === "节目" ? "节目" : "片段";
+        this.editAndView = true;
+      } else {
+        this.$message("请保存或取消上一编辑内容");
+      }
     },
-
-    components: {
-      videoPlayer
+    // 上传至后端保存数据
+    uploadEdit() {
+      
     },
-
-    watch: {
-      //监测路由变化,只要变化了就调用获取路由参数方法将数据存储本组件即可
-      '$route': 'getQuery'
-    },
-
-    methods: {
-      //初始化监听路由传递的edit使true(审核)还是false(编目)
-      getQuery:function() {
-        let queryEdit = this.$route.query.edit;
-        this.edit = queryEdit;
-      },
-      // 定义右侧列背景色
-      rowStyle({rowIndex, columnIndex}) {
-        if (columnIndex == 0 && rowIndex == 0) {
-          return "background-color:rgb(122, 150, 233);";
-        } else if (columnIndex == 0) {
-          return "background-color:rgb(231, 233, 242);";
-        } else {
-          return "";
-        }
-      },
-
-      //编目：点击编辑左下内容以及右上表格信息
-      handleEdit(data, node) {
-        data.listEdit = true;
-        console.log(data.listEdit);
-        data.EditData.forEach(function(item, index) {
-          item.list_right_edit = true;
-        });
-        this.EditData = data.EditData;
-      },
-      //编目：确认编辑
-      handleDefine(node, data) {
-        //当确定后，左下列表中list_edit_label中的值会覆盖默认显示label的值
-        data.list_edit_label === '' ? data.label = data.label : data.label = data.list_edit_label;
-        //当确定后，右上列表编辑框中的textarea的值会覆盖默认显示的name的值
-        data.listEdit = false;
-        data.EditData.forEach(function(item, index) {
-          item.list_right_edit = false;
-          item.name = item.textarea;
-        })
-      },
-      //编目：增加行
-      append(data) {
-        const newChild = {
-          id: id++,
-          label: '编辑内容',
-          listEdit:false,
-          list_edit_label:'',
-          Catalog: [],
-          imageData:[],
-          EditData:[
-            {date: "正题名1111", name: '1111', textarea:'', list_right_edit:false},
-            {date: "首播日期", name: '1991-5-12', textarea:'', list_right_edit:false},
-            {date: "节目类型", name: '新闻', textarea:'', list_right_edit:false},
-            {date: "内容描述", name: '1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益', textarea:'', list_right_edit:false},
-            {date: "字幕形式", name: '只有画面叠加字幕', textarea:'', list_right_edit:false},
-            {date: "创建者名称", name: '杭州电视台', textarea:'', list_right_edit:false},
-            {date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台', textarea:'', list_right_edit:false},
-            {date: "节目形态", name: '综合', textarea:'', list_right_edit:false},
-            {date: "栏目", name: '杭州新闻', textarea:'', list_right_edit:false},
-            {date: "色彩", name: '彩色', textarea:'', list_right_edit:false},
-            {date: "制式", name: 'PAL', textarea:'', list_right_edit:false},
-            {date: "声道格式", name: '单声道', textarea:'', list_right_edit:false},
-            {date: "画面宽高比", name: '4:3', textarea:'', list_right_edit:false},
-            {date: "入点", name: '00:00:00:19', textarea:'', list_right_edit:false},
-            {date: "时长", name: '00:11:10:12', textarea:'', list_right_edit:false},
-            {date: "资料获取方式", name: '自制', textarea:'', list_right_edit:false},
-            {date: "资料提供者", name: '杭州电视台', textarea:'', list_right_edit:false},
-          ],
-          children: []
-        };
-        if (!data.children) {
-          this.$set(data, 'children', []);
-        }
-        data.children.push(newChild);
-      },
-      //编目：删除行
-      remove(node, data) {
-        const parent = node.parent;
-        const children = parent.data.children || parent.data;
-        const index = children.findIndex(d => d.id === data.id);
-        children.splice(index, 1);
-      },
-
-      //审核：点击查看对应右上信息列表
-      openDetails(row) {
-        this.tableData = row.tableData;
-      },
-
-      //左下角节目信息
-      //数组嵌套数组数据，左侧为父，右侧为子
-      getList: async function () {
-        this.loading = true;
-        let newTableList = [
-          {
-            id: 1,
-            name: '浙江之声 1990-09-24',
-            state: '节目',
-            result: '',
-            saveEdit: false,
-            tableData: [
-              {id: 1, date: "正题名", name: '杭州新闻 1991-05-12'},
-              {id: 2, date: "首播日期", name: '1991-5-12'},
-              {id: 3, date: "节目类型", name: '新闻'},
-              {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-              {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-              {id: 6, date: "创建者名称", name: '杭州电视台'},
-              {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-              {id: 8, date: "节目形态", name: '综合'},
-              {id: 9, date: "栏目", name: '杭州新闻'},
-              {id: 10, date: "色彩", name: '彩色'},
-              {id: 11, date: "制式", name: 'PAL'},
-              {id: 12, date: "声道格式", name: '单声道'},
-              {id: 13, date: "画面宽高比", name: '4:3'},
-              {id: 14, date: "入点", name: '00:00:00:19'},
-              {id: 15, date: "时长", name: '00:11:10:12'},
-              {id: 16, date: "资料获取方式", name: '自制'},
-              {id: 17, date: "资料提供者", name: '杭州电视台'},
-            ],
-            imageData:[],
-            children: [
-              {
-                id: 11,
-                name: '杭州农药厂依靠科技进步',
-                state: '片段',
-                result: '',
-                saveEdit: false,
-                tableData: [
-                  {id: 1, date: "正题名", name: '杭州农药厂依靠科技进步'},
-                  {id: 2, date: "首播日期", name: '1991-5-12'},
-                  {id: 3, date: "节目类型", name: '新闻'},
-                  {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-                  {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-                  {id: 6, date: "创建者名称", name: '杭州电视台'},
-                  {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-                  {id: 8, date: "节目形态", name: '综合'},
-                  {id: 9, date: "栏目", name: '杭州新闻'},
-                  {id: 10, date: "色彩", name: '彩色'},
-                  {id: 11, date: "制式", name: 'PAL'},
-                  {id: 12, date: "声道格式", name: '单声道'},
-                  {id: 13, date: "画面宽高比", name: '4:3'},
-                  {id: 14, date: "入点", name: '00:00:00:19'},
-                  {id: 15, date: "时长", name: '00:11:10:12'},
-                  {id: 16, date: "资料获取方式", name: '自制'},
-                  {id: 17, date: "资料提供者", name: '杭州电视台'},
-                ],
-                imageData:[],
-              },
-              {
-                id: 12,
-                name: '杭州市无偿献血活动日',
-                state: '片段',
-                result: '',
-                saveEdit: false,
-                tableData: [
-                  {id: 1, date: "正题名", name: '杭州市无偿献血活动日'},
-                  {id: 2, date: "首播日期", name: '1991-5-12'},
-                  {id: 3, date: "节目类型", name: '新闻'},
-                  {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-                  {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-                  {id: 6, date: "创建者名称", name: '杭州电视台'},
-                  {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-                  {id: 8, date: "节目形态", name: '综合'},
-                  {id: 9, date: "栏目", name: '杭州新闻'},
-                  {id: 10, date: "色彩", name: '彩色'},
-                  {id: 11, date: "制式", name: 'PAL'},
-                  {id: 12, date: "声道格式", name: '单声道'},
-                  {id: 13, date: "画面宽高比", name: '4:3'},
-                  {id: 14, date: "入点", name: '00:00:00:19'},
-                  {id: 15, date: "时长", name: '00:11:10:12'},
-                  {id: 16, date: "资料获取方式", name: '自制'},
-                  {id: 17, date: "资料提供者", name: '杭州电视台'},
-                ],
-                imageData:[],
-              },
-              {
-                id: 13,
-                name: '本市医卫工作者开展“5.1”劳动节活动',
-                state: '片段',
-                result: '',
-                saveEdit: false,
-                tableData: [
-                  {id: 1, date: "正题名", name: '本市医卫工作者开展“5.1”劳动节活动'},
-                  {id: 2, date: "首播日期", name: '1991-5-12'},
-                  {id: 3, date: "节目类型", name: '新闻'},
-                  {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-                  {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-                  {id: 6, date: "创建者名称", name: '杭州电视台'},
-                  {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-                  {id: 8, date: "节目形态", name: '综合'},
-                  {id: 9, date: "栏目", name: '杭州新闻'},
-                  {id: 10, date: "色彩", name: '彩色'},
-                  {id: 11, date: "制式", name: 'PAL'},
-                  {id: 12, date: "声道格式", name: '单声道'},
-                  {id: 13, date: "画面宽高比", name: '4:3'},
-                  {id: 14, date: "入点", name: '00:00:00:19'},
-                  {id: 15, date: "时长", name: '00:11:10:12'},
-                  {id: 16, date: "资料获取方式", name: '自制'},
-                  {id: 17, date: "资料提供者", name: '杭州电视台'},
-                ],
-                imageData:[],
-              },
-              {
-                id: 14,
-                name: '杭州户使学校培养合格护士',
-                state: '片段',
-                result: '',
-                saveEdit: false,
-                tableData: [
-                  {id: 1, date: "正题名", name: '杭州户使学校培养合格护士'},
-                  {id: 2, date: "首播日期", name: '1991-5-12'},
-                  {id: 3, date: "节目类型", name: '新闻'},
-                  {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-                  {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-                  {id: 6, date: "创建者名称", name: '杭州电视台'},
-                  {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-                  {id: 8, date: "节目形态", name: '综合'},
-                  {id: 9, date: "栏目", name: '杭州新闻'},
-                  {id: 10, date: "色彩", name: '彩色'},
-                  {id: 11, date: "制式", name: 'PAL'},
-                  {id: 12, date: "声道格式", name: '单声道'},
-                  {id: 13, date: "画面宽高比", name: '4:3'},
-                  {id: 14, date: "入点", name: '00:00:00:19'},
-                  {id: 15, date: "时长", name: '00:11:10:12'},
-                  {id: 16, date: "资料获取方式", name: '自制'},
-                  {id: 17, date: "资料提供者", name: '杭州电视台'},
-                ],
-                imageData:[],
-              },
-              {
-                id: 15,
-                name: '我市举行小发明家成果发布会',
-                state: '片段',
-                result: '',
-                saveEdit: false,
-                tableData: [
-                  {id: 1, date: "正题名", name: '我市举行小发明家成果发布会'},
-                  {id: 2, date: "首播日期", name: '1991-5-12'},
-                  {id: 3, date: "节目类型", name: '新闻'},
-                  {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-                  {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-                  {id: 6, date: "创建者名称", name: '杭州电视台'},
-                  {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-                  {id: 8, date: "节目形态", name: '综合'},
-                  {id: 9, date: "栏目", name: '杭州新闻'},
-                  {id: 10, date: "色彩", name: '彩色'},
-                  {id: 11, date: "制式", name: 'PAL'},
-                  {id: 12, date: "声道格式", name: '单声道'},
-                  {id: 13, date: "画面宽高比", name: '4:3'},
-                  {id: 14, date: "入点", name: '00:00:00:19'},
-                  {id: 15, date: "时长", name: '00:11:10:12'},
-                  {id: 16, date: "资料获取方式", name: '自制'},
-                  {id: 17, date: "资料提供者", name: '杭州电视台'},
-                ],
-                imageData:[],
-              },
-              {
-                id: 16,
-                name: '杭州西湖加斯总厂重视新发展',
-                state: '片段',
-                result: '',
-                saveEdit: false,
-                tableData: [
-                  {id: 1, date: "正题名", name: '杭州西湖加斯总厂重视新发展'},
-                  {id: 2, date: "首播日期", name: '1991-5-12'},
-                  {id: 3, date: "节目类型", name: '新闻'},
-                  {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-                  {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-                  {id: 6, date: "创建者名称", name: '杭州电视台'},
-                  {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-                  {id: 8, date: "节目形态", name: '综合'},
-                  {id: 9, date: "栏目", name: '杭州新闻'},
-                  {id: 10, date: "色彩", name: '彩色'},
-                  {id: 11, date: "制式", name: 'PAL'},
-                  {id: 12, date: "声道格式", name: '单声道'},
-                  {id: 13, date: "画面宽高比", name: '4:3'},
-                  {id: 14, date: "入点", name: '00:00:00:19'},
-                  {id: 15, date: "时长", name: '00:11:10:12'},
-                  {id: 16, date: "资料获取方式", name: '自制'},
-                  {id: 17, date: "资料提供者", name: '杭州电视台'},
-                ],
-                imageData:[],
-              },
-              {
-                id: 17,
-                name: '斯迈尔到临安考察生态农业',
-                state: '片段',
-                result: '',
-                saveEdit: false,
-                tableData: [
-                  {id: 1, date: "正题名", name: '斯迈尔到临安考察生态农业'},
-                  {id: 2, date: "首播日期", name: '1991-5-12'},
-                  {id: 3, date: "节目类型", name: '新闻'},
-                  {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-                  {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-                  {id: 6, date: "创建者名称", name: '杭州电视台'},
-                  {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-                  {id: 8, date: "节目形态", name: '综合'},
-                  {id: 9, date: "栏目", name: '杭州新闻'},
-                  {id: 10, date: "色彩", name: '彩色'},
-                  {id: 11, date: "制式", name: 'PAL'},
-                  {id: 12, date: "声道格式", name: '单声道'},
-                  {id: 13, date: "画面宽高比", name: '4:3'},
-                  {id: 14, date: "入点", name: '00:00:00:19'},
-                  {id: 15, date: "时长", name: '00:11:10:12'},
-                  {id: 16, date: "资料获取方式", name: '自制'},
-                  {id: 17, date: "资料提供者", name: '杭州电视台'},
-                ],
-                imageData:[],
-              },
-              {
-                id: 18,
-                name: '龙翔桥农副产品时长抓好',
-                state: '片段',
-                result: '',
-                saveEdit: false,
-                tableData: [
-                  {id: 1, date: "正题名", name: '龙翔桥农副产品时长抓好'},
-                  {id: 2, date: "首播日期", name: '1991-5-12'},
-                  {id: 3, date: "节目类型", name: '新闻'},
-                  {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-                  {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-                  {id: 6, date: "创建者名称", name: '杭州电视台'},
-                  {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-                  {id: 8, date: "节目形态", name: '综合'},
-                  {id: 9, date: "栏目", name: '杭州新闻'},
-                  {id: 10, date: "色彩", name: '彩色'},
-                  {id: 11, date: "制式", name: 'PAL'},
-                  {id: 12, date: "声道格式", name: '单声道'},
-                  {id: 13, date: "画面宽高比", name: '4:3'},
-                  {id: 14, date: "入点", name: '00:00:00:19'},
-                  {id: 15, date: "时长", name: '00:11:10:12'},
-                  {id: 16, date: "资料获取方式", name: '自制'},
-                  {id: 17, date: "资料提供者", name: '杭州电视台'},
-                ],
-                imageData:[],
-              },
-            ]
-          }
-        ];
-        let newTableData = [
-          {id: 1, date: "正题名", name: '杭州新闻 1991-05-12'},
-          {id: 2, date: "首播日期", name: '1991-5-12'},
-          {id: 3, date: "节目类型", name: '新闻'},
-          {id: 4, date: "内容描述", name: '1、向科技要效益————杭州农药厂依靠科技进步，提高经济效益 1、向科技要效益——杭州农药厂依靠科技进步，提高经济效益'},
-          {id: 5, date: "字幕形式", name: '只有画面叠加字幕'},
-          {id: 6, date: "创建者名称", name: '杭州电视台'},
-          {id: 7, date: "其他责任者项", name: '编辑：赵良，行首电视台；编辑：孟丽，杭州电视台；播音：闫倩，杭州电视台'},
-          {id: 8, date: "节目形态", name: '综合'},
-          {id: 9, date: "栏目", name: '杭州新闻'},
-          {id: 10, date: "色彩", name: '彩色'},
-          {id: 11, date: "制式", name: 'PAL'},
-          {id: 12, date: "声道格式", name: '单声道'},
-          {id: 13, date: "画面宽高比", name: '4:3'},
-          {id: 14, date: "入点", name: '00:00:00:19'},
-          {id: 15, date: "时长", name: '00:11:10:12'},
-          {id: 16, date: "资料获取方式", name: '自制'},
-          {id: 17, date: "资料提供者", name: '杭州电视台'},
-        ];
-        let newCatalogImages = [
-          {id: 0, title: '杭州新闻题目..', img: require('@/assets/images/logo.png')},
-          {id: 1, title: '杭州新闻题目二', img: require('@/assets/images/logo.png')},
-          {id: 2, title: '杭州新闻题目一', img: require('@/assets/images/logo.png')},
-          {id: 3, title: '杭州新闻题目二', img: require('@/assets/images/logo.png')},
-          {id: 4, title: '杭州新闻题目一', img: require('@/assets/images/logo.png')},
-          {id: 5, title: '杭州新闻题目二', img: require('@/assets/images/logo.png')},
-          {id: 6, title: '杭州新闻题目一', img: require('@/assets/images/logo.png')},
-          {id: 7, title: '杭州新闻题目二', img: require('@/assets/images/logo.png')},
-          {id: 8, title: '杭州新闻题目一', img: require('@/assets/images/logo.png')},
-          {id: 9, title: '杭州新闻题目二', img: require('@/assets/images/logo.png')},
-          {id: 10, title: '杭州新闻题目一', img: require('@/assets/images/logo.png')},
-        ];
-        this.tableList = newTableList;
-        this.tableData = newTableData;
-        this.CatalogImages = newCatalogImages;
-        this.loading = false;
-      },
-
-      //开始 操作（审核或编目）
-      modifyClick() {
-        this.saveEdit = true;
-        //审核
-        this.tableList[0].saveEdit = true;
-        this.tableList[0].children.forEach(function(item, index) {
-          item.saveEdit = true;
-        })
-      },
-      //点击确认保存按钮
-      saveClick() {
-        this.saveEdit = false;
-        //审核
-        this.tableList[0].saveEdit = false;
-        this.tableList[0].result = this.tableList[0].value;
-        this.tableList[0].children.forEach(function(item, index) {
-          item.result = item.value;
-          item.saveEdit = false;
-        })
-      },
-    }
-  }
+  },
+};
 </script>
 
 <style scoped lang="less">
-  .home {
+.home {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 85.5vh;
+
+  .home-left {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    height: 85.5vh;
+    flex-direction: column;
+    width: 43%;
+    height: 100%;
+    min-width: 635px;
 
-    .home-left {
+    .home-video {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
-      flex-direction: column;
-      width: 43%;
-      height: 100%;
-      min-width: 635px;
-
-      .home-video {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 635px;
-      }
-
-      .home-list {
-        width: 635px;
-        height: 35%;
-        overflow-y: scroll;
-
-        .list-tree-node{
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          width: 100%;
-          font-size: 1.2em;
-
-          .list-tree-node-input{
-            width: 13em;
-            height: 1.3em;
-            border-radius: 3px;
-            border: .5px solid lightgray;
-          }
-          .list-tree-node-input:focus{
-            outline: none;
-            border: .5px solid rgb(64,158,255);
-          }
-
-          .list-tree-node-buttons{
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 8em;
-
-            .list-tree-node-btn{
-              width: 1.7em;
-              height: 1.7em;
-              border-radius: 50%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              background-color: rgb(64,158,255);
-            }
-            .list-tree-node-btn:nth-child(1){
-              background-color: rgb(103,194,58);
-            }
-            .list-tree-node-btn:nth-child(3){
-              background-color: rgb(245,108,108);
-            }
-          }
-        }
-      }
+      width: 635px;
     }
 
-    .home-right {
-      width: 55%;
+    .home-list {
+      width: 635px;
+      height: 35%;
+      overflow-y: scroll;
+    }
+  }
+
+  .home-right {
+    width: 55%;
+    height: 100%;
+    min-width: 50%;
+
+    .home-right-card {
+      width: 100%;
       height: 100%;
-
-      .home-right-card{
+      overflow-y: scroll;
+      .right-card-btns {
+        position: sticky;
+        top: 0.8em;
+        z-index: 5;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+      }
+      .right-card-screenshot {
         width: 100%;
-        height: 100%;
-        .home-right-btn {
-          display: flex;
-          justify-content: flex-end;
-          align-items: center;
-          width: 100%;
-          height: 3em;
-
-          .btn-item {
-            display: table-cell;
-            width: auto;
-            height: 100%;
-          }
-        }
-
-        .home-right-text {
-          display: block;
-          width: 100%;
-          height: 31.7em;
-          overflow: scroll;
-          overflow-x: hidden;
-          //设置文本换行
-          .home-right-text-wrap{
-            white-space: pre-wrap;
-          }
-        }
-
-        .home-right-img {
+        height: auto;
+        .screenshot-list {
           display: flex;
           flex-wrap: wrap;
           width: 100%;
-          min-width: 690px;
-          height: 15em;
+          height: 26em;
           overflow-y: scroll;
-          border-top: black .2em dashed;
-          box-sizing: border-box;
-
-          .img-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            margin: 10px 50px;
-            width: 18%;
-            height: 45%;
-            font-size: .8em;
-
-            .img {
-              display: block;
-              height: 6em;
-              width: auto;
-            }
-          }
+          border: 1px solid #dcdfe6;
+          border-radius: 0.5em;
         }
       }
     }
   }
+  .onload {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    width: 5em;
+    height: 3em;
+  }
+}
 </style>

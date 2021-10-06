@@ -53,7 +53,6 @@ export default {
         }
         projectList.push({ ...val, ...options })
       })
-      console.log(projectList);
       commit('setProjectList', projectList)
     } catch (e) {
       this.$catch = e
@@ -124,7 +123,6 @@ export default {
         }
         taskList.push({ ...val, ...options })
       })
-      console.log(taskList);
       commit('setTaskList', taskList)
     } catch (e) {
       this.$catch = e
@@ -149,10 +147,9 @@ export default {
         }
         feedbackList.push({ ...val, ...options })
       })
-      console.log(feedbackList);
       commit('setFeedbackList', feedbackList)
     } catch (e) {
       this.$catch = e
     }
-  }
+  },
 }
