@@ -40,7 +40,10 @@ export default {
       // this.$router.go(-1);
       if (this.$route.path === "/edit/task") {
         this.$router.push("/admin/projectList");
-      } else if (this.$route.path === "/edit/check") {
+      } else if (
+        this.$route.path === "/edit/check" ||
+        this.$route.path === "/edit/exame"
+      ) {
         this.$router.push("/edit/task");
       }
       this.setTitleStats(false);

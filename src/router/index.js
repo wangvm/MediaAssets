@@ -50,6 +50,10 @@ const routes = [
 			{
 				path: '/edit/check',
 				component: () => import('@/views/edit/childEdit/edit-check'),
+			},
+			{
+				path: '/edit/exame',
+				component: () => import('@/views/edit/childEdit/edit-exame'),
 			}
 		]
 	},

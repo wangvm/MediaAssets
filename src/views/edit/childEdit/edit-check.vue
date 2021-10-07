@@ -73,8 +73,12 @@
       <el-card class="home-right-card" shadow="hover">
         <el-form ref="form" :model="form" size="small" label-width="110px">
           <el-form-item class="right-card-btns">
-            <el-button type="primary" @click="saveClick">保存</el-button>
-            <el-button @click="cancleClick">取消</el-button>
+            <el-button type="primary" v-show="editAndView" @click="saveClick"
+              >保存</el-button
+            >
+            <el-button @click="cancleClick" v-show="editAndView"
+              >取消</el-button
+            >
           </el-form-item>
           <el-form-item label="正题名">
             <el-input
@@ -122,7 +126,11 @@
             <span v-show="!this.editAndView">{{ form.subtitleForm }}</span>
           </el-form-item>
           <el-form-item label="创建者名称">
-            <h3>{{ form.taskName }}</h3>
+            <el-input
+              v-model="form.edit_taskName"
+              v-show="this.editAndView"
+            ></el-input>
+            <h3 v-show="!this.editAndView">{{ form.taskName }}</h3>
           </el-form-item>
           <el-form-item label="其他责任者">
             <el-input
@@ -255,6 +263,7 @@
  * 目前处于点击左侧显示右侧对应信息
  * */
 import videoPlayer from "@/components/video-player/video-player";
+import { mapState } from "vuex";
 
 export default {
   name: "editCheck",
@@ -295,7 +304,6 @@ export default {
         duration: "",
         AcquisitionMethod: "",
         provider: "",
-        taskName: "123",
         imageList: [],
       },
     };
@@ -308,7 +316,9 @@ export default {
   components: {
     videoPlayer,
   },
-
+  computed: {
+    ...mapState("common", []),
+  },
   methods: {
     // 点击查看详情
     lookClick(row, column, event) {
@@ -386,7 +396,22 @@ export default {
       this.editAndView = false;
       this.isEdit = false;
     },
-    cancleClick() {},
+    cancleClick() {
+      if (this.state === "节目") {
+        this.tableData[0].edit = false;
+      } else {
+        for (let i in this.tableData[0].children) {
+          if (this.count === this.tableData[0].children[i].id) {
+            this.tableData[0].children[i].edit = false;
+          }
+        }
+      }
+
+      this.state = "";
+      this.count = null;
+      this.editAndView = false;
+      this.isEdit = false;
+    },
     //
     // 初始化数据
     initEditList() {
@@ -503,7 +528,8 @@ export default {
     },
     // 上传至后端保存数据
     uploadEdit() {
-      
+      console.log(this.tableData);
+      let uploadList = _.cloneDeep(this.tableData);
     },
   },
 };
