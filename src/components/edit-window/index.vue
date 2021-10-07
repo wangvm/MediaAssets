@@ -24,22 +24,21 @@
             />
             <el-upload
               class="upload-demo"
-              :action="item.taskName"
+              action="http://121.196.100.229:8080/mam/file/videoUpload"
               :on-preview="handlePreview"
               :on-remove="handleRemove"
-              :on-progress="test"
               :on-success="handleSuccess"
+              :on-error="handleError"
               :before-remove="beforeRemove"
-              :http-request="uploadFile"
+              :on-progress="handleProgress"
               multiple
               :limit="1"
               :on-exceed="handleExceed"
               :file-list="fileList"
-              name="file"
             >
               <el-button size="small" type="primary">点击上传</el-button>
               <div slot="tip" class="el-upload__tip">
-                只能上传mp4文件，且不超过500kb
+                只能上传mp4文件，且不超过500M
               </div>
             </el-upload>
           </div>
@@ -76,52 +75,93 @@ export default {
   data() {
     return {
       createList: [],
-      uploadList: [],
+      catalogList: [],
     };
   },
   created() {
     this.initTaskList();
   },
+  watch: {
+    catalogList: "updateCatalog",
+  },
   methods: {
     initTaskList() {
-      this.createList = [{ taskName: "" }];
+      this.createList = [{ taskName: "", videoId: "", id: "", list: [] }];
     },
     // 增加创建用户 +号按钮
     addItem() {
-      this.createList.push({
-        taskName: "",
-      });
+      let sum = 0;
+      for (let i = 0; i < this.createList.length; i++) {
+        if (this.createList[i].videoId === "") {
+          sum++;
+        }
+      }
+      if (sum === 0) {
+        this.createList.push({
+          taskName: "",
+          videoId: "",
+          id: "",
+          list: [],
+        });
+      } else {
+        this.$message("请依次上传视频");
+      }
     },
     // 删除创建的任务 - 号按钮
     reduceItem() {
       if (this.createList.length > 1) {
         this.createList.pop();
-        this.uploadList.pop();
       } else {
         this.$message("不能再删了");
       }
     },
 
     // 创建任务
-    createTask: debounce(async function () {
-      if (this.createList.length === 1 && this.createList[0].taskName === "") {
+    createTask: _.debounce(async function () {
+      if (
+        this.createList.length === 1 &&
+        (this.createList[0].taskName === "" ||
+          this.createList[0].videoId === "")
+      ) {
         this.$message.error("注册信息为空");
         return;
       }
       let repeatIndex = this.repeatItem(this.createList);
-      console.log(repeatIndex);
       if (repeatIndex[0] !== repeatIndex[1])
         return this.$message.error(
           `任务${repeatIndex[0] + 1}与任务${repeatIndex[1] + 1}名子重复`
         );
       let taskList = this.filterItem(this.createList).map((val) => {
-        console.log(val);
         return {
           taskName: val.taskName,
+          videoId: val.videoId,
         };
       });
-      await this.flieUpload(taskList, this.uploadList);
+      let catalogList = this.filterItem(this.createList).map((val) => {
+        return {
+          list: val.list,
+        };
+      });
+      // this.catalogList = catalogList;
+      try {
+        let res = await $api.addTask(taskList);
+        console.log(res);
+        if (res.code === 200) {
+          this.catalogList = catalogList;
+          this.$emit("operation", false);
+        }
+      } catch (e) {
+        this.$catch(e);
+        this.$emit("operation", false);
+      }
     }, 300),
+    updateCatalog: _.debounce(async function () {
+      for (let i in this.catalogList) {
+        console.log(this.catalogList[i].list);
+        let res = await $api.setCatalog(this.catalogList[i].list);
+        console.log(res);
+      }
+    }, 500),
     // 判断任务名是否重复
     repeatItem(list) {
       let idList = [];
@@ -129,7 +169,6 @@ export default {
       Object.keys(list).forEach((val) => {
         if (list[val].taskName === "") return;
         let index = idList.findIndex((name) => name === list[val].taskName);
-        console.log(index);
         index === -1
           ? idList.push(list[val].taskName)
           : (repeatIndex = [index, parseInt(val)]);
@@ -138,60 +177,53 @@ export default {
     },
     // 过滤任务名为空的信息
     filterItem(list) {
-      return list.filter((val) => val.taskName !== "");
+      return list.filter((val) => val.taskName !== "" || val.videoId !== "");
     },
-    flieUpload: _.debounce(function (taskList, uploadList) {
-      console.log(uploadList);
-      let allList = [];
-      let index = 0;
-      while (index < taskList.length) {
-        for (let i in uploadList) {
-          if ((uploadList[i].taskName = taskList[index])) {
-            allList.push({
-              taskName: uploadList[i].taskName.taskName,
-              file: uploadList[i].file,
-            });
-            index++;
-          }
-        }
-      }
-      let sum = 0;
-      for (let j in allList) {
-        let uploadRes = $api.fileUpload(allList[j].file, allList[j].taskName);
-        if (uploadRes.data.code === 200) sum++;
-      }
-      if (sum === allList.length) {
-        try {
-          let res = $api.addTask(taskList);
-          if (res.code === 200) {
-            this.$emit("operation", false);
-          }
-        } catch (e) {
-          this.$catch(e);
-          this.$emit("operation", false);
-        }
-      }
-    }, 500),
     //   阻止点击冒泡事件
     stopClick() {},
     noEnterClick() {
       this.initTaskList();
       this.$emit("operation", false);
     },
-    // 添加任务上传视频相关操作
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
+    // 上传中的钩子
+    // handleProgress(event, file, fileList) {
+    //   console.log(event, file, fileList);
+    // },
+    // 上传成功时的钩子
+    handleSuccess(response, file) {
+      let index = 0;
+      let i = 0;
+      while (index !== 1) {
+        if (this.createList[i].videoId === "") {
+          this.createList[i].videoId = response.data.position;
+          this.createList[i].id = file.uid;
+          this.createList[i].list = response.data;
+          this.createList[i].list["taskName"] = this.createList[i].taskName;
+          index = 1;
+        }
+        i++;
+      }
+      console.log(this.createList);
     },
-    uploadFile(params) {
-      console.log(params);
-      this.uploadList.push({ taskName: params.action, file: params.file });
+    // 上传失败时的钩子
+    handleError(err, file, fileList) {
+      this.handleRemove(file, fileList);
+      this.$message("上传失败，请重新上传");
     },
-    handleSuccess(response, file, fileList) {
-      console.log(response, file, fileList);
+    // 文件列表移除文件时的钩子
+    handleRemove(file) {
+      for (let i in this.createList) {
+        if (this.createList[i].id === file.uid) {
+          this.createList[i].videoId = "";
+          this.createList[i].id = "";
+        }
+      }
     },
-    handlePreview(file) {
-      console.log(file);
-    },
+    // 点击文件列表中已上传的文件时的钩子
+    // handlePreview(file) {
+    //   console.log(file);
+    // },
+    // 文件超出个数限制时的钩子
     handleExceed(files, fileList) {
       this.$message.warning(
         `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${
@@ -199,6 +231,7 @@ export default {
         } 个文件`
       );
     },
+    // 删除文件之前的钩子，参数为上传的文件和文件列表，若返回 false 或者返回 Promise 且被 reject，则停止删除。
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },

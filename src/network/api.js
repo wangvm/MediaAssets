@@ -75,9 +75,14 @@ const $api = {
     // 完成反馈
     CompleteFeedback: (feedbackId) => request('/feedback/completed', { feedbackId }, 'POST'),
 
+    // 新建编目条目
+    setCatalog: (catalogList) => request('/catalog/add', catalogList, 'POST'),
     // 更新编目内容
-    updateCatalog: (catalogList) => request('/catalog/update', {catalogList}, 'POST'),
+    updateCatalog: (catalogList) => request('/catalog/update', { catalogList }, 'POST'),
     // 搜索编目内容
-    getCatalog:(key, value) => request('/catalog/search', {key, value}, 'POST'),
+    getCatalog: (key, value) => request('/catalog/search', { key, value }),
+    // 关键帧截取接口
+    getscreenshotList: (cutTime, taskName) => request('/catalog/cut', { cutTime, taskName }),
+
 }
 export default $api

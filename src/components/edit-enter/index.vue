@@ -52,7 +52,7 @@ export default {
     // 审核界面
     examClick() {
       this.$router.push({
-        path: "/edit/check",
+        path: "/edit/exame",
         //跳转路由时传递编目名称和edit状态true(审核)
         query: {
           edit: true,

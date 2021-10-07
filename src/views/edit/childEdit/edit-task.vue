@@ -173,7 +173,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <edit-window v-show="cerateTask" @operation="operationClick" />
+      <edit-window v-show="this.createTask" @operation="operationClick" />
       <edit-enter
         v-show="enterIn"
         :taskName="this.newTaskName"
@@ -184,7 +184,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 import { debounce } from "lodash";
 import AdminList from "@/components/admin-list";
 import $api from "@/network/api";
@@ -204,7 +204,7 @@ export default {
       taskStatus,
       loading: false, //表格loading
       showList: [], //每页显示的数组
-      cerateTask: false,
+      createTask: false,
       enterIn: false,
       newTaskName: "",
     };
@@ -224,7 +224,7 @@ export default {
   },
   methods: {
     ...mapActions("common", ["getTaskList"]), //先用project的数据
-    // ...mapActions("edit", ["getEditList"]),
+    ...mapMutations("common", ["setVideoSrc"]),
     //获取到信息
     initTaskList: debounce(async function () {
       let content = {
@@ -253,7 +253,16 @@ export default {
         : (this.showList = this.taskList.slice(this.currentPage - 1, val));
     },
     //进入项目
-    enterTask(val) {
+    async enterTask(val) {
+      try {
+        let res = await $api.getCatalog("taskName", val.taskName);
+        console.log(res);
+        if (res.code === 200) {
+          this.setVideoSrc(res.data.position);
+        }
+      } catch (e) {
+        this.$catch(e);
+      }
       this.newTaskName = val.taskName;
       this.enterIn = true;
     },
@@ -311,14 +320,14 @@ export default {
     },
     // 是否显示添加任务组件
     operationClick(val) {
-      this.cerateTask = val;
+      this.createTask = val;
     },
     enterInClick(val) {
       this.enterIn = val;
     },
     //新建编目任务
     newBuilt() {
-      this.cerateTask = true;
+      this.createTask = true;
     },
   },
 };
