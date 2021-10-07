@@ -35,7 +35,7 @@
                 ></el-button>
               </el-tooltip>
               <el-tooltip
-                v-if="scope.row.state === '节目'"
+                v-show="scope.row.state === '节目'"
                 class="item"
                 effect="light"
                 content="增加"
@@ -50,7 +50,7 @@
                 ></el-button>
               </el-tooltip>
               <el-tooltip
-                v-if="scope.row.state === '片段'"
+                v-show="scope.row.state === '片段'"
                 class="item"
                 effect="light"
                 content="删除"
@@ -264,6 +264,7 @@
  * */
 import videoPlayer from "@/components/video-player/video-player";
 import { mapState } from "vuex";
+import $api from "@/network/api";
 
 export default {
   name: "editCheck",
@@ -317,7 +318,7 @@ export default {
     videoPlayer,
   },
   computed: {
-    ...mapState("common", []),
+    ...mapState("common", ["taskName", "videoSrc"]),
   },
   methods: {
     // 点击查看详情
@@ -347,9 +348,11 @@ export default {
           this.tableData[0].edit_AcquisitionMethod;
         this.tableData[0].provider = this.tableData[0].edit_provider;
         this.tableData[0].edit = false;
+        // this.state = "节目";
       } else {
         for (let i in this.tableData[0].children) {
           if (this.count === this.tableData[0].children[i].id) {
+            // this.state = "片段";
             this.tableData[0].children[i].title =
               this.tableData[0].children[i].edit_title;
             this.tableData[0].children[i].premiereDate =
@@ -384,14 +387,10 @@ export default {
               this.tableData[0].children[i].edit_AcquisitionMethod;
             this.tableData[0].children[i].provider =
               this.tableData[0].children[i].edit_provider;
-            this.tableData[0].children[i].state =
-              this.tableData[0].children[i].edit_state;
             this.tableData[0].children[i].edit = false;
           }
         }
       }
-
-      this.state = "";
       this.count = null;
       this.editAndView = false;
       this.isEdit = false;
@@ -406,8 +405,6 @@ export default {
           }
         }
       }
-
-      this.state = "";
       this.count = null;
       this.editAndView = false;
       this.isEdit = false;
@@ -527,9 +524,54 @@ export default {
       }
     },
     // 上传至后端保存数据
-    uploadEdit() {
-      console.log(this.tableData);
+    async uploadEdit() {
       let uploadList = _.cloneDeep(this.tableData);
+      delete uploadList[0].id;
+      delete uploadList[0].edit;
+      delete uploadList[0].edit_title;
+      delete uploadList[0].edit_premiereDate;
+      delete uploadList[0].edit_programType;
+      delete uploadList[0].edit_contentDescription;
+      delete uploadList[0].edit_subtitleForm;
+      delete uploadList[0].edit_taskName;
+      delete uploadList[0].edit_groupMembers;
+      delete uploadList[0].edit_programForm;
+      delete uploadList[0].edit_column;
+      delete uploadList[0].edit_color;
+      delete uploadList[0].edit_standard;
+      delete uploadList[0].edit_channelFormat;
+      delete uploadList[0].edit_AspectRatio;
+      delete uploadList[0].edit_entryPoint;
+      delete uploadList[0].edit_duration;
+      delete uploadList[0].edit_AcquisitionMethod;
+      delete uploadList[0].edit_provider;
+      if (uploadList[0].children.length !== 0) {
+        for (let i in uploadList[0].children) {
+          delete uploadList[0].children[i].id;
+          delete uploadList[0].children[i].edit;
+          delete uploadList[0].children[i].edit_title;
+          delete uploadList[0].children[i].edit_premiereDate;
+          delete uploadList[0].children[i].edit_programType;
+          delete uploadList[0].children[i].edit_contentDescription;
+          delete uploadList[0].children[i].edit_subtitleForm;
+          delete uploadList[0].children[i].edit_taskName;
+          delete uploadList[0].children[i].edit_groupMembers;
+          delete uploadList[0].children[i].edit_programForm;
+          delete uploadList[0].children[i].edit_column;
+          delete uploadList[0].children[i].edit_color;
+          delete uploadList[0].children[i].edit_standard;
+          delete uploadList[0].children[i].edit_channelFormat;
+          delete uploadList[0].children[i].edit_AspectRatio;
+          delete uploadList[0].children[i].edit_entryPoint;
+          delete uploadList[0].children[i].edit_duration;
+          delete uploadList[0].children[i].edit_AcquisitionMethod;
+          delete uploadList[0].children[i].edit_provider;
+        }
+      }
+      uploadList[0].taskName = this.taskName;
+      console.log(uploadList[0]);
+      let res = await $api.updateCatalog(uploadList[0]);
+      console.log(res);
     },
   },
 };

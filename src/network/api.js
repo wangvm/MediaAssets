@@ -78,7 +78,7 @@ const $api = {
     // 新建编目条目
     setCatalog: (catalogList) => request('/catalog/add', catalogList, 'POST'),
     // 更新编目内容
-    updateCatalog: (catalogList) => request('/catalog/update', { catalogList }, 'POST'),
+    updateCatalog: (updateList) => request('/catalog/update', {updateList}, 'POST'),
     // 搜索编目内容
     getCatalog: (key, value) => request('/catalog/search', { key, value }),
     // 关键帧截取接口

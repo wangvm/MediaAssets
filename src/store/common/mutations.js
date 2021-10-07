@@ -33,6 +33,7 @@ export default {
   // 与视频播放相关
   setVideoSrc(state, val) {
     state.videoSrc = val;
+    console.log(state.videoSrc);
   },
   setscreenshotList(state, val) {
     state.screenshotList = val;
