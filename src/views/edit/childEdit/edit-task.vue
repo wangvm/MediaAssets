@@ -26,8 +26,15 @@
             >
               {{ taskStatus[scope.row.status].label }}
             </span>
-            <span v-else>
-              <el-select v-model="scope.row.edit_status">
+            <div v-else>
+              <span
+                v-if="loginType !== 0"
+                class="project-status"
+                :class="['project-status-' + scope.row.status]"
+              >
+                {{ taskStatus[scope.row.status].label }}
+              </span>
+              <el-select v-else v-model="scope.row.edit_status">
                 <el-option
                   v-for="item in taskStatus"
                   :key="item.value"
@@ -36,7 +43,7 @@
                 >
                 </el-option>
               </el-select>
-            </span>
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="cataloger" label="编目员" width="200">
@@ -213,8 +220,7 @@ export default {
     this.initTaskList();
   },
   computed: {
-    ...mapState("common", ["taskList", "loginType"]), //先用project的数据
-    //...mapState("edit", ["editList", "loginType"]),
+    ...mapState("common", ["taskList", "loginType"]),
   },
   watch: {
     taskList: "updateTaskList",
@@ -223,8 +229,8 @@ export default {
     await this.initTaskList(); //初始化数组信息
   },
   methods: {
-    ...mapActions("common", ["getTaskList"]), //先用project的数据
-    ...mapMutations("common", ["setVideoSrc"]),
+    ...mapActions("common", ["getTaskList", "getCatalogList"]), //先用project的数据
+    ...mapMutations("common", ["setVideoSrc", "setTaskName", "setTitleStats"]),
     //获取到信息
     initTaskList: debounce(async function () {
       let content = {
@@ -259,12 +265,45 @@ export default {
         console.log(res);
         if (res.code === 200) {
           this.setVideoSrc(res.data.position);
+          this.getCatalogList(res.data);
         }
       } catch (e) {
-        this.$catch(e);
+        this.$message.error(e);
       }
-      this.newTaskName = val.taskName;
-      this.enterIn = true;
+      console.log(this.loginType);
+      if (this.loginType === 0) {
+        this.newTaskName = val.taskName;
+        this.enterIn = true;
+      } else if (this.loginType === 2 || this.loginType === 4) {
+        this.$router.push({
+          path: "/edit/check",
+          //跳转路由时传递编目名称和edit状态true(审核)
+          query: {
+            edit: false,
+            //   state: "edit",
+            editName: val.taskName,
+          },
+        });
+        this.setTaskName(val.taskName);
+        this.setTitleStats(true);
+      } else if (this.loginType === 3) {
+        this.$router.push({
+          path: "/edit/exame",
+          //跳转路由时传递编目名称和edit状态true(审核)
+          query: {
+            edit: true,
+            //   state: "edit",
+            editName: val.taskName,
+          },
+        });
+        this.setTaskName(val.taskName);
+        this.setTitleStats(true);
+      }
+      console.log(val.status);
+      if (val.status === 1) {
+        let updateRes = await $api.updateTask(val.taskName, 2);
+        console.log(updateRes);
+      }
     },
     editTask(row) {
       console.log(row);
@@ -309,6 +348,7 @@ export default {
     },
     //删除项目
     async deleteTask(currentProject) {
+      console.log(currentProject.taskName);
       this.loading = true;
       try {
         await $api.deleteTask(currentProject.taskName);
@@ -357,5 +397,8 @@ export default {
 
 .project-status-3 {
   background: #67c23a;
+}
+.project-status-4 {
+  background: #66b1ff;
 }
 </style>

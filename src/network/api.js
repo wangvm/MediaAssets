@@ -52,7 +52,7 @@ const $api = {
     // 上传视频
     fileUpload: (file, taskName) => request('/file/upload', { file, taskName }, 'POST'),
     // 删除任务
-    deleteTask: (taskName) => request('/task/delete', { taskName }),
+    deleteTask: (name) => request('/task/delete', { name }),
     // 更改任务
     updateTask: (taskName, status, cataloger, auditor, videoId, catalogId) => request('/task/update', { taskName, status, cataloger, auditor, videoId, catalogId }, 'POST'),
     // 任务查询
@@ -78,7 +78,7 @@ const $api = {
     // 新建编目条目
     setCatalog: (catalogList) => request('/catalog/add', catalogList, 'POST'),
     // 更新编目内容
-    updateCatalog: (updateList) => request('/catalog/update', {updateList}, 'POST'),
+    updateCatalog: (updateList) => request('/catalog/update', updateList, 'POST'),
     // 搜索编目内容
     getCatalog: (key, value) => request('/catalog/search', { key, value }),
     // 关键帧截取接口

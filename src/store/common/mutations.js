@@ -37,5 +37,10 @@ export default {
   },
   setscreenshotList(state, val) {
     state.screenshotList = val;
+  },
+  // 编目信息
+  setCatalogList(state, val) {
+    state.catalogList = val;
+    console.log(state.catalogList);
   }
 }

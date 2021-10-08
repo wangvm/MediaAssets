@@ -14,4 +14,6 @@ export default () => ({
   // 视频播放组件
   videoSrc: "http://121.196.100.229/vod/test.mp4",
   screenshotList: [],
+  // 编目信息列表
+  catalogList: [],
 })

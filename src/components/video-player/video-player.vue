@@ -3,7 +3,7 @@
 <!--frameRate: 25-->
 <!--}-->
 <template>
-  <el-card shadow="hover">
+  <el-card shadow="hover" v-loading.fullscreen.lock="loading">
     <div
       class="videoPlayer"
       contenteditable="true"
@@ -145,11 +145,14 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
+import $api from "@/network/api";
+
 export default {
   name: "videoPlayer",
   data() {
     return {
+      loading: false, //加载中
       player: null, //视频播放器
       playerPreview: null, //视频进度条预览
       ifLoad: false, //视频是否加载完成
@@ -179,9 +182,10 @@ export default {
     getPlayerDuration() {
       return this.player.duration;
     },
-    ...mapState("common", ["videoSrc"]),
+    ...mapState("common", ["videoSrc", "taskName"]),
   },
   methods: {
+    ...mapActions("common", ["updateScreenshotList"]),
     videoPlayerKeyEvent(event) {
       let myVid = this.player;
       // console.log(event.key)
@@ -398,12 +402,23 @@ export default {
       this.$refs.preview.style.display = "none";
     },
     // 截图
-    screenshot() {
-      console.log(this.player.currentTime);
-      console.log(
-        timeFormat(this.player.currentTime, this.videoInfo.frameRate)
-      );
+    async screenshot() {
       this.playerBtnEvent("pause");
+      this.loading = true;
+      console.log(this.player.currentTime);
+      try {
+        let res = await $api.getscreenshotList(
+          this.player.currentTime,
+          this.taskName
+        );
+        if (res.code === 200) {
+          this.updateScreenshotList(res.data);
+        }
+        this.loading = false;
+      } catch (e) {
+        this.$emit(e);
+        this.loading = false;
+      }
     },
     //改变播放视频声音大小
     volumeEvent(status) {

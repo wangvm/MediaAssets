@@ -6,7 +6,7 @@
       </div>
       <el-card class="home-list" shadow="hover">
         <el-table
-          :data="tableData"
+          :data="catalogList"
           style="width: 100%"
           row-key="id"
           border
@@ -15,7 +15,7 @@
           @row-click="lookClick"
           :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
         >
-          <el-table-column prop="title" label="标题" width="450">
+          <el-table-column prop="title" label="审核标题" width="450">
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -35,7 +35,7 @@
                 ></el-button>
               </el-tooltip>
               <el-tooltip
-                v-if="scope.row.state === '节目'"
+                v-show="scope.row.state === '节目'"
                 class="item"
                 effect="light"
                 content="增加"
@@ -50,7 +50,7 @@
                 ></el-button>
               </el-tooltip>
               <el-tooltip
-                v-if="scope.row.state === '片段'"
+                v-show="scope.row.state === '片段'"
                 class="item"
                 effect="light"
                 content="删除"
@@ -239,12 +239,41 @@
           </el-form-item>
           <el-form-item
             label="图片截取"
-            v-model="form.imageList"
+            v-model="form.edit_imageList"
             class="right-card-screenshot"
           >
-            <div class="screenshot-list">
-              <span>iewubfhu</span>
-              <div v-for="item in form.imageList" :key="item.url"></div>
+            <div class="screenshot-list" v-show="this.editAndView">
+              <div
+                class="list-items"
+                v-for="item in form.edit_imageList"
+                :key="item.src"
+              >
+                <div class="item-delete">
+                  <img
+                    src="@/assets/images/close.png"
+                    alt="图片加载失败"
+                    @click="deleteClick(item.src)"
+                  />
+                </div>
+                <img class="item-image" :src="item.src" alt="" />
+                <el-input
+                  placeholder="请输入内容"
+                  v-model="item.title"
+                  size="mini"
+                  clearable
+                >
+                </el-input>
+              </div>
+            </div>
+            <div class="screenshot-list" v-show="!this.editAndView">
+              <div
+                class="list-items"
+                v-for="item in form.imageList"
+                :key="item.src"
+              >
+                <img class="item-image" :src="item.src" alt="" />
+                <span>{{ item.title === "" ? "请编辑" : item.title }}</span>
+              </div>
             </div>
           </el-form-item>
         </el-form>
@@ -263,7 +292,8 @@
  * 目前处于点击左侧显示右侧对应信息
  * */
 import videoPlayer from "@/components/video-player/video-player";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
+import $api from "@/network/api";
 
 export default {
   name: "editExame",
@@ -283,9 +313,7 @@ export default {
         url: "http://121.196.100.229/vod/test.mp4",
         frameRate: 25,
       },
-      tableData: [],
 
-      //
       form: {
         title: "",
         premiereDate: "",
@@ -309,161 +337,133 @@ export default {
     };
   },
 
-  created() {
-    this.initEditList();
-  },
-
   components: {
     videoPlayer,
   },
+  watch: {
+    screenshotList: "updateFormImageList",
+  },
   computed: {
-    ...mapState("common", []),
+    ...mapState("common", [
+      "taskName",
+      "videoSrc",
+      "catalogList",
+      "screenshotList",
+    ]),
   },
   methods: {
+    ...mapMutations("common", ["setscreenshotList"]),
     // 点击查看详情
     lookClick(row, column, event) {
       this.form = row;
     },
+    // 更新表单图片数据
+    updateFormImageList() {
+      this.form.edit_imageList = _.cloneDeep(this.screenshotList);
+    },
+    deleteClick(val) {
+      for (let i in this.form.edit_imageList) {
+        if (this.form.edit_imageList[i].src === val) {
+          this.form.edit_imageList.splice(i, 1);
+        }
+      }
+    },
     // 保存更改
     saveClick() {
       if (this.state === "节目") {
-        this.tableData[0].title = this.tableData[0].edit_title;
-        this.tableData[0].premiereDate = this.tableData[0].edit_premiereDate;
-        this.tableData[0].programType = this.tableData[0].edit_programType;
-        this.tableData[0].contentDescription =
-          this.tableData[0].edit_contentDescription;
-        this.tableData[0].subtitleForm = this.tableData[0].edit_subtitleForm;
-        this.tableData[0].taskName = this.tableData[0].edit_taskName;
-        this.tableData[0].groupMembers = this.tableData[0].edit_groupMembers;
-        this.tableData[0].programForm = this.tableData[0].edit_programForm;
-        this.tableData[0].column = this.tableData[0].edit_column;
-        this.tableData[0].color = this.tableData[0].edit_color;
-        this.tableData[0].standard = this.tableData[0].edit_standard;
-        this.tableData[0].channelFormat = this.tableData[0].edit_channelFormat;
-        this.tableData[0].AspectRatio = this.tableData[0].edit_AspectRatio;
-        this.tableData[0].entryPoint = this.tableData[0].edit_entryPoint;
-        this.tableData[0].duration = this.tableData[0].edit_duration;
-        this.tableData[0].AcquisitionMethod =
-          this.tableData[0].edit_AcquisitionMethod;
-        this.tableData[0].provider = this.tableData[0].edit_provider;
-        this.tableData[0].edit = false;
+        this.catalogList[0].title = this.catalogList[0].edit_title;
+        this.catalogList[0].premiereDate =
+          this.catalogList[0].edit_premiereDate;
+        this.catalogList[0].programType = this.catalogList[0].edit_programType;
+        this.catalogList[0].contentDescription =
+          this.catalogList[0].edit_contentDescription;
+        this.catalogList[0].subtitleForm =
+          this.catalogList[0].edit_subtitleForm;
+        this.catalogList[0].taskName = this.catalogList[0].edit_taskName;
+        this.catalogList[0].groupMembers =
+          this.catalogList[0].edit_groupMembers;
+        this.catalogList[0].programForm = this.catalogList[0].edit_programForm;
+        this.catalogList[0].column = this.catalogList[0].edit_column;
+        this.catalogList[0].color = this.catalogList[0].edit_color;
+        this.catalogList[0].standard = this.catalogList[0].edit_standard;
+        this.catalogList[0].channelFormat =
+          this.catalogList[0].edit_channelFormat;
+        this.catalogList[0].AspectRatio = this.catalogList[0].edit_AspectRatio;
+        this.catalogList[0].entryPoint = this.catalogList[0].edit_entryPoint;
+        this.catalogList[0].duration = this.catalogList[0].edit_duration;
+        this.catalogList[0].AcquisitionMethod =
+          this.catalogList[0].edit_AcquisitionMethod;
+        this.catalogList[0].provider = this.catalogList[0].edit_provider;
+        this.catalogList[0].edit = false;
+        // this.state = "节目";
+        this.catalogList[0].imageList = this.catalogList[0].edit_imageList;
       } else {
-        for (let i in this.tableData[0].children) {
-          if (this.count === this.tableData[0].children[i].id) {
-            this.tableData[0].children[i].title =
-              this.tableData[0].children[i].edit_title;
-            this.tableData[0].children[i].premiereDate =
-              this.tableData[0].children[i].edit_premiereDate;
-            this.tableData[0].children[i].programType =
-              this.tableData[0].children[i].edit_programType;
-            this.tableData[0].children[i].contentDescription =
-              this.tableData[0].children[i].edit_contentDescription;
-            this.tableData[0].children[i].subtitleForm =
-              this.tableData[0].children[i].edit_subtitleForm;
-            this.tableData[0].children[i].taskName =
-              this.tableData[0].children[i].edit_taskName;
-            this.tableData[0].children[i].groupMembers =
-              this.tableData[0].children[i].edit_groupMembers;
-            this.tableData[0].children[i].programForm =
-              this.tableData[0].children[i].edit_programForm;
-            this.tableData[0].children[i].column =
-              this.tableData[0].children[i].edit_column;
-            this.tableData[0].children[i].color =
-              this.tableData[0].children[i].edit_color;
-            this.tableData[0].children[i].standard =
-              this.tableData[0].children[i].edit_standard;
-            this.tableData[0].children[i].channelFormat =
-              this.tableData[0].children[i].edit_channelFormat;
-            this.tableData[0].children[i].AspectRatio =
-              this.tableData[0].children[i].edit_AspectRatio;
-            this.tableData[0].children[i].entryPoint =
-              this.tableData[0].children[i].edit_entryPoint;
-            this.tableData[0].children[i].duration =
-              this.tableData[0].children[i].edit_duration;
-            this.tableData[0].children[i].AcquisitionMethod =
-              this.tableData[0].children[i].edit_AcquisitionMethod;
-            this.tableData[0].children[i].provider =
-              this.tableData[0].children[i].edit_provider;
-            this.tableData[0].children[i].state =
-              this.tableData[0].children[i].edit_state;
-            this.tableData[0].children[i].edit = false;
+        for (let i in this.catalogList[0].children) {
+          if (this.count === this.catalogList[0].children[i].id) {
+            // this.state = "片段";
+            this.catalogList[0].children[i].title =
+              this.catalogList[0].children[i].edit_title;
+            this.catalogList[0].children[i].premiereDate =
+              this.catalogList[0].children[i].edit_premiereDate;
+            this.catalogList[0].children[i].programType =
+              this.catalogList[0].children[i].edit_programType;
+            this.catalogList[0].children[i].contentDescription =
+              this.catalogList[0].children[i].edit_contentDescription;
+            this.catalogList[0].children[i].subtitleForm =
+              this.catalogList[0].children[i].edit_subtitleForm;
+            this.catalogList[0].children[i].taskName =
+              this.catalogList[0].children[i].edit_taskName;
+            this.catalogList[0].children[i].groupMembers =
+              this.catalogList[0].children[i].edit_groupMembers;
+            this.catalogList[0].children[i].programForm =
+              this.catalogList[0].children[i].edit_programForm;
+            this.catalogList[0].children[i].column =
+              this.catalogList[0].children[i].edit_column;
+            this.catalogList[0].children[i].color =
+              this.catalogList[0].children[i].edit_color;
+            this.catalogList[0].children[i].standard =
+              this.catalogList[0].children[i].edit_standard;
+            this.catalogList[0].children[i].channelFormat =
+              this.catalogList[0].children[i].edit_channelFormat;
+            this.catalogList[0].children[i].AspectRatio =
+              this.catalogList[0].children[i].edit_AspectRatio;
+            this.catalogList[0].children[i].entryPoint =
+              this.catalogList[0].children[i].edit_entryPoint;
+            this.catalogList[0].children[i].duration =
+              this.catalogList[0].children[i].edit_duration;
+            this.catalogList[0].children[i].AcquisitionMethod =
+              this.catalogList[0].children[i].edit_AcquisitionMethod;
+            this.catalogList[0].children[i].provider =
+              this.catalogList[0].children[i].edit_provider;
+            this.catalogList[0].children[i].edit = false;
+            this.catalogList[0].children[i].imageList =
+              this.catalogList[0].children[i].edit_imageList;
           }
         }
       }
-
-      this.state = "";
       this.count = null;
       this.editAndView = false;
       this.isEdit = false;
+      this.setscreenshotList([]);
     },
     cancleClick() {
       if (this.state === "节目") {
-        this.tableData[0].edit = false;
+        this.catalogList[0].edit = false;
       } else {
-        for (let i in this.tableData[0].children) {
-          if (this.count === this.tableData[0].children[i].id) {
-            this.tableData[0].children[i].edit = false;
+        for (let i in this.catalogList[0].children) {
+          if (this.count === this.catalogList[0].children[i].id) {
+            this.catalogList[0].children[i].edit = false;
           }
         }
       }
-
-      this.state = "";
       this.count = null;
       this.editAndView = false;
       this.isEdit = false;
-    },
-    //
-    // 初始化数据
-    initEditList() {
-      // 后续将id写成添加项中的index
-      this.tableData = [
-        {
-          id: 1,
-          title: "审核页面",
-          premiereDate: "",
-          programType: "",
-          contentDescription: "",
-          subtitleForm: "",
-          taskName: "",
-          groupMembers: "",
-          programForm: "",
-          column: "",
-          color: "",
-          standard: "",
-          channelFormat: "",
-          AspectRatio: "",
-          entryPoint: "",
-          duration: "",
-          AcquisitionMethod: "",
-          provider: "",
-          state: "节目",
-          imageList: [],
-          edit: false,
-          edit_title: "",
-          edit_premiereDate: "",
-          edit_programType: "",
-          edit_contentDescription: "",
-          edit_subtitleForm: "",
-          edit_taskName: "",
-          edit_groupMembers: "",
-          edit_programForm: "",
-          edit_column: "",
-          edit_color: "",
-          edit_standard: "",
-          edit_channelFormat: "",
-          edit_AspectRatio: "",
-          edit_entryPoint: "",
-          edit_duration: "",
-          edit_AcquisitionMethod: "",
-          edit_provider: "",
-          children: [],
-        },
-      ];
     },
     // 添加子行
     addItem() {
       // 后续将id写成添加项中的index
-      this.tableData[0].children.push({
+      this.catalogList[0].children.push({
         id: this.index,
         title: "默认数据" + this.index,
         premiereDate: "",
@@ -507,9 +507,9 @@ export default {
     },
     // 删除行
     deleteItem(row) {
-      for (let i in this.tableData[0].children) {
-        if (row.id === this.tableData[0].children[i].id) {
-          this.tableData[0].children.splice(i, 1);
+      for (let i in this.catalogList[0].children) {
+        if (row.id === this.catalogList[0].children[i].id) {
+          this.catalogList[0].children.splice(i, 1);
         }
       }
     },
@@ -522,12 +522,62 @@ export default {
         this.form = row;
         this.state = row.state === "节目" ? "节目" : "片段";
         this.editAndView = true;
+        // this.setscreenshotList([]);
       } else {
         this.$message("请保存或取消上一编辑内容");
       }
     },
     // 上传至后端保存数据
-    uploadEdit() {},
+    async uploadEdit() {
+      let uploadList = _.cloneDeep(this.catalogList);
+      delete uploadList[0].id;
+      delete uploadList[0].edit;
+      delete uploadList[0].edit_title;
+      delete uploadList[0].edit_premiereDate;
+      delete uploadList[0].edit_programType;
+      delete uploadList[0].edit_contentDescription;
+      delete uploadList[0].edit_subtitleForm;
+      delete uploadList[0].edit_taskName;
+      delete uploadList[0].edit_groupMembers;
+      delete uploadList[0].edit_programForm;
+      delete uploadList[0].edit_column;
+      delete uploadList[0].edit_color;
+      delete uploadList[0].edit_standard;
+      delete uploadList[0].edit_channelFormat;
+      delete uploadList[0].edit_AspectRatio;
+      delete uploadList[0].edit_entryPoint;
+      delete uploadList[0].edit_duration;
+      delete uploadList[0].edit_AcquisitionMethod;
+      delete uploadList[0].edit_provider;
+      if (uploadList[0].children.length !== 0) {
+        for (let i in uploadList[0].children) {
+          delete uploadList[0].children[i].id;
+          delete uploadList[0].children[i].edit;
+          delete uploadList[0].children[i].edit_title;
+          delete uploadList[0].children[i].edit_premiereDate;
+          delete uploadList[0].children[i].edit_programType;
+          delete uploadList[0].children[i].edit_contentDescription;
+          delete uploadList[0].children[i].edit_subtitleForm;
+          delete uploadList[0].children[i].edit_taskName;
+          delete uploadList[0].children[i].edit_groupMembers;
+          delete uploadList[0].children[i].edit_programForm;
+          delete uploadList[0].children[i].edit_column;
+          delete uploadList[0].children[i].edit_color;
+          delete uploadList[0].children[i].edit_standard;
+          delete uploadList[0].children[i].edit_channelFormat;
+          delete uploadList[0].children[i].edit_AspectRatio;
+          delete uploadList[0].children[i].edit_entryPoint;
+          delete uploadList[0].children[i].edit_duration;
+          delete uploadList[0].children[i].edit_AcquisitionMethod;
+          delete uploadList[0].children[i].edit_provider;
+        }
+      }
+      uploadList[0].taskName = this.taskName;
+      console.log(uploadList[0]);
+      console.log(typeof uploadList[0]);
+      let res = await $api.updateCatalog(uploadList[0]);
+      console.log(res);
+    },
   },
 };
 </script>
@@ -584,13 +634,47 @@ export default {
         width: 100%;
         height: auto;
         .screenshot-list {
-          display: flex;
-          flex-wrap: wrap;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          grid-gap: 1%;
           width: 100%;
           height: 26em;
           overflow-y: scroll;
-          border: 1px solid #dcdfe6;
           border-radius: 0.5em;
+          box-sizing: border-box;
+          padding: 1em 0 0 1em;
+          border: 0.1em solid rgb(204, 206, 211);
+          .list-items {
+            width: 13em;
+            height: 10em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
+            margin: 0.5em 1em 0 0;
+            padding: 0.3em;
+            border: 0.1em solid rgb(204, 206, 211);
+            box-sizing: border-box;
+            border-radius: 0.5em;
+            .item-image {
+              width: 80%;
+              height: auto;
+            }
+            .item-delete {
+              width: 100%;
+              height: 10%;
+              display: flex;
+              justify-content: flex-end;
+              img {
+                height: 100%;
+                width: auto;
+                cursor: pointer;
+              }
+            }
+          }
+          .list-items:hover {
+            background-color: rgb(235, 238, 245);
+          }
         }
       }
     }
