@@ -82,7 +82,7 @@
           </el-form-item>
           <el-form-item
             label="正题名"
-            :class="{ 'exam-style': !form.title.state }"
+            :class="{ 'exame-style': !form.title.exame }"
           >
             <el-input
               v-model="form.title.value"
@@ -90,7 +90,10 @@
             ></el-input>
             <span v-show="!this.editAndView">{{ form.title.value }}</span>
           </el-form-item>
-          <el-form-item label="首播日期">
+          <el-form-item
+            label="首播日期"
+            :class="{ 'exame-style': !form.premiereDate.exame }"
+          >
             <el-date-picker
               v-model="form.premiereDate.value"
               type="date"
@@ -102,7 +105,10 @@
               form.premiereDate.value
             }}</span>
           </el-form-item>
-          <el-form-item label="节目类型">
+          <el-form-item
+            label="节目类型"
+            :class="{ 'exame-style': !form.programType.exame }"
+          >
             <el-select
               v-model="form.programType.value"
               placeholder="请选择活动区域"
@@ -113,7 +119,10 @@
             </el-select>
             <span v-show="!this.editAndView">{{ form.programType.value }}</span>
           </el-form-item>
-          <el-form-item label="内容描述">
+          <el-form-item
+            label="内容描述"
+            :class="{ 'exame-style': !form.contentDescription.exame }"
+          >
             <el-input
               type="textarea"
               v-model="form.contentDescription.value"
@@ -123,7 +132,10 @@
               form.contentDescription.value
             }}</span>
           </el-form-item>
-          <el-form-item label="字幕形式">
+          <el-form-item
+            label="字幕形式"
+            :class="{ 'exame-style': !form.subtitleForm.exame }"
+          >
             <el-input
               v-model="form.subtitleForm.value"
               v-show="this.editAndView"
@@ -139,7 +151,10 @@
             ></el-input>
             <h3 v-show="!this.editAndView">{{ form.taskName }}</h3>
           </el-form-item>
-          <el-form-item label="其他责任者">
+          <el-form-item
+            label="其他责任者"
+            :class="{ 'exame-style': !form.groupMembers.exame }"
+          >
             <el-input
               v-model="form.groupMembers.value"
               v-show="this.editAndView"
@@ -148,7 +163,10 @@
               form.groupMembers.value
             }}</span>
           </el-form-item>
-          <el-form-item label="节目形态">
+          <el-form-item
+            label="节目形态"
+            :class="{ 'exame-style': !form.programForm.exame }"
+          >
             <el-select
               v-show="this.editAndView"
               v-model="form.programForm.value"
@@ -161,14 +179,20 @@
             </el-select>
             <span v-show="!this.editAndView">{{ form.programForm.value }}</span>
           </el-form-item>
-          <el-form-item label="栏目">
+          <el-form-item
+            label="栏目"
+            :class="{ 'exame-style': !form.column.exame }"
+          >
             <el-input
               v-model="form.column.value"
               v-show="this.editAndView"
             ></el-input>
             <span v-show="!this.editAndView">{{ form.column.value }}</span>
           </el-form-item>
-          <el-form-item label="色彩">
+          <el-form-item
+            label="色彩"
+            :class="{ 'exame-style': !form.color.exame }"
+          >
             <el-radio-group
               v-model="form.color.value"
               v-show="this.editAndView"
@@ -178,7 +202,10 @@
             </el-radio-group>
             <span v-show="!this.editAndView">{{ form.color.value }}</span>
           </el-form-item>
-          <el-form-item label="制式">
+          <el-form-item
+            label="制式"
+            :class="{ 'exame-style': !form.standard.exame }"
+          >
             <el-radio-group
               v-model="form.standard.value"
               v-show="this.editAndView"
@@ -189,7 +216,10 @@
             </el-radio-group>
             <span v-show="!this.editAndView">{{ form.standard.value }}</span>
           </el-form-item>
-          <el-form-item label="声道格式">
+          <el-form-item
+            label="声道格式"
+            :class="{ 'exame-style': !form.channelFormat.exame }"
+          >
             <el-radio-group
               v-model="form.channelFormat.value"
               v-show="this.editAndView"
@@ -202,7 +232,10 @@
               form.channelFormat.value
             }}</span>
           </el-form-item>
-          <el-form-item label="画面宽高比">
+          <el-form-item
+            label="画面宽高比"
+            :class="{ 'exame-style': !form.AspectRatio.exame }"
+          >
             <el-radio-group
               v-model="form.AspectRatio.value"
               v-show="this.editAndView"
@@ -213,7 +246,10 @@
             </el-radio-group>
             <span v-show="!this.editAndView">{{ form.AspectRatio.value }}</span>
           </el-form-item>
-          <el-form-item label="入点">
+          <el-form-item
+            label="入点"
+            :class="{ 'exame-style': !form.entryPoint.exame }"
+          >
             <el-time-picker
               v-model="form.entryPoint.value"
               :picker-options="{
@@ -225,7 +261,10 @@
             </el-time-picker>
             <span v-show="!this.editAndView">{{ form.entryPoint.value }}</span>
           </el-form-item>
-          <el-form-item label="时长">
+          <el-form-item
+            label="时长"
+            :class="{ 'exame-style': !form.duration.exame }"
+          >
             <el-time-picker
               v-model="form.duration.value"
               :picker-options="{
@@ -237,7 +276,10 @@
             </el-time-picker>
             <span v-show="!this.editAndView">{{ form.duration.value }}</span>
           </el-form-item>
-          <el-form-item label="资料获取方式">
+          <el-form-item
+            label="资料获取方式"
+            :class="{ 'exame-style': !form.AcquisitionMethod.exame }"
+          >
             <el-input
               v-model="form.AcquisitionMethod.value"
               v-show="this.editAndView"
@@ -246,7 +288,10 @@
               form.AcquisitionMethod.value
             }}</span>
           </el-form-item>
-          <el-form-item label="资料提供者">
+          <el-form-item
+            label="资料提供者"
+            :class="{ 'exame-style': !form.provider.exame }"
+          >
             <el-input
               v-model="form.provider.value"
               v-show="this.editAndView"
@@ -258,6 +303,9 @@
             v-model="form.imageList.value"
             class="right-card-screenshot"
           >
+            <div style="color: #f56c6c">
+              {{ form.imageList.exame === false ? "不合格" : "" }}
+            </div>
             <div class="screenshot-list" v-show="this.editAndView">
               <div
                 class="list-items"
@@ -331,24 +379,24 @@ export default {
       },
 
       form: {
-        title: "",
-        premiereDate: "",
-        programType: "",
-        contentDescription: "",
-        subtitleForm: "",
-        taskName: "",
-        groupMembers: "",
-        programForm: "",
-        column: "",
-        color: "",
-        standard: "",
-        channelFormat: "",
-        AspectRatio: "",
-        entryPoint: "",
-        duration: "",
-        AcquisitionMethod: "",
-        provider: "",
-        imageList: [],
+        title: { value: "", exame: true },
+        premiereDate: { value: "", exame: true },
+        programType: { value: "", exame: true },
+        contentDescription: { value: "", exame: true },
+        subtitleForm: { value: "", exame: true },
+        taskName: this.taskNamef,
+        groupMembers: { value: "", exame: true },
+        programForm: { value: "", exame: true },
+        column: { value: "", exame: true },
+        color: { value: "", exame: true },
+        standard: { value: "", exame: true },
+        channelFormat: { value: "", exame: true },
+        AspectRatio: { value: "", exame: true },
+        entryPoint: { value: "", exame: true },
+        duration: { value: "", exame: true },
+        AcquisitionMethod: { value: "", exame: true },
+        provider: { value: "", exame: true },
+        imageList: { value: [], exame: true },
       },
     };
   },
@@ -426,8 +474,7 @@ export default {
               this.form.contentDescription.value;
             this.catalogList[0].children[i].subtitleForm.value =
               this.form.subtitleForm.value;
-            this.catalogList[0].children[i].taskName =
-              this.form.taskName;
+            this.catalogList[0].children[i].taskName = this.form.taskName;
             this.catalogList[0].children[i].groupMembers.value =
               this.form.groupMembers.value;
             this.catalogList[0].children[i].programForm.value =
@@ -595,7 +642,7 @@ export default {
         justify-content: flex-end;
         align-items: center;
       }
-      .exam-style {
+      .exame-style {
         background-color: antiquewhite;
       }
       .right-card-screenshot {

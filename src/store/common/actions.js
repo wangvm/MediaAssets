@@ -161,6 +161,7 @@ export default {
       console.log(list);
       list.id = 1;
       list.edit = false;
+      list.state = '节目';
       // list.edit_title = _.cloneDeep(list.title);
       // list.edit_premiereDate = _.cloneDeep(list.premiereDate);
       // list.edit_programType = _.cloneDeep(list.programType);
@@ -183,6 +184,7 @@ export default {
         for (let i in list.children) {
           list.children[i].id = i * 1 + 10;
           list.children[i].edit = false;
+          list.children[i].state = '片段';
           // list.children[i].edit_title = _.cloneDeep(list.children[i].title);
           // list.children[i].edit_premiereDate = _.cloneDeep(list.children[i].premiereDate);
           // list.children[i].edit_programType = _.cloneDeep(list.children[i].programType);

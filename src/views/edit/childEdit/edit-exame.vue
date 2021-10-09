@@ -15,7 +15,7 @@
           @row-click="lookClick"
           :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
         >
-          <el-table-column prop="title" label="审核标题" width="450">
+          <el-table-column prop="title.value" label="审核标题" width="450">
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -23,47 +23,18 @@
                 v-if="scope.row.edit === false"
                 class="item"
                 effect="light"
-                content="编辑"
+                content="审核"
                 placement="left"
               >
                 <el-button
                   type="primary"
                   size="mini"
                   icon="el-icon-edit"
-                  @click="editItem(scope.row)"
+                  @click.stop="editItem(scope.row)"
                   circle
                 ></el-button>
               </el-tooltip>
-              <el-tooltip
-                v-show="scope.row.state === '节目'"
-                class="item"
-                effect="light"
-                content="增加"
-                placement="top"
-              >
-                <el-button
-                  type="success"
-                  size="mini"
-                  icon="el-icon-plus"
-                  @click="addItem()"
-                  circle
-                ></el-button>
-              </el-tooltip>
-              <el-tooltip
-                v-show="scope.row.state === '片段'"
-                class="item"
-                effect="light"
-                content="删除"
-                placement="right"
-              >
-                <el-button
-                  type="danger"
-                  size="mini"
-                  icon="el-icon-delete"
-                  @click="deleteItem(scope.row)"
-                  circle
-                ></el-button>
-              </el-tooltip>
+              <span v-if="scope.row.edit === false">123</span>
             </template>
           </el-table-column>
         </el-table>
@@ -80,172 +51,219 @@
               >取消</el-button
             >
           </el-form-item>
-          <el-form-item label="正题名">
-            <el-input
-              v-model="form.edit_title"
-              v-show="this.editAndView"
-            ></el-input>
-            <span v-show="!this.editAndView">{{ form.title }}</span>
-          </el-form-item>
-          <el-form-item label="首播日期">
-            <el-date-picker
-              v-model="form.edit_premiereDate"
-              type="date"
-              placeholder="选择日期"
-              v-show="this.editAndView"
-            >
-            </el-date-picker>
-            <span v-show="!this.editAndView">{{ form.premiereDate }}</span>
-          </el-form-item>
-          <el-form-item label="节目类型">
+          <el-form-item label="正题名" class="exame-style">
+            <span>{{ form.title.value }}</span>
             <el-select
-              v-model="form.edit_programType"
+              class="exame-select"
+              v-show="this.editAndView"
+              v-model="form.title.exame"
               placeholder="请选择活动区域"
-              v-show="this.editAndView"
             >
-              <el-option label="新闻" value="1"></el-option>
-              <el-option label="综艺" value="2"></el-option>
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
             </el-select>
-            <span v-show="!this.editAndView">{{ form.programType }}</span>
           </el-form-item>
-          <el-form-item label="内容描述">
-            <el-input
-              type="textarea"
-              v-model="form.edit_contentDescription"
+          <el-form-item label="首播日期" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
-            ></el-input>
-            <span v-show="!this.editAndView">{{
-              form.contentDescription
-            }}</span>
+              v-model="form.premiereDate.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.premiereDate.value }}</span>
           </el-form-item>
-          <el-form-item label="字幕形式">
-            <el-input
-              v-model="form.edit_subtitleForm"
+          <el-form-item label="节目类型" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
-            ></el-input>
-            <span v-show="!this.editAndView">{{ form.subtitleForm }}</span>
+              v-model="form.programType.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.programType.value }}</span>
+          </el-form-item>
+          <el-form-item label="内容描述" class="exame-style">
+            <el-select
+              class="exame-select"
+              v-show="this.editAndView"
+              v-model="form.contentDescription.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.contentDescription.value }}</span>
+          </el-form-item>
+          <el-form-item label="字幕形式" class="exame-style">
+            <el-select
+              class="exame-select"
+              v-show="this.editAndView"
+              v-model="form.subtitleForm.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.subtitleForm.value }}</span>
           </el-form-item>
           <el-form-item label="创建者名称">
-            <el-input
-              v-model="form.edit_taskName"
-              v-show="this.editAndView"
-            ></el-input>
-            <h3 v-show="!this.editAndView">{{ form.taskName }}</h3>
+            <h3>{{ form.taskName }}</h3>
           </el-form-item>
-          <el-form-item label="其他责任者">
-            <el-input
-              v-model="form.edit_groupMembers"
-              v-show="this.editAndView"
-            ></el-input>
-            <span v-show="!this.editAndView">{{ form.groupMembers }}</span>
-          </el-form-item>
-          <el-form-item label="节目形态">
+          <el-form-item label="其他责任者" class="exame-style">
             <el-select
+              class="exame-select"
               v-show="this.editAndView"
-              v-model="form.edit_programForm"
+              v-model="form.groupMembers.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="综合" value="1"></el-option>
-              <el-option label="内容" value="2"></el-option>
-              <el-option label="主题" value="3"></el-option>
-              <el-option label="形式" value="4"></el-option>
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
             </el-select>
-            <span v-show="!this.editAndView">{{ form.programForm }}</span>
+            <span>{{ form.groupMembers.value }}</span>
           </el-form-item>
-          <el-form-item label="栏目">
-            <el-input
-              v-model="form.edit_column"
+          <el-form-item label="节目形态" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
-            ></el-input>
-            <span v-show="!this.editAndView">{{ form.column }}</span>
-          </el-form-item>
-          <el-form-item label="色彩">
-            <el-radio-group v-model="form.edit_color" v-show="this.editAndView">
-              <el-radio label="彩色" value="1"></el-radio>
-              <el-radio label="黑白" value="2"></el-radio>
-            </el-radio-group>
-            <span v-show="!this.editAndView">{{ form.color }}</span>
-          </el-form-item>
-          <el-form-item label="制式">
-            <el-radio-group
-              v-model="form.edit_standard"
-              v-show="this.editAndView"
+              v-model="form.programForm.exame"
+              placeholder="请选择活动区域"
             >
-              <el-radio label="PAL" value="1"></el-radio>
-              <el-radio label="NTSC" value="2"></el-radio>
-              <el-radio label="SECAM" value="3"></el-radio>
-            </el-radio-group>
-            <span v-show="!this.editAndView">{{ form.standard }}</span>
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.programForm.value }}</span>
           </el-form-item>
-          <el-form-item label="声道格式">
-            <el-radio-group
-              v-model="form.edit_channelFormat"
+          <el-form-item label="栏目" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
+              v-model="form.column.exame"
+              placeholder="请选择活动区域"
             >
-              <el-radio label="单声道" value="1"></el-radio>
-              <el-radio label="双声道" value="2"></el-radio>
-              <el-radio label="立体声" value="3"></el-radio>
-            </el-radio-group>
-            <span v-show="!this.editAndView">{{ form.channelFormat }}</span>
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.column.value }}</span>
           </el-form-item>
-          <el-form-item label="画面宽高比">
-            <el-radio-group
-              v-model="form.edit_AspectRatio"
+          <el-form-item label="色彩" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
+              v-model="form.color.exame"
+              placeholder="请选择活动区域"
             >
-              <el-radio label="4:3" value="1"></el-radio>
-              <el-radio label="16:9" value="2"></el-radio>
-              <el-radio label="14:9" value="3"></el-radio>
-            </el-radio-group>
-            <span v-show="!this.editAndView">{{ form.AspectRatio }}</span>
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.color.value }}</span>
           </el-form-item>
-          <el-form-item label="入点">
-            <el-time-picker
-              v-model="form.edit_entryPoint"
-              :picker-options="{
-                selectableRange: '18:30:00 - 20:30:00',
-              }"
-              placeholder="任意时间点"
+          <el-form-item label="制式" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
+              v-model="form.standard.exame"
+              placeholder="请选择活动区域"
             >
-            </el-time-picker>
-            <span v-show="!this.editAndView">{{ form.entryPoint }}</span>
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.standard.value }}</span>
           </el-form-item>
-          <el-form-item label="时长">
-            <el-time-picker
-              v-model="form.edit_duration"
-              :picker-options="{
-                selectableRange: '18:30:00 - 20:30:00',
-              }"
-              placeholder="任意时间点"
+          <el-form-item label="声道格式" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
+              v-model="form.channelFormat.exame"
+              placeholder="请选择活动区域"
             >
-            </el-time-picker>
-            <span v-show="!this.editAndView">{{ form.duration }}</span>
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.channelFormat.value }}</span>
           </el-form-item>
-          <el-form-item label="资料获取方式">
-            <el-input
-              v-model="form.edit_AcquisitionMethod"
+          <el-form-item label="画面宽高比" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
-            ></el-input>
-            <span v-show="!this.editAndView">{{ form.AcquisitionMethod }}</span>
+              v-model="form.AspectRatio.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.AspectRatio.value }}</span>
           </el-form-item>
-          <el-form-item label="资料提供者">
-            <el-input
-              v-model="form.edit_provider"
+          <el-form-item label="入点" class="exame-style">
+            <el-select
+              class="exame-select"
               v-show="this.editAndView"
-            ></el-input>
-            <span v-show="!this.editAndView">{{ form.provider }}</span>
+              v-model="form.entryPoint.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.entryPoint.value }}</span>
+          </el-form-item>
+          <el-form-item label="时长" class="exame-style">
+            <el-select
+              class="exame-select"
+              v-show="this.editAndView"
+              v-model="form.duration.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.duration.value }}</span>
+          </el-form-item>
+          <el-form-item label="资料获取方式" class="exame-style">
+            <el-select
+              class="exame-select"
+              v-show="this.editAndView"
+              v-model="form.AcquisitionMethod.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.AcquisitionMethod.value }}</span>
+          </el-form-item>
+          <el-form-item label="资料提供者" class="exame-style">
+            <el-select
+              class="exame-select"
+              v-show="this.editAndView"
+              v-model="form.provider.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
+            <span>{{ form.provider.value }}</span>
           </el-form-item>
           <el-form-item
             label="图片截取"
-            v-model="form.edit_imageList"
+            v-model="form.imageList.value"
             class="right-card-screenshot"
           >
+            <el-select
+              class="exame-select"
+              v-show="this.editAndView"
+              v-model="form.imageList.exame"
+              placeholder="请选择活动区域"
+            >
+              <el-option label="true" value="true"></el-option>
+              <el-option label="false" value="false"></el-option>
+            </el-select>
             <div class="screenshot-list" v-show="this.editAndView">
               <div
                 class="list-items"
-                v-for="item in form.edit_imageList"
+                v-for="item in form.imageList.value"
                 :key="item.src"
               >
                 <div class="item-delete">
@@ -268,7 +286,7 @@
             <div class="screenshot-list" v-show="!this.editAndView">
               <div
                 class="list-items"
-                v-for="item in form.imageList"
+                v-for="item in form.imageList.value"
                 :key="item.src"
               >
                 <img class="item-image" :src="item.src" alt="" />
@@ -315,24 +333,24 @@ export default {
       },
 
       form: {
-        title: "",
-        premiereDate: "",
-        programType: "",
-        contentDescription: "",
-        subtitleForm: "",
-        taskName: "",
-        groupMembers: "",
-        programForm: "",
-        column: "",
-        color: "",
-        standard: "",
-        channelFormat: "",
-        AspectRatio: "",
-        entryPoint: "",
-        duration: "",
-        AcquisitionMethod: "",
-        provider: "",
-        imageList: [],
+        title: { value: "", exame: true },
+        premiereDate: { value: "", exame: true },
+        programType: { value: "", exame: true },
+        contentDescription: { value: "", exame: true },
+        subtitleForm: { value: "", exame: true },
+        taskName: this.taskNamef,
+        groupMembers: { value: "", exame: true },
+        programForm: { value: "", exame: true },
+        column: { value: "", exame: true },
+        color: { value: "", exame: true },
+        standard: { value: "", exame: true },
+        channelFormat: { value: "", exame: true },
+        AspectRatio: { value: "", exame: true },
+        entryPoint: { value: "", exame: true },
+        duration: { value: "", exame: true },
+        AcquisitionMethod: { value: "", exame: true },
+        provider: { value: "", exame: true },
+        imageList: { value: [], exame: true },
       },
     };
   },
@@ -340,189 +358,107 @@ export default {
   components: {
     videoPlayer,
   },
-  watch: {
-    screenshotList: "updateFormImageList",
-  },
   computed: {
-    ...mapState("common", [
-      "taskName",
-      "videoSrc",
-      "catalogList",
-      "screenshotList",
-    ]),
+    ...mapState("common", ["taskName", "videoSrc", "catalogList"]),
   },
   methods: {
-    ...mapMutations("common", ["setscreenshotList"]),
     // 点击查看详情
     lookClick(row, column, event) {
-      this.form = row;
-    },
-    // 更新表单图片数据
-    updateFormImageList() {
-      this.form.edit_imageList = _.cloneDeep(this.screenshotList);
-    },
-    deleteClick(val) {
-      for (let i in this.form.edit_imageList) {
-        if (this.form.edit_imageList[i].src === val) {
-          this.form.edit_imageList.splice(i, 1);
-        }
+      if (this.editAndView === true) {
+        this.$message("请结束修改再进行查看");
+      } else {
+        this.form = row;
       }
     },
     // 保存更改
     saveClick() {
       if (this.state === "节目") {
-        this.catalogList[0].title = this.catalogList[0].edit_title;
-        this.catalogList[0].premiereDate =
-          this.catalogList[0].edit_premiereDate;
-        this.catalogList[0].programType = this.catalogList[0].edit_programType;
-        this.catalogList[0].contentDescription =
-          this.catalogList[0].edit_contentDescription;
-        this.catalogList[0].subtitleForm =
-          this.catalogList[0].edit_subtitleForm;
-        this.catalogList[0].taskName = this.catalogList[0].edit_taskName;
-        this.catalogList[0].groupMembers =
-          this.catalogList[0].edit_groupMembers;
-        this.catalogList[0].programForm = this.catalogList[0].edit_programForm;
-        this.catalogList[0].column = this.catalogList[0].edit_column;
-        this.catalogList[0].color = this.catalogList[0].edit_color;
-        this.catalogList[0].standard = this.catalogList[0].edit_standard;
-        this.catalogList[0].channelFormat =
-          this.catalogList[0].edit_channelFormat;
-        this.catalogList[0].AspectRatio = this.catalogList[0].edit_AspectRatio;
-        this.catalogList[0].entryPoint = this.catalogList[0].edit_entryPoint;
-        this.catalogList[0].duration = this.catalogList[0].edit_duration;
-        this.catalogList[0].AcquisitionMethod =
-          this.catalogList[0].edit_AcquisitionMethod;
-        this.catalogList[0].provider = this.catalogList[0].edit_provider;
+        console.log("这是节目");
+        console.log(this.form);
+        console.log(this.catalogList[0]);
+        this.catalogList[0].title = this.form.title;
+        this.catalogList[0].premiereDate = this.form.premiereDate;
+        this.catalogList[0].programType = this.form.programType;
+        this.catalogList[0].contentDescription = this.form.contentDescription;
+        this.catalogList[0].subtitleForm = this.form.subtitleForm;
+        this.catalogList[0].taskName = this.form.taskName;
+        this.catalogList[0].groupMembers = this.form.groupMembers;
+        this.catalogList[0].programForm = this.form.programForm;
+        this.catalogList[0].column = this.form.column;
+        this.catalogList[0].color = this.form.color;
+        this.catalogList[0].standard = this.form.standard;
+        this.catalogList[0].channelFormat = this.form.channelFormat;
+        this.catalogList[0].AspectRatio = this.form.AspectRatio;
+        this.catalogList[0].entryPoint = this.form.entryPoint;
+        this.catalogList[0].duration = this.form.duration;
+        this.catalogList[0].AcquisitionMethod = this.form.AcquisitionMethod;
+        this.catalogList[0].provider = this.form.provider;
         this.catalogList[0].edit = false;
-        // this.state = "节目";
-        this.catalogList[0].imageList = this.catalogList[0].edit_imageList;
+        // // this.state = "节目";
+        this.catalogList[0].imageList = this.form.imageList;
       } else {
         for (let i in this.catalogList[0].children) {
           if (this.count === this.catalogList[0].children[i].id) {
+            console.log("这是片段");
             // this.state = "片段";
-            this.catalogList[0].children[i].title =
-              this.catalogList[0].children[i].edit_title;
+            this.catalogList[0].children[i].title = this.form.title;
             this.catalogList[0].children[i].premiereDate =
-              this.catalogList[0].children[i].edit_premiereDate;
-            this.catalogList[0].children[i].programType =
-              this.catalogList[0].children[i].edit_programType;
+              this.form.premiereDate;
+            this.catalogList[0].children[i].programType = this.form.programType;
             this.catalogList[0].children[i].contentDescription =
-              this.catalogList[0].children[i].edit_contentDescription;
+              this.form.contentDescription;
             this.catalogList[0].children[i].subtitleForm =
-              this.catalogList[0].children[i].edit_subtitleForm;
-            this.catalogList[0].children[i].taskName =
-              this.catalogList[0].children[i].edit_taskName;
+              this.form.subtitleForm;
+            this.catalogList[0].children[i].taskName = this.form.taskName;
             this.catalogList[0].children[i].groupMembers =
-              this.catalogList[0].children[i].edit_groupMembers;
-            this.catalogList[0].children[i].programForm =
-              this.catalogList[0].children[i].edit_programForm;
-            this.catalogList[0].children[i].column =
-              this.catalogList[0].children[i].edit_column;
-            this.catalogList[0].children[i].color =
-              this.catalogList[0].children[i].edit_color;
-            this.catalogList[0].children[i].standard =
-              this.catalogList[0].children[i].edit_standard;
+              this.form.groupMembers;
+            this.catalogList[0].children[i].programForm = this.form.programForm;
+            this.catalogList[0].children[i].column = this.form.column;
+            this.catalogList[0].children[i].color = this.form.color;
+            this.catalogList[0].children[i].standard = this.form.standard;
             this.catalogList[0].children[i].channelFormat =
-              this.catalogList[0].children[i].edit_channelFormat;
-            this.catalogList[0].children[i].AspectRatio =
-              this.catalogList[0].children[i].edit_AspectRatio;
-            this.catalogList[0].children[i].entryPoint =
-              this.catalogList[0].children[i].edit_entryPoint;
-            this.catalogList[0].children[i].duration =
-              this.catalogList[0].children[i].edit_duration;
+              this.form.channelFormat;
+            this.catalogList[0].children[i].AspectRatio = this.form.AspectRatio;
+            this.catalogList[0].children[i].entryPoint = this.form.entryPoint;
+            this.catalogList[0].children[i].duration = this.form.duration;
             this.catalogList[0].children[i].AcquisitionMethod =
-              this.catalogList[0].children[i].edit_AcquisitionMethod;
-            this.catalogList[0].children[i].provider =
-              this.catalogList[0].children[i].edit_provider;
+              this.form.AcquisitionMethod;
+            this.catalogList[0].children[i].provider = this.form.provider;
             this.catalogList[0].children[i].edit = false;
-            this.catalogList[0].children[i].imageList =
-              this.catalogList[0].children[i].edit_imageList;
+            this.catalogList[0].children[i].imageList = this.form.imageList;
           }
         }
       }
       this.count = null;
       this.editAndView = false;
       this.isEdit = false;
-      this.setscreenshotList([]);
     },
     cancleClick() {
       if (this.state === "节目") {
+        console.log("这是节目");
         this.catalogList[0].edit = false;
       } else {
         for (let i in this.catalogList[0].children) {
           if (this.count === this.catalogList[0].children[i].id) {
             this.catalogList[0].children[i].edit = false;
+            console.log("这是片段");
           }
         }
       }
       this.count = null;
       this.editAndView = false;
       this.isEdit = false;
-    },
-    // 添加子行
-    addItem() {
-      // 后续将id写成添加项中的index
-      this.catalogList[0].children.push({
-        id: this.index,
-        title: "默认数据" + this.index,
-        premiereDate: "",
-        programType: "",
-        contentDescription: "",
-        subtitleForm: "",
-        taskName: "",
-        groupMembers: "",
-        programForm: "",
-        column: "",
-        color: "",
-        standard: "",
-        channelFormat: "",
-        AspectRatio: "",
-        entryPoint: "",
-        duration: "",
-        AcquisitionMethod: "",
-        provider: "",
-        imageList: [],
-        state: "片段",
-        edit: false,
-        edit_title: "",
-        edit_premiereDate: "",
-        edit_programType: "",
-        edit_contentDescription: "",
-        edit_subtitleForm: "",
-        edit_taskName: "",
-        edit_groupMembers: "",
-        edit_programForm: "",
-        edit_column: "",
-        edit_color: "",
-        edit_standard: "",
-        edit_channelFormat: "",
-        edit_AspectRatio: "",
-        edit_entryPoint: "",
-        edit_duration: "",
-        edit_AcquisitionMethod: "",
-        edit_provider: "",
-      });
-      this.index++;
-    },
-    // 删除行
-    deleteItem(row) {
-      for (let i in this.catalogList[0].children) {
-        if (row.id === this.catalogList[0].children[i].id) {
-          this.catalogList[0].children.splice(i, 1);
-        }
-      }
     },
     // 编辑内容
     editItem(row) {
       if (this.isEdit === false) {
+        console.log(row);
         this.isEdit = true;
         row.edit = true;
         this.count = row.id;
-        this.form = row;
+        this.form = _.cloneDeep(row);
         this.state = row.state === "节目" ? "节目" : "片段";
         this.editAndView = true;
-        // this.setscreenshotList([]);
       } else {
         this.$message("请保存或取消上一编辑内容");
       }
@@ -532,50 +468,20 @@ export default {
       let uploadList = _.cloneDeep(this.catalogList);
       delete uploadList[0].id;
       delete uploadList[0].edit;
-      delete uploadList[0].edit_title;
-      delete uploadList[0].edit_premiereDate;
-      delete uploadList[0].edit_programType;
-      delete uploadList[0].edit_contentDescription;
-      delete uploadList[0].edit_subtitleForm;
-      delete uploadList[0].edit_taskName;
-      delete uploadList[0].edit_groupMembers;
-      delete uploadList[0].edit_programForm;
-      delete uploadList[0].edit_column;
-      delete uploadList[0].edit_color;
-      delete uploadList[0].edit_standard;
-      delete uploadList[0].edit_channelFormat;
-      delete uploadList[0].edit_AspectRatio;
-      delete uploadList[0].edit_entryPoint;
-      delete uploadList[0].edit_duration;
-      delete uploadList[0].edit_AcquisitionMethod;
-      delete uploadList[0].edit_provider;
+      delete uploadList[0].state;
       if (uploadList[0].children.length !== 0) {
         for (let i in uploadList[0].children) {
           delete uploadList[0].children[i].id;
           delete uploadList[0].children[i].edit;
-          delete uploadList[0].children[i].edit_title;
-          delete uploadList[0].children[i].edit_premiereDate;
-          delete uploadList[0].children[i].edit_programType;
-          delete uploadList[0].children[i].edit_contentDescription;
-          delete uploadList[0].children[i].edit_subtitleForm;
-          delete uploadList[0].children[i].edit_taskName;
-          delete uploadList[0].children[i].edit_groupMembers;
-          delete uploadList[0].children[i].edit_programForm;
-          delete uploadList[0].children[i].edit_column;
-          delete uploadList[0].children[i].edit_color;
-          delete uploadList[0].children[i].edit_standard;
-          delete uploadList[0].children[i].edit_channelFormat;
-          delete uploadList[0].children[i].edit_AspectRatio;
-          delete uploadList[0].children[i].edit_entryPoint;
-          delete uploadList[0].children[i].edit_duration;
-          delete uploadList[0].children[i].edit_AcquisitionMethod;
-          delete uploadList[0].children[i].edit_provider;
+          delete uploadList[0].children[i].state;
         }
       }
       uploadList[0].taskName = this.taskName;
       console.log(uploadList[0]);
       console.log(typeof uploadList[0]);
       let res = await $api.updateCatalog(uploadList[0]);
+      // let updateRes = await $api.updateTask(this.taskName, 4);
+      // console.log(updateRes);
       console.log(res);
     },
   },
@@ -622,6 +528,9 @@ export default {
       width: 100%;
       height: 100%;
       overflow-y: scroll;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
       .right-card-btns {
         position: sticky;
         top: 0.8em;
@@ -629,6 +538,22 @@ export default {
         display: flex;
         justify-content: flex-end;
         align-items: center;
+      }
+      .exame-style {
+        width: 100%;
+        position: relative;
+        .exame-select {
+          position: absolute;
+          top: -0.2em;
+          right: 0;
+          // background-color: aqua;
+          width: 25%;
+        }
+      }
+      .right-card-screenshot-false {
+        width: 100%;
+        height: auto;
+        background-color: antiquewhite;
       }
       .right-card-screenshot {
         width: 100%;

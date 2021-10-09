@@ -158,7 +158,6 @@ export default {
     updateCatalog: _.debounce(async function () {
       for (let i in this.catalogList) {
         this.catalogList[i].list.title = { value: "默认数据", exame: true };
-        this.catalogList[i].list.state =  "节目";
         this.catalogList[i].list.premiereDate = { value: "", exame: true };
         this.catalogList[i].list.programType = { value: "", exame: true };
         this.catalogList[i].list.contentDescription = { value: "", exame: true };

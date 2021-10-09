@@ -266,43 +266,45 @@ export default {
         if (res.code === 200) {
           this.setVideoSrc(res.data.position);
           this.getCatalogList(res.data);
+          console.log(this.loginType);
+          if (this.loginType === 0) {
+            this.newTaskName = val.taskName;
+            this.enterIn = true;
+          } else if (this.loginType === 2 || this.loginType === 4) {
+            this.$router.push({
+              path: "/edit/check",
+              //跳转路由时传递编目名称和edit状态true(审核)
+              query: {
+                edit: false,
+                //   state: "edit",
+                editName: val.taskName,
+              },
+            });
+            this.setTaskName(val.taskName);
+            this.setTitleStats(true);
+          } else if (this.loginType === 3) {
+            this.$router.push({
+              path: "/edit/exame",
+              //跳转路由时传递编目名称和edit状态true(审核)
+              query: {
+                edit: true,
+                //   state: "edit",
+                editName: val.taskName,
+              },
+            });
+            this.setTaskName(val.taskName);
+            this.setTitleStats(true);
+            let exameRes = await $api.updateTask(val.taskName, 4);
+            console.log(exameRes);
+          }
+          console.log(val.status);
+          if (val.status === 1) {
+            let updateRes = await $api.updateTask(val.taskName, 2);
+            console.log(updateRes);
+          }
         }
       } catch (e) {
         this.$message.error(e);
-      }
-      console.log(this.loginType);
-      if (this.loginType === 0) {
-        this.newTaskName = val.taskName;
-        this.enterIn = true;
-      } else if (this.loginType === 2 || this.loginType === 4) {
-        this.$router.push({
-          path: "/edit/check",
-          //跳转路由时传递编目名称和edit状态true(审核)
-          query: {
-            edit: false,
-            //   state: "edit",
-            editName: val.taskName,
-          },
-        });
-        this.setTaskName(val.taskName);
-        this.setTitleStats(true);
-      } else if (this.loginType === 3) {
-        this.$router.push({
-          path: "/edit/exame",
-          //跳转路由时传递编目名称和edit状态true(审核)
-          query: {
-            edit: true,
-            //   state: "edit",
-            editName: val.taskName,
-          },
-        });
-        this.setTaskName(val.taskName);
-        this.setTitleStats(true);
-      }
-      console.log(val.status);
-      if (val.status === 1) {
-        let updateRes = await $api.updateTask(val.taskName, 2);
-        console.log(updateRes);
       }
     },
     editTask(row) {
@@ -361,6 +363,9 @@ export default {
     // 是否显示添加任务组件
     operationClick(val) {
       this.createTask = val;
+      if (val === false) {
+        this.initTaskList();
+      }
     },
     enterInClick(val) {
       this.enterIn = val;
