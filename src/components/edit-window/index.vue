@@ -157,25 +157,26 @@ export default {
     }, 300),
     updateCatalog: _.debounce(async function () {
       for (let i in this.catalogList) {
-        this.catalogList[i].list.title = "默认数据";
-        this.catalogList[i].list.state = "节目";
-        this.catalogList[i].list.premiereDate = "";
-        this.catalogList[i].list.programType = "";
-        this.catalogList[i].list.contentDescription = "";
-        this.catalogList[i].list.subtitleForm = "";
-        this.catalogList[i].list.groupMembers = "";
-        this.catalogList[i].list.programForm = "";
-        this.catalogList[i].list.column = "";
-        this.catalogList[i].list.color = "";
-        this.catalogList[i].list.standard = "";
-        this.catalogList[i].list.channelFormat = "";
-        this.catalogList[i].list.AspectRatio = "";
-        this.catalogList[i].list.entryPoint = "";
-        this.catalogList[i].list.duration = "";
-        this.catalogList[i].list.AcquisitionMethod = "";
-        this.catalogList[i].list.provider = "";
-        this.catalogList[i].list.imageList = [];
+        this.catalogList[i].list.title = { value: "默认数据", exame: true };
+        this.catalogList[i].list.state =  "节目";
+        this.catalogList[i].list.premiereDate = { value: "", exame: true };
+        this.catalogList[i].list.programType = { value: "", exame: true };
+        this.catalogList[i].list.contentDescription = { value: "", exame: true };
+        this.catalogList[i].list.subtitleForm = { value: "", exame: true };
+        this.catalogList[i].list.groupMembers = { value: "", exame: true };
+        this.catalogList[i].list.programForm = { value: "", exame: true };
+        this.catalogList[i].list.column = { value: "", exame: true };
+        this.catalogList[i].list.color = { value: "", exame: true };
+        this.catalogList[i].list.standard = { value: "", exame: true };
+        this.catalogList[i].list.channelFormat = { value: "", exame: true };
+        this.catalogList[i].list.AspectRatio = { value: "", exame: true };
+        this.catalogList[i].list.entryPoint = { value: "", exame: true };
+        this.catalogList[i].list.duration = { value: "", exame: true };
+        this.catalogList[i].list.AcquisitionMethod = { value: "", exame: true };
+        this.catalogList[i].list.provider = { value: "", exame: true };
+        this.catalogList[i].list.imageList = { value: [], exame: true };
         this.catalogList[i].list.children = [];
+        this.catalogList[i].list.exame = false;
         console.log(this.catalogList[i].list);
         let res = await $api.setCatalog(this.catalogList[i].list);
         console.log(res);
