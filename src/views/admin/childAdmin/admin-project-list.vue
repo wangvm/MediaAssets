@@ -81,7 +81,7 @@
         <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-tooltip
-              v-if="!scope.row.edit"
+              v-if="loginType === 0"
               class="item"
               effect="light"
               content="编辑项目"
@@ -97,7 +97,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="!scope.row.edit"
+              v-if="loginType === 0"
               class="item"
               effect="light"
               content="删除项目"
@@ -130,7 +130,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="scope.row.edit"
+              v-if="loginType === 0"
               class="item"
               effect="light"
               content="保存修改"
@@ -146,7 +146,7 @@
               ></el-button
             ></el-tooltip>
             <el-tooltip
-              v-if="scope.row.edit"
+              v-if="loginType === 0"
               class="item"
               effect="light"
               content="取消"
@@ -227,7 +227,7 @@ export default {
         : (this.showList = this.projectList.slice(this.currentPage - 1, val));
     },
     //进入项目
-    enterProject(val) {
+    async enterProject(val) {
       this.$router
         .push({
           path: "/edit/task",
@@ -237,6 +237,7 @@ export default {
           },
         })
         .catch((err) => {});
+      let res = await $api.updateProject(val.projectName, 2);
       this.setProjectName(val.projectName);
       this.setTitleStats(false);
       // this.$router.replace({ name: "task" }).catch((err) => {
@@ -244,7 +245,6 @@ export default {
       // });
     },
     editProject(row) {
-      console.log(row);
       row.edit = true;
     },
     async saveEdit(index, row) {
@@ -266,7 +266,6 @@ export default {
         row.edit_category,
         row.edit_status
       );
-      console.log(resProject);
       row.edit = false;
       this.initProjectList();
     },
@@ -275,7 +274,6 @@ export default {
     },
     //删除项目
     async deleteProject(currentProject) {
-      console.log(currentProject);
       this.loading = true;
       try {
         await $api.deleteProject(currentProject.projectName);

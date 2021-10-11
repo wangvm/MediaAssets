@@ -1,6 +1,7 @@
 import axios from "axios"
 import { Message } from 'element-ui'
-import { getUserToken } from "../config/storage"
+// import { getUserToken } from "../config/storage"
+import { message } from '../assets/js/message'
 
 let baseUrl = 'http://121.196.100.229:8080/mam'
 // let baseUrl = 'http://192.168.3.206:8080'
@@ -11,6 +12,7 @@ let instance = axios.create({
   crossDomain: true,
   withCredentials: false,
 })
+let messageList = [];
 
 // axios.defaults.withCredentials = true
 //http request拦截器
@@ -44,8 +46,8 @@ export default function (url, data, method = 'GET') {
       //   Message.error(res.data.message)
       // }
       res.data.code === 200 ?
-        Message.success(res.data.message)
-        : Message.error(res.data.message)
+        message.success(res.data.message)
+        : message.error(res.data.message)
       resolve(res.data)
     }).catch(err => {
       Message.error(err.data.message)

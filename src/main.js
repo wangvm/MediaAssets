@@ -11,6 +11,10 @@ import VueLazyload from 'vue-lazyload'
 // 引用loadsh
 import _ from "lodash"
 
+// 引用修改后的message提示
+import { message } from './assets/js/message'
+Vue.prototype.$message = message; // 这一个操作一定要放在Vue.use(ElementUI) 后面
+
 Vue.prototype.dayjs = dayjs;//可以全局使用dayjs
 
 Vue.config.productionTip = false

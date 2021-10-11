@@ -4,27 +4,27 @@
     <el-main class="home-main">
       <div class="home-container">
         <div class="login-type">
-          <div class="type-login type-common" @click="changeLoginType('login')">
+          <div class="type-login type-common" @click="changeLoginStatus('login')">
             <el-button type="primary" class="type-common">登录</el-button>
           </div>
           <div
             class="type-register type-common"
-            @click="changeLoginType('register')"
+            @click="changeLoginStatus('register')"
           >
             <el-button type="danger" class="type-common">注册</el-button>
           </div>
         </div>
         <div class="login-show">
           <div class="form">
-            <div class="form-title">{{ loginTypeTitle }}</div>
-            <div class="form-input" v-if="!loginType">
+            <div class="form-title">{{ loginStatusTitle }}</div>
+            <div class="form-input" v-if="!loginStatus">
               <el-input placeholder="请输入用户名" v-model="username" clearable>
                 <template slot="prepend">用 户 名 ：</template>
               </el-input>
             </div>
             <div class="form-input">
               <el-input placeholder="请输入账号" v-model="id">
-                <template slot="prepend">{{ loginTypeId }}</template>
+                <template slot="prepend">{{ loginStatusId }}</template>
               </el-input>
             </div>
             <div class="form-input">
@@ -33,10 +33,10 @@
                 v-model="password"
                 show-password
               >
-                <template slot="prepend">{{ loginTypePassword }}</template>
+                <template slot="prepend">{{ loginStatusPassword }}</template>
               </el-input>
             </div>
-            <div class="form-input" v-if="!loginType">
+            <div class="form-input" v-if="!loginStatus">
               <el-input
                 placeholder="请再次输入密码"
                 v-model="password1"
@@ -47,11 +47,11 @@
             </div>
             <div class="form-button">
               <el-button
-                :class="loginTypeButtonClassName"
+                :class="loginStatusButtonClassName"
                 type="primary"
                 @click="loginAndRegisterClick"
               >
-                {{ loginTypeButtonContent }}
+                {{ loginStatusButtonContent }}
               </el-button>
             </div>
           </div>
@@ -89,7 +89,7 @@ export default {
   name: "home",
   data() {
     return {
-      loginType: true, //登录类型 true=登录 false=注册
+      loginStatus: true, //登录类型 true=登录 false=注册
       username: "", //用户名
       id: null, //账号
       password: "", //密码
@@ -98,33 +98,33 @@ export default {
   },
   computed: {
     ...mapState("common", ["loginType"]),
-    loginTypeTitle() {
-      return this.loginType ? "用户登录" : "用户注册";
+    loginStatusTitle() {
+      return this.loginStatus ? "用户登录" : "用户注册";
     },
-    loginTypeId() {
-      return this.loginType ? "账 号：" : "新 的 账 号：";
+    loginStatusId() {
+      return this.loginStatus ? "账 号：" : "新 的 账 号：";
     },
-    loginTypePassword() {
-      return this.loginType ? "密 码：" : "新 的 密 码：";
+    loginStatusPassword() {
+      return this.loginStatus ? "密 码：" : "新 的 密 码：";
     },
-    loginTypeButtonClassName() {
-      return this.loginType ? "button-login" : "button-register";
+    loginStatusButtonClassName() {
+      return this.loginStatus ? "button-login" : "button-register";
     },
-    loginTypeButtonContent() {
-      return this.loginType ? "登录" : "注册";
+    loginStatusButtonContent() {
+      return this.loginStatus ? "登录" : "注册";
     },
   },
   methods: {
     ...mapActions("common", ["userLogin"]),
     // 登录注册切换
-    changeLoginType(type) {
+    changeLoginStatus(type) {
       switch (type) {
         case "login":
-          this.loginType = true;
+          this.loginStatus = true;
           this.initFormData();
           break;
         case "register":
-          this.loginType = false;
+          this.loginStatus = false;
           this.initFormData();
           break;
       }
@@ -134,7 +134,7 @@ export default {
       const { id, password } = this;
       if (!id) return this.$message.error("账号不能为空");
       if (!password) return this.$message.error("密码不能为空");
-      this.loginType ? this.login() : this.register();
+      this.loginStatus ? this.login() : this.register();
     }, 300),
     // 登录
     async login() {
@@ -143,10 +143,10 @@ export default {
       const params = { id, password };
       if (retNum.test(id)) {
         await this.userLogin(params);
-        if (this.loginType != "") this.$router.push("/admin");
+        if (this.loginType !== "") this.$router.push("/admin");
         this.initFormData();
       } else {
-        this.$message.error("请输入正确格式的账号123");
+        this.$message.error("请输入正确格式的账号");
       }
     },
     // 注册
@@ -159,7 +159,7 @@ export default {
           let resRegister = await $api.register([
             { id, username, password, authority: "1" },
           ]);
-          resRegister.code === 200 && this.changeLoginType("login");
+          resRegister.code === 200 && this.changeLoginStatus("login");
           this.initFormData();
         } catch (e) {
           this.$message.error(e);

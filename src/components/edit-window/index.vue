@@ -145,7 +145,6 @@ export default {
       // this.catalogList = catalogList;
       try {
         let res = await $api.addTask(taskList);
-        console.log(res);
         if (res.code === 200) {
           this.catalogList = catalogList;
           this.$emit("operation", false);
@@ -176,9 +175,7 @@ export default {
         this.catalogList[i].list.imageList = { value: [], exame: true };
         this.catalogList[i].list.children = [];
         this.catalogList[i].list.exame = false;
-        console.log(this.catalogList[i].list);
         let res = await $api.setCatalog(this.catalogList[i].list);
-        console.log(res);
       }
     }, 500),
     // 判断任务名是否重复
@@ -204,10 +201,6 @@ export default {
       this.initTaskList();
       this.$emit("operation", false);
     },
-    // 上传中的钩子
-    // handleProgress(event, file, fileList) {
-    //   console.log(event, file, fileList);
-    // },
     // 上传成功时的钩子
     handleSuccess(response, file) {
       let index = 0;
@@ -222,7 +215,6 @@ export default {
         }
         i++;
       }
-      console.log(this.createList);
     },
     // 上传失败时的钩子
     handleError(err, file, fileList) {
@@ -238,10 +230,6 @@ export default {
         }
       }
     },
-    // 点击文件列表中已上传的文件时的钩子
-    // handlePreview(file) {
-    //   console.log(file);
-    // },
     // 文件超出个数限制时的钩子
     handleExceed(files, fileList) {
       this.$message.warning(

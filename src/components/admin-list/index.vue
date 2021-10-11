@@ -12,34 +12,55 @@
           clearable
         >
           <el-select
+            v-if="placeholder === '请输入项目名称'"
             class="search-select"
             v-model="select"
             slot="prepend"
             placeholder="请选择"
           >
             <el-option
-              v-show="placeholder == '请输入项目名称'"
               :label="item.label"
               :value="item.value"
               v-for="item in Project"
               :key="item.value"
             ></el-option>
+          </el-select>
+          <el-select
+            v-else-if="placeholder === '请输入用户名称'"
+            class="search-select"
+            v-model="select"
+            slot="prepend"
+            placeholder="请选择"
+          >
             <el-option
-              v-show="placeholder == '请输入用户名称'"
               :label="item.label"
               :value="item.value"
               v-for="item in User"
               :key="item.value"
             ></el-option>
+          </el-select>
+          <el-select
+            v-else-if="placeholder === '请输入编目名称'"
+            class="search-select"
+            v-model="select"
+            slot="prepend"
+            placeholder="请选择"
+          >
             <el-option
-              v-show="placeholder == '请输入编目名称'"
               :label="item.label"
               :value="item.value"
               v-for="item in Task"
               :key="item.value"
             ></el-option>
+          </el-select>
+          <el-select
+            v-else-if="placeholder === '请输入反馈状态'"
+            class="search-select"
+            v-model="select"
+            slot="prepend"
+            placeholder="请选择"
+          >
             <el-option
-              v-show="placeholder == '请输入反馈状态'"
               :label="item.label"
               :value="item.value"
               v-for="item in feedback"
@@ -79,7 +100,14 @@ export default {
       searchValue: "", //搜索康输入的值
       pageSize: 5, //默认每页显示多少条
       pageSizes: [5, 10, 15, 20], //每页显示多少条有哪些选项
-      select: this.placeholder === "请输入用户名称" ? 4 : 7,
+      select:
+        this.placeholder === "请输入用户名称"
+          ? 4
+          : this.placeholder === "请输入项目名称"
+          ? 7
+          : this.placeholder === "请输入编目名称"
+          ? 6
+          : 3,
       Project: [
         { value: 1, label: "项目名" },
         { value: 2, label: "项目类别" },
@@ -188,7 +216,6 @@ export default {
         content.searchValue = this.searchValue;
         await this.getUserList(content);
       } else if (this.placeholder === "请输入项目名称") {
-        console.log("搜索项目");
         if (this.select === 1) {
           content.state = "name";
         } else if (this.select === 2) {
@@ -204,10 +231,22 @@ export default {
         } else if (this.select === 7) {
           content.state = "all";
         }
-        content.searchValue = this.searchValue;
+        if (this.select === 3) {
+          if (this.searchValue === "新创建") {
+            content.searchValue = 1;
+          } else if (this.searchValue === "编辑中") {
+            content.searchValue = 2;
+          } else if (this.searchValue === "已完成") {
+            content.searchValue = 3;
+          } else if (this.searchValue === "已删除") {
+            content.searchValue = -1;
+          }
+        } else {
+          content.searchValue = this.searchValue;
+        }
+        // content.searchValue = this.searchValue;
         await this.getProjectList(content);
       } else if (this.placeholder === "请输入编目名称") {
-        console.log("搜索项目");
         if (this.select === 1) {
           content.state = "name";
         } else if (this.select === 2) {
@@ -221,7 +260,22 @@ export default {
         } else if (this.select === 6) {
           content.state = "all";
         }
-        content.searchValue = this.searchValue;
+        if (this.select === 3) {
+          if (this.searchValue === "新创建") {
+            content.searchValue = 1;
+          } else if (this.searchValue === "编辑中") {
+            content.searchValue = 2;
+          } else if (this.searchValue === "已完成") {
+            content.searchValue = 3;
+          } else if (this.searchValue === "审核中") {
+            content.searchValue = 4;
+          } else if (this.searchValue === "终止") {
+            content.searchValue = -1;
+          }
+        } else {
+          content.searchValue = this.searchValue;
+        }
+        // content.searchValue = this.searchValue;
         await this.getTaskList(content);
       } else if (this.placeholder === "请输入反馈状态") {
         if (this.select === 1) {

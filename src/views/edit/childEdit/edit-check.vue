@@ -82,7 +82,7 @@
           </el-form-item>
           <el-form-item
             label="正题名"
-            :class="{ 'exame-style': !form.title.exame }"
+            :class="{ 'exame-style': form.title.exame==='false' }"
           >
             <el-input
               v-model="form.title.value"
@@ -92,7 +92,7 @@
           </el-form-item>
           <el-form-item
             label="首播日期"
-            :class="{ 'exame-style': !form.premiereDate.exame }"
+            :class="{ 'exame-style': form.premiereDate.exame==='false' }"
           >
             <el-date-picker
               v-model="form.premiereDate.value"
@@ -107,7 +107,7 @@
           </el-form-item>
           <el-form-item
             label="节目类型"
-            :class="{ 'exame-style': !form.programType.exame }"
+            :class="{ 'exame-style': form.programType.exame==='false' }"
           >
             <el-select
               v-model="form.programType.value"
@@ -121,7 +121,7 @@
           </el-form-item>
           <el-form-item
             label="内容描述"
-            :class="{ 'exame-style': !form.contentDescription.exame }"
+            :class="{ 'exame-style': form.contentDescription.exame==='false' }"
           >
             <el-input
               type="textarea"
@@ -134,7 +134,7 @@
           </el-form-item>
           <el-form-item
             label="字幕形式"
-            :class="{ 'exame-style': !form.subtitleForm.exame }"
+            :class="{ 'exame-style': form.subtitleForm.exame==='false' }"
           >
             <el-input
               v-model="form.subtitleForm.value"
@@ -153,7 +153,7 @@
           </el-form-item>
           <el-form-item
             label="其他责任者"
-            :class="{ 'exame-style': !form.groupMembers.exame }"
+            :class="{ 'exame-style': form.groupMembers.exame==='false' }"
           >
             <el-input
               v-model="form.groupMembers.value"
@@ -165,7 +165,7 @@
           </el-form-item>
           <el-form-item
             label="节目形态"
-            :class="{ 'exame-style': !form.programForm.exame }"
+            :class="{ 'exame-style': form.programForm.exame==='false' }"
           >
             <el-select
               v-show="this.editAndView"
@@ -181,7 +181,7 @@
           </el-form-item>
           <el-form-item
             label="栏目"
-            :class="{ 'exame-style': !form.column.exame }"
+            :class="{ 'exame-style': form.column.exame==='false' }"
           >
             <el-input
               v-model="form.column.value"
@@ -191,7 +191,7 @@
           </el-form-item>
           <el-form-item
             label="色彩"
-            :class="{ 'exame-style': !form.color.exame }"
+            :class="{ 'exame-style': form.color.exame==='false' }"
           >
             <el-radio-group
               v-model="form.color.value"
@@ -204,7 +204,7 @@
           </el-form-item>
           <el-form-item
             label="制式"
-            :class="{ 'exame-style': !form.standard.exame }"
+            :class="{ 'exame-style': form.standard.exame==='false' }"
           >
             <el-radio-group
               v-model="form.standard.value"
@@ -218,7 +218,7 @@
           </el-form-item>
           <el-form-item
             label="声道格式"
-            :class="{ 'exame-style': !form.channelFormat.exame }"
+            :class="{ 'exame-style': form.channelFormat.exame==='false' }"
           >
             <el-radio-group
               v-model="form.channelFormat.value"
@@ -234,7 +234,7 @@
           </el-form-item>
           <el-form-item
             label="画面宽高比"
-            :class="{ 'exame-style': !form.AspectRatio.exame }"
+            :class="{ 'exame-style': form.AspectRatio.exame==='false' }"
           >
             <el-radio-group
               v-model="form.AspectRatio.value"
@@ -248,7 +248,7 @@
           </el-form-item>
           <el-form-item
             label="入点"
-            :class="{ 'exame-style': !form.entryPoint.exame }"
+            :class="{ 'exame-style': form.entryPoint.exame==='false' }"
           >
             <el-time-picker
               v-model="form.entryPoint.value"
@@ -263,7 +263,7 @@
           </el-form-item>
           <el-form-item
             label="时长"
-            :class="{ 'exame-style': !form.duration.exame }"
+            :class="{ 'exame-style': form.duration.exame==='false' }"
           >
             <el-time-picker
               v-model="form.duration.value"
@@ -278,7 +278,7 @@
           </el-form-item>
           <el-form-item
             label="资料获取方式"
-            :class="{ 'exame-style': !form.AcquisitionMethod.exame }"
+            :class="{ 'exame-style': form.AcquisitionMethod.exame==='false' }"
           >
             <el-input
               v-model="form.AcquisitionMethod.value"
@@ -290,7 +290,7 @@
           </el-form-item>
           <el-form-item
             label="资料提供者"
-            :class="{ 'exame-style': !form.provider.exame }"
+            :class="{ 'exame-style': form.provider.exame==='false' }"
           >
             <el-input
               v-model="form.provider.value"
@@ -304,7 +304,7 @@
             class="right-card-screenshot"
           >
             <div style="color: #f56c6c">
-              {{ form.imageList.exame === false ? "不合格" : "" }}
+              {{ form.imageList.exame === "false" ? "不合格" : "" }}
             </div>
             <div class="screenshot-list" v-show="this.editAndView">
               <div
@@ -345,7 +345,10 @@
     </div>
     <div class="onload">
       <el-button type="success" size="small" @click="uploadEdit()"
-        >上传</el-button
+        >上传保存</el-button
+      >
+      <el-button type="primary" size="small" @click="uploadExame()"
+        >提交审核</el-button
       >
     </div>
   </div>
@@ -416,7 +419,7 @@ export default {
     ]),
   },
   methods: {
-    ...mapMutations("common", ["setscreenshotList"]),
+    ...mapMutations("common", ["setscreenshotList", "setTaskStatus"]),
     // 点击查看详情
     lookClick(row, column, event) {
       if (this.editAndView === true) {
@@ -427,12 +430,13 @@ export default {
     },
     // 更新表单图片数据
     updateFormImageList() {
-      this.form.imageList = _.cloneDeep(this.screenshotList);
+      this.form.imageList.value = _.cloneDeep(this.screenshotList);
     },
     deleteClick(val) {
       for (let i in this.form.imageList.value) {
         if (this.form.imageList.value[i].src === val) {
           this.form.imageList.value.splice(i, 1);
+          this.setscreenshotList(this.form.imageList.value);
         }
       }
     },
@@ -585,10 +589,15 @@ export default {
         }
       }
       uploadList[0].taskName = this.taskName;
-      console.log(uploadList[0]);
-      console.log(typeof uploadList[0]);
       let res = await $api.updateCatalog(uploadList[0]);
-      console.log(res);
+    },
+    async uploadExame() {
+      this.uploadEdit();
+      let res = await $api.updateTask(this.taskName, 4);
+      if (res.code === 200) {
+        this.$router.push("/edit/task");
+        this.setTaskStatus(4);
+      }
     },
   },
 };
@@ -695,10 +704,13 @@ export default {
     }
   }
   .onload {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     position: fixed;
     top: 1em;
     right: 1em;
-    width: 5em;
+    width: 15em;
     height: 3em;
   }
 }

@@ -30,9 +30,6 @@ export default {
   props: {
     taskName: String,
   },
-  created() {
-    console.log(this.taskName);
-  },
   methods: {
     ...mapMutations("common", ["setTaskName", "setTitleStats"]),
     //   编写界面

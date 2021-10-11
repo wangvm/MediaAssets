@@ -188,7 +188,6 @@ export default {
     ...mapActions("common", ["updateScreenshotList"]),
     videoPlayerKeyEvent(event) {
       let myVid = this.player;
-      // console.log(event.key)
       if (event.key === " " && this.ifPlay === false) {
         this.playerBtnEvent("play");
       } else if (event.key === " " && this.ifPlay === true) {
@@ -405,7 +404,6 @@ export default {
     async screenshot() {
       this.playerBtnEvent("pause");
       this.loading = true;
-      console.log(this.player.currentTime);
       try {
         let res = await $api.getscreenshotList(
           this.player.currentTime,

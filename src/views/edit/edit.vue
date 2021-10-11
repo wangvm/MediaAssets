@@ -23,18 +23,8 @@ export default {
   computed: {
     ...mapState("common", ["taskName", "projectName", "titleStatus"]),
   },
-  watch: {
-    taskName: "taskChange",
-    projectName: "projectChange",
-  },
   methods: {
     ...mapMutations("common", ["setTitleStats"]),
-    taskChange() {
-      console.log(this.taskName + "111");
-    },
-    projectChange() {
-      console.log(this.projectName + "222");
-    },
     goBack() {
       // this.$router.push("/admin/projectList");
       // this.$router.go(-1);

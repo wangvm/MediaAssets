@@ -17,6 +17,9 @@ export default {
   setTaskList(state, val) {
     state.taskList = val
   },
+  setTaskStatus(state, val) {
+    state.taskStatus = val;
+  },
   setFeedbackList(state, val) {
     state.feedbackList = val
   },
@@ -33,7 +36,6 @@ export default {
   // 与视频播放相关
   setVideoSrc(state, val) {
     state.videoSrc = val;
-    console.log(state.videoSrc);
   },
   setscreenshotList(state, val) {
     state.screenshotList = val;
@@ -41,6 +43,5 @@ export default {
   // 编目信息
   setCatalogList(state, val) {
     state.catalogList = val;
-    console.log(state.catalogList);
   }
 }

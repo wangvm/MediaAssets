@@ -20,13 +20,14 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-tooltip
-                v-if="scope.row.edit === false"
+                v-if="taskStatus === 4"
                 class="item"
                 effect="light"
                 content="审核"
                 placement="left"
               >
                 <el-button
+                  v-if="scope.row.edit === false"
                   type="primary"
                   size="mini"
                   icon="el-icon-edit"
@@ -34,7 +35,6 @@
                   circle
                 ></el-button>
               </el-tooltip>
-              <span v-if="scope.row.edit === false">123</span>
             </template>
           </el-table-column>
         </el-table>
@@ -53,14 +53,19 @@
           </el-form-item>
           <el-form-item label="正题名" class="exame-style">
             <span>{{ form.title.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.title.exame === 'false' }"
+              >{{ form.title.exame }}</span
+            >
             <el-select
               class="exame-select"
               v-show="this.editAndView"
               v-model="form.title.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="首播日期" class="exame-style">
@@ -70,10 +75,15 @@
               v-model="form.premiereDate.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.premiereDate.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.premiereDate.exame === 'false' }"
+              >{{ form.premiereDate.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="节目类型" class="exame-style">
             <el-select
@@ -82,10 +92,15 @@
               v-model="form.programType.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.programType.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.programType.exame === 'false' }"
+              >{{ form.programType.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="内容描述" class="exame-style">
             <el-select
@@ -94,10 +109,15 @@
               v-model="form.contentDescription.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.contentDescription.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.contentDescription.exame === 'false' }"
+              >{{ form.contentDescription.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="字幕形式" class="exame-style">
             <el-select
@@ -106,10 +126,15 @@
               v-model="form.subtitleForm.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.subtitleForm.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.subtitleForm.exame === 'false' }"
+              >{{ form.subtitleForm.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="创建者名称">
             <h3>{{ form.taskName }}</h3>
@@ -121,10 +146,15 @@
               v-model="form.groupMembers.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.groupMembers.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.groupMembers.exame === 'false' }"
+              >{{ form.groupMembers.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="节目形态" class="exame-style">
             <el-select
@@ -133,10 +163,15 @@
               v-model="form.programForm.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.programForm.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.programForm.exame === 'false' }"
+              >{{ form.programForm.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="栏目" class="exame-style">
             <el-select
@@ -145,10 +180,15 @@
               v-model="form.column.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.column.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.column.exame === 'false' }"
+              >{{ form.column.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="色彩" class="exame-style">
             <el-select
@@ -157,10 +197,15 @@
               v-model="form.color.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.color.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.color.exame === 'false' }"
+              >{{ form.color.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="制式" class="exame-style">
             <el-select
@@ -169,10 +214,15 @@
               v-model="form.standard.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.standard.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.standard.exame === 'false' }"
+              >{{ form.standard.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="声道格式" class="exame-style">
             <el-select
@@ -181,10 +231,15 @@
               v-model="form.channelFormat.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.channelFormat.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.channelFormat.exame === 'false' }"
+              >{{ form.channelFormat.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="画面宽高比" class="exame-style">
             <el-select
@@ -193,10 +248,15 @@
               v-model="form.AspectRatio.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.AspectRatio.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.AspectRatio.exame === 'false' }"
+              >{{ form.AspectRatio.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="入点" class="exame-style">
             <el-select
@@ -205,10 +265,15 @@
               v-model="form.entryPoint.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.entryPoint.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.entryPoint.exame === 'false' }"
+              >{{ form.entryPoint.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="时长" class="exame-style">
             <el-select
@@ -217,10 +282,15 @@
               v-model="form.duration.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.duration.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.duration.exame === 'false' }"
+              >{{ form.duration.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="资料获取方式" class="exame-style">
             <el-select
@@ -229,10 +299,15 @@
               v-model="form.AcquisitionMethod.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.AcquisitionMethod.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.AcquisitionMethod.exame === 'false' }"
+              >{{ form.AcquisitionMethod.exame }}</span
+            >
           </el-form-item>
           <el-form-item label="资料提供者" class="exame-style">
             <el-select
@@ -241,10 +316,15 @@
               v-model="form.provider.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
             <span>{{ form.provider.value }}</span>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.provider.exame === 'false' }"
+              >{{ form.provider.exame }}</span
+            >
           </el-form-item>
           <el-form-item
             label="图片截取"
@@ -257,9 +337,14 @@
               v-model="form.imageList.exame"
               placeholder="请选择活动区域"
             >
-              <el-option label="true" value="true"></el-option>
-              <el-option label="false" value="false"></el-option>
+              <el-option label="合格" value="true"></el-option>
+              <el-option label="不合格" value="false"></el-option>
             </el-select>
+            <span
+              class="exame-select"
+              :class="{ 'exame-select-false': form.imageList.exame === 'false' }"
+              >{{ form.imageList.exame }}</span
+            >
             <div class="screenshot-list" v-show="this.editAndView">
               <div
                 class="list-items"
@@ -298,9 +383,10 @@
       </el-card>
     </div>
     <div class="onload">
-      <el-button type="success" size="small" @click="uploadEdit()"
-        >上传</el-button
+      <el-button type="success" size="small" @click="complete()"
+        >打回</el-button
       >
+      <el-button type="success" size="small" @click="repulse()">完成</el-button>
     </div>
   </div>
 </template>
@@ -333,24 +419,24 @@ export default {
       },
 
       form: {
-        title: { value: "", exame: true },
-        premiereDate: { value: "", exame: true },
-        programType: { value: "", exame: true },
-        contentDescription: { value: "", exame: true },
-        subtitleForm: { value: "", exame: true },
+        title: { value: "", exame: "true" },
+        premiereDate: { value: "", exame: "true" },
+        programType: { value: "", exame: "true" },
+        contentDescription: { value: "", exame: "true" },
+        subtitleForm: { value: "", exame: "true" },
         taskName: this.taskNamef,
-        groupMembers: { value: "", exame: true },
-        programForm: { value: "", exame: true },
-        column: { value: "", exame: true },
-        color: { value: "", exame: true },
-        standard: { value: "", exame: true },
-        channelFormat: { value: "", exame: true },
-        AspectRatio: { value: "", exame: true },
-        entryPoint: { value: "", exame: true },
-        duration: { value: "", exame: true },
-        AcquisitionMethod: { value: "", exame: true },
-        provider: { value: "", exame: true },
-        imageList: { value: [], exame: true },
+        groupMembers: { value: "", exame: "true" },
+        programForm: { value: "", exame: "true" },
+        column: { value: "", exame: "true" },
+        color: { value: "", exame: "true" },
+        standard: { value: "", exame: "true" },
+        channelFormat: { value: "", exame: "true" },
+        AspectRatio: { value: "", exame: "true" },
+        entryPoint: { value: "", exame: "true" },
+        duration: { value: "", exame: "true" },
+        AcquisitionMethod: { value: "", exame: "true" },
+        provider: { value: "", exame: "true" },
+        imageList: { value: [], exame: "true" },
       },
     };
   },
@@ -359,7 +445,12 @@ export default {
     videoPlayer,
   },
   computed: {
-    ...mapState("common", ["taskName", "videoSrc", "catalogList"]),
+    ...mapState("common", [
+      "taskName",
+      "videoSrc",
+      "catalogList",
+      "taskStatus",
+    ]),
   },
   methods: {
     // 点击查看详情
@@ -373,9 +464,6 @@ export default {
     // 保存更改
     saveClick() {
       if (this.state === "节目") {
-        console.log("这是节目");
-        console.log(this.form);
-        console.log(this.catalogList[0]);
         this.catalogList[0].title = this.form.title;
         this.catalogList[0].premiereDate = this.form.premiereDate;
         this.catalogList[0].programType = this.form.programType;
@@ -399,7 +487,6 @@ export default {
       } else {
         for (let i in this.catalogList[0].children) {
           if (this.count === this.catalogList[0].children[i].id) {
-            console.log("这是片段");
             // this.state = "片段";
             this.catalogList[0].children[i].title = this.form.title;
             this.catalogList[0].children[i].premiereDate =
@@ -435,13 +522,11 @@ export default {
     },
     cancleClick() {
       if (this.state === "节目") {
-        console.log("这是节目");
         this.catalogList[0].edit = false;
       } else {
         for (let i in this.catalogList[0].children) {
           if (this.count === this.catalogList[0].children[i].id) {
             this.catalogList[0].children[i].edit = false;
-            console.log("这是片段");
           }
         }
       }
@@ -452,7 +537,6 @@ export default {
     // 编辑内容
     editItem(row) {
       if (this.isEdit === false) {
-        console.log(row);
         this.isEdit = true;
         row.edit = true;
         this.count = row.id;
@@ -464,7 +548,7 @@ export default {
       }
     },
     // 上传至后端保存数据
-    async uploadEdit() {
+    async complete() {
       let uploadList = _.cloneDeep(this.catalogList);
       delete uploadList[0].id;
       delete uploadList[0].edit;
@@ -477,13 +561,14 @@ export default {
         }
       }
       uploadList[0].taskName = this.taskName;
-      console.log(uploadList[0]);
-      console.log(typeof uploadList[0]);
-      let res = await $api.updateCatalog(uploadList[0]);
-      // let updateRes = await $api.updateTask(this.taskName, 4);
-      // console.log(updateRes);
-      console.log(res);
+      // console.log(uploadList[0]);
+      // console.log(typeof uploadList[0]);
+      // let res = await $api.updateCatalog(uploadList[0]);
+      // // let updateRes = await $api.updateTask(this.taskName, 4);
+      // // console.log(updateRes);
+      // console.log(res);
     },
+    repulse() {},
   },
 };
 </script>
@@ -546,8 +631,15 @@ export default {
           position: absolute;
           top: -0.2em;
           right: 0;
-          // background-color: aqua;
           width: 25%;
+          color: #409eff;
+        }
+        .exame-select-false {
+          position: absolute;
+          top: -0.2em;
+          right: 0;
+          width: 25%;
+          color: #e6a23c;
         }
       }
       .right-card-screenshot-false {

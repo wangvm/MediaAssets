@@ -22,11 +22,9 @@ export default {
         return;
       } else {
         let res = $api.createProject(this.projectName);
-        console.log(res);
         this.projectName = "";
       }
       //TODO 项目创建
-      console.log(this.projectName);
     }, 300),
   },
 };

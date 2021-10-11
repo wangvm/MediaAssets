@@ -48,14 +48,9 @@ export default {
       this.dialogFormVisible = true;
     },
     async submitBug() {
-      console.log(this.form.message);
-      // await $api.AddFeedback([
-      //   { title: this.title, details: this.form.message },
-      // ]);
       try {
         let title = this.title;
         let details = this.form.message;
-        console.log(typeof details);
         let addFeedback = await $api.AddFeedback(title, details);
       } catch (e) {
         this.$message.error(e);

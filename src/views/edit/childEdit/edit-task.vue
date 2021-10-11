@@ -6,7 +6,9 @@
     title="编目列表"
     placeholder="请输入编目名称"
   >
-    <el-button type="primary" @click="newBuilt">新建任务</el-button>
+    <el-button type="primary" v-if="loginType === 0" @click="newBuilt"
+      >新建任务</el-button
+    >
     <div class="content_table">
       <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
         <el-table-column prop="index" label="序号" fixed="left" width="100" />
@@ -97,7 +99,7 @@
         <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-tooltip
-              v-if="!scope.row.edit"
+              v-if="loginType === 0"
               class="item"
               effect="light"
               content="编辑任务"
@@ -113,7 +115,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="!scope.row.edit"
+              v-if="loginType === 0"
               class="item"
               effect="light"
               content="删除任务"
@@ -146,7 +148,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="scope.row.edit"
+              v-if="loginType === 0"
               class="item"
               effect="light"
               content="保存修改"
@@ -162,7 +164,7 @@
               ></el-button
             ></el-tooltip>
             <el-tooltip
-              v-if="scope.row.edit"
+              v-if="loginType === 0"
               class="item"
               effect="light"
               content="取消"
@@ -230,7 +232,12 @@ export default {
   },
   methods: {
     ...mapActions("common", ["getTaskList", "getCatalogList"]), //先用project的数据
-    ...mapMutations("common", ["setVideoSrc", "setTaskName", "setTitleStats"]),
+    ...mapMutations("common", [
+      "setVideoSrc",
+      "setTaskName",
+      "setTitleStats",
+      "setTaskStatus",
+    ]),
     //获取到信息
     initTaskList: debounce(async function () {
       let content = {
@@ -260,13 +267,12 @@ export default {
     },
     //进入项目
     async enterTask(val) {
+      this.setTaskStatus(val.status);
       try {
         let res = await $api.getCatalog("taskName", val.taskName);
-        console.log(res);
         if (res.code === 200) {
           this.setVideoSrc(res.data.position);
           this.getCatalogList(res.data);
-          console.log(this.loginType);
           if (this.loginType === 0) {
             this.newTaskName = val.taskName;
             this.enterIn = true;
@@ -294,13 +300,10 @@ export default {
             });
             this.setTaskName(val.taskName);
             this.setTitleStats(true);
-            let exameRes = await $api.updateTask(val.taskName, 4);
-            console.log(exameRes);
           }
-          console.log(val.status);
           if (val.status === 1) {
             let updateRes = await $api.updateTask(val.taskName, 2);
-            console.log(updateRes);
+            this.setTaskStatus(2);
           }
         }
       } catch (e) {
@@ -308,7 +311,6 @@ export default {
       }
     },
     editTask(row) {
-      console.log(row);
       row.edit = true;
     },
     async saveEdit(index, row) {
@@ -332,7 +334,6 @@ export default {
         if (row.edit_catalogId === "") {
           row.edit_catalogId = row.catalogId;
         }
-        console.log(row);
         let resTask = await $api.updateTask(
           row.taskName,
           row.edit_status,
@@ -350,7 +351,6 @@ export default {
     },
     //删除项目
     async deleteTask(currentProject) {
-      console.log(currentProject.taskName);
       this.loading = true;
       try {
         await $api.deleteTask(currentProject.taskName);

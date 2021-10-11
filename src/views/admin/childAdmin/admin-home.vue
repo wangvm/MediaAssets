@@ -42,7 +42,12 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="200">
+        <el-table-column
+          label="操作"
+          fixed="right"
+          width="200"
+          v-if="loginType === 0"
+        >
           <template slot-scope="scope">
             <el-tooltip
               class="item"
@@ -107,7 +112,6 @@ export default {
       await this.getFeedbackList(content);
       this.handleSizeChange(5);
       this.loading = false; //结束缓冲
-      console.log(this.feedbackList);
     }, 300),
     changeShowList(val) {
       this.showList = val;
@@ -127,7 +131,6 @@ export default {
     },
     //删除项目
     async CompleteClick(currentProject) {
-      console.log(currentProject);
       this.loading = true;
       try {
         await await $api.CompleteFeedback(currentProject.id);

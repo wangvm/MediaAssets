@@ -193,7 +193,6 @@ export default {
     },
     upload(file) {
       // TODO
-      console.log(file);
       this.ifUploadLoading = false;
     },
   },
