@@ -14,6 +14,7 @@ export default {
         // setUserToken(token);
         // setLoginType(loginType);
         commit('updateLoginType', loginType)
+        localStorage.setItem('loginType', loginType);
         // commit('setToken', token)
       } else {
         // setLoginType("")

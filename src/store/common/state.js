@@ -1,6 +1,6 @@
 export default () => ({
   // 首页部分
-  loginType: "",
+  loginType: localStorage.getItem("loginType") !== "" ? localStorage.getItem("loginType") : "",
   currentMenu: '',
   // token: '',
   // 管理部分

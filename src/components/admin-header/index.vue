@@ -36,16 +36,18 @@ export default {
         .catch(() => {});
     },
     async exitAdmin() {
-      // try {
-      //   await $api.logout(res => {
-      //     console.log(res);
-      //   }).catch(err => {
-      //     console.log(err);
-      //   })
-      // } catch (e) {
-      //   this.$message.error(e);
-      // }
-
+      try {
+        await $api
+          .logout((res) => {
+            console.log(res);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      } catch (e) {
+        this.$message.error(e);
+      }
+      localStorage.removeItem("loginType");
       // removeAllSessionStorage();
       // // this.setToken("");
       // this.updateLoginType("");
