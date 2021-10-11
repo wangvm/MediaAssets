@@ -49,7 +49,6 @@ export default {
         let options = {
           "edit": false,
           "index": index + 1,
-          "edit_projectName": '',
           "edit_leaderId": '',
           "edit_category": '',
           "edit_status": '',

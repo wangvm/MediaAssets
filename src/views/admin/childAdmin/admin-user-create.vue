@@ -79,6 +79,8 @@
         multiple
         :limit="1"
         :on-change="upload"
+        :on-success="success"
+        :on-error="error"
       >
         <i class="el-icon-upload"></i>
         <div class="el-upload__text"><em>点击选择文件上传</em></div>
@@ -194,6 +196,24 @@ export default {
     upload(file) {
       // TODO
       this.ifUploadLoading = false;
+    },
+    success(response, file, fileList) {
+      console.log(response, file, fileList);
+      fileList = [];
+      if (response.code === 200) {
+        this.$message({
+          message: response.message,
+          type: "success",
+        });
+        this.dialogVisible = false;
+      } else {
+        this.$message(response.message);
+      }
+    },
+    error(err, file, fileList) {
+      console.log(err, file, fileList);
+      fileList = [];
+      this.$message(err.message);
     },
   },
 };

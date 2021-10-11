@@ -6,7 +6,10 @@
     title="编目列表"
     placeholder="请输入编目名称"
   >
-    <el-button type="primary" v-if="loginType === 0" @click="newBuilt"
+    <el-button
+      type="primary"
+      v-if="loginType === 0 || loginType === 1"
+      @click="newBuilt"
       >新建任务</el-button
     >
     <div class="content_table">
@@ -30,7 +33,7 @@
             </span>
             <div v-else>
               <span
-                v-if="loginType !== 0"
+                v-if="loginType !== 0 || loginType !== 1"
                 class="project-status"
                 :class="['project-status-' + scope.row.status]"
               >
@@ -99,7 +102,7 @@
         <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-tooltip
-              v-if="loginType === 0"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="编辑任务"
@@ -115,7 +118,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="删除任务"
@@ -148,7 +151,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="保存修改"
@@ -164,7 +167,7 @@
               ></el-button
             ></el-tooltip>
             <el-tooltip
-              v-if="loginType === 0"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="取消"
@@ -273,7 +276,7 @@ export default {
         if (res.code === 200) {
           this.setVideoSrc(res.data.position);
           this.getCatalogList(res.data);
-          if (this.loginType === 0) {
+          if (this.loginType === 0 || this.loginType === 1) {
             this.newTaskName = val.taskName;
             this.enterIn = true;
           } else if (this.loginType === 2 || this.loginType === 4) {

@@ -157,7 +157,7 @@ export default {
       if (retNum.test(id)) {
         try {
           let resRegister = await $api.register([
-            { id, username, password, authority: "1" },
+            { id, username, password, authority: "4" },
           ]);
           resRegister.code === 200 && this.changeLoginStatus("login");
           this.initFormData();

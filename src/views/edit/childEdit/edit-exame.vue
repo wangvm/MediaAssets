@@ -81,7 +81,9 @@
             <span>{{ form.premiereDate.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.premiereDate.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.premiereDate.exame === 'false',
+              }"
               >{{ form.premiereDate.exame }}</span
             >
           </el-form-item>
@@ -98,7 +100,9 @@
             <span>{{ form.programType.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.programType.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.programType.exame === 'false',
+              }"
               >{{ form.programType.exame }}</span
             >
           </el-form-item>
@@ -115,7 +119,9 @@
             <span>{{ form.contentDescription.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.contentDescription.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.contentDescription.exame === 'false',
+              }"
               >{{ form.contentDescription.exame }}</span
             >
           </el-form-item>
@@ -132,7 +138,9 @@
             <span>{{ form.subtitleForm.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.subtitleForm.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.subtitleForm.exame === 'false',
+              }"
               >{{ form.subtitleForm.exame }}</span
             >
           </el-form-item>
@@ -152,7 +160,9 @@
             <span>{{ form.groupMembers.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.groupMembers.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.groupMembers.exame === 'false',
+              }"
               >{{ form.groupMembers.exame }}</span
             >
           </el-form-item>
@@ -169,7 +179,9 @@
             <span>{{ form.programForm.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.programForm.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.programForm.exame === 'false',
+              }"
               >{{ form.programForm.exame }}</span
             >
           </el-form-item>
@@ -237,7 +249,9 @@
             <span>{{ form.channelFormat.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.channelFormat.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.channelFormat.exame === 'false',
+              }"
               >{{ form.channelFormat.exame }}</span
             >
           </el-form-item>
@@ -254,7 +268,9 @@
             <span>{{ form.AspectRatio.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.AspectRatio.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.AspectRatio.exame === 'false',
+              }"
               >{{ form.AspectRatio.exame }}</span
             >
           </el-form-item>
@@ -271,7 +287,9 @@
             <span>{{ form.entryPoint.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.entryPoint.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.entryPoint.exame === 'false',
+              }"
               >{{ form.entryPoint.exame }}</span
             >
           </el-form-item>
@@ -305,7 +323,9 @@
             <span>{{ form.AcquisitionMethod.value }}</span>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.AcquisitionMethod.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.AcquisitionMethod.exame === 'false',
+              }"
               >{{ form.AcquisitionMethod.exame }}</span
             >
           </el-form-item>
@@ -342,7 +362,9 @@
             </el-select>
             <span
               class="exame-select"
-              :class="{ 'exame-select-false': form.imageList.exame === 'false' }"
+              :class="{
+                'exame-select-false': form.imageList.exame === 'false',
+              }"
               >{{ form.imageList.exame }}</span
             >
             <div class="screenshot-list" v-show="this.editAndView">
@@ -383,10 +405,10 @@
       </el-card>
     </div>
     <div class="onload">
+      <el-button type="warning" size="small" @click="repulse()">打回</el-button>
       <el-button type="success" size="small" @click="complete()"
-        >打回</el-button
+        >完成</el-button
       >
-      <el-button type="success" size="small" @click="repulse()">完成</el-button>
     </div>
   </div>
 </template>
@@ -547,8 +569,8 @@ export default {
         this.$message("请保存或取消上一编辑内容");
       }
     },
-    // 上传至后端保存数据
-    async complete() {
+    // 上传至后端保存数据(打回)
+    async uploadExame() {
       let uploadList = _.cloneDeep(this.catalogList);
       delete uploadList[0].id;
       delete uploadList[0].edit;
@@ -561,14 +583,23 @@ export default {
         }
       }
       uploadList[0].taskName = this.taskName;
-      // console.log(uploadList[0]);
-      // console.log(typeof uploadList[0]);
-      // let res = await $api.updateCatalog(uploadList[0]);
-      // // let updateRes = await $api.updateTask(this.taskName, 4);
-      // // console.log(updateRes);
-      // console.log(res);
     },
-    repulse() {},
+    // 完成
+    async complete() {
+      this.uploadExame();
+      let res = await $api.setUploadExame(this.taskName, 3);
+      if (res.code === 200) {
+        this.$router.push("/edit/task");
+      }
+    },
+    // 打回
+    async repulse() {
+      this.uploadExame();
+      let res = await $api.setUploadExame(this.taskName, 2);
+      if (res.code === 200) {
+        this.$router.push("/edit/task");
+      }
+    },
   },
 };
 </script>
@@ -697,10 +728,13 @@ export default {
     }
   }
   .onload {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     position: fixed;
     top: 1em;
     right: 1em;
-    width: 5em;
+    width: 15em;
     height: 3em;
   }
 }

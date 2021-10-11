@@ -10,18 +10,6 @@
       <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
         <el-table-column prop="index" label="序号" fixed="left" width="100" />
         <el-table-column prop="projectName" label="项目名称" width="200">
-          <template slot-scope="scope">
-            <span v-if="!scope.row.edit">
-              {{ scope.row.projectName }}
-            </span>
-            <span v-else>
-              <el-input
-                v-model="scope.row.edit_projectName"
-                placeholder="请输入用户名"
-                clearable
-              />
-            </span>
-          </template>
         </el-table-column>
         <el-table-column prop="leaderId" label="组长账号" width="200">
           <template slot-scope="scope">
@@ -81,7 +69,7 @@
         <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-tooltip
-              v-if="loginType === 0"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="编辑项目"
@@ -97,7 +85,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0"
+              v-if="loginType === 0||loginType === 1"
               class="item"
               effect="light"
               content="删除项目"
@@ -130,7 +118,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0"
+              v-if="loginType === 0||loginType === 1"
               class="item"
               effect="light"
               content="保存修改"
@@ -146,7 +134,7 @@
               ></el-button
             ></el-tooltip>
             <el-tooltip
-              v-if="loginType === 0"
+              v-if="loginType === 0||loginType === 1"
               class="item"
               effect="light"
               content="取消"
@@ -248,9 +236,6 @@ export default {
       row.edit = true;
     },
     async saveEdit(index, row) {
-      if (row.edit_projectName === "") {
-        row.edit_projectName = row.projectName;
-      }
       if (row.edit_leaderId === "") {
         row.edit_leaderId = row.leaderId;
       }
@@ -261,7 +246,7 @@ export default {
         row.edit_status = row.status;
       }
       let resProject = await $api.updateProject(
-        row.edit_projectName,
+        row.projectName,
         row.edit_leaderId,
         row.edit_category,
         row.edit_status

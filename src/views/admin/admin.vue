@@ -22,11 +22,7 @@
 import { mapState, mapMutations } from "vuex";
 import adminAside from "@/components/admin-aside";
 import adminHeader from "@/components/admin-header";
-import {
-  getCurrentMenu,
-  getLoginType,
-  setCurrentMenu,
-} from "@/config/storage";
+import { getCurrentMenu, getLoginType, setCurrentMenu } from "@/config/storage";
 import menuConfig from "@/config/menu-config";
 import { userType } from "@/constants/common";
 
@@ -48,10 +44,7 @@ export default {
     this.getMenuList();
   },
   methods: {
-    ...mapMutations("common", [
-      "updateLoginType",
-      "updateCurrentMenu",
-    ]),
+    ...mapMutations("common", ["updateLoginType", "updateCurrentMenu"]),
     initUserToken() {
       let loginType = getLoginType();
       // if (!userToken) {
@@ -66,7 +59,10 @@ export default {
       let loginType = this.loginType;
       let getMenu = [];
       //authority值为admin:0;user:1创建；user:2编目; user:3审核
-      if (loginType.toString() === userType["0"].key.toString()) {
+      if (
+        loginType.toString() === userType["0"].key.toString() ||
+        loginType.toString() === userType["1"].key.toString()
+      ) {
         getMenu = [
           { name: "主页", value: "00" },
           { name: "项目管理", value: "10" },
@@ -76,6 +72,8 @@ export default {
           { name: "用户列表", value: "21" },
           { name: "创建用户", value: "22" },
         ];
+      } else if (loginType.toString() === userType["4"].key.toString()) {
+        getMenu = [{ name: "主页", value: "00" }];
       } else {
         getMenu = [
           { name: "主页", value: "00" },

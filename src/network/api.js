@@ -83,6 +83,8 @@ const $api = {
     getCatalog: (key, value) => request('/catalog/search', { key, value }),
     // 关键帧截取接口
     getscreenshotList: (cutTime, taskName) => request('/catalog/cut', { cutTime, taskName }),
+    // 管理员审核接口
+    setUploadExame:(taskName, status) => request('/catalog/audit', {taskName, status}),
 
 }
 export default $api

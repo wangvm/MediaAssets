@@ -46,7 +46,7 @@
           label="操作"
           fixed="right"
           width="200"
-          v-if="loginType === 0"
+          v-if="loginType === 0 || loginType === 1"
         >
           <template slot-scope="scope">
             <el-tooltip
