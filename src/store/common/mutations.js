@@ -26,9 +26,11 @@ export default {
   // 保存编目名以及任务名
   setProjectName(state, val) {
     state.projectName = val;
+    localStorage.setItem("projectName", state.projectName);
   },
   setTaskName(state, val) {
     state.taskName = val;
+    localStorage.setItem("taskName", state.taskName);
   },
   setTitleStats(state, val) {
     state.titleStatus = val;

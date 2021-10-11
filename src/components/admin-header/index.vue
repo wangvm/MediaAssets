@@ -48,6 +48,8 @@ export default {
         this.$message.error(e);
       }
       localStorage.removeItem("loginType");
+      localStorage.removeItem("projectName");
+      localStorage.removeItem("taskName");
       // removeAllSessionStorage();
       // // this.setToken("");
       // this.updateLoginType("");

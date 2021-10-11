@@ -8,8 +8,8 @@ export default () => ({
   userList: [],
   taskList: [],
   feedbackList: [],
-  projectName: '',
-  taskName: '',
+  projectName: localStorage.getItem("projectName") !== "" ? localStorage.getItem("projectName") : "",
+  taskName: localStorage.getItem("taskName") !== "" ? localStorage.getItem("taskName") : "",
   taskStatus: 2,
   titleStatus: false,
   // 视频播放组件
