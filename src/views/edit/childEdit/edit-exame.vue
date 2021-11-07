@@ -407,7 +407,7 @@
     <div class="onload">
       <el-button type="warning" size="small" @click="repulse()">打回</el-button>
       <el-button type="success" size="small" @click="complete()"
-        >完成</el-button
+        >通过</el-button
       >
     </div>
   </div>

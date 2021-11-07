@@ -5,9 +5,6 @@ export default {
   updateCurrentMenu(state, val) {
     state.currentMenu = val
   },
-  // setToken(state, val) {
-  //   state.token = val
-  // },
   setProjectList(state, val) {
     state.projectList = val
   },

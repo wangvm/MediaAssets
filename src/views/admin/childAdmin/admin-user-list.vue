@@ -54,10 +54,10 @@
               class="user-role"
               :class="['user-role-' + scope.row.authority]"
             >
-              {{ userType[scope.row.authority].label }}
+              {{ getUserAuthority(scope.row) }}
             </span>
             <span v-else>
-              <el-select v-model="scope.row.authority">
+              <el-select v-model="scope.row.edit_authority">
                 <el-option
                   v-for="item in userType"
                   :key="item.key"
@@ -210,25 +210,42 @@ export default {
       }
     },
     //确认修改任务
-    deterMine(index, row) {
+    async deterMine(index, row) {
+      try {
+      } catch (e) {
+        this.$message(e);
+      }
       if (
         row.username !== row.edit_username &&
         row.edit_username !== undefined
       ) {
-        let resUsername = $api.updateUsername(row.id, row.edit_username);
+        try {
+          await $api.updateUsername(row.id, row.edit_username);
+        } catch (e) {
+          this.$message(e);
+        }
       }
       if (
         row.edit_newpassword !== undefined &&
         row.edit_newpassword !== undefined
       ) {
-        let resPassword = $api.updateUserPassword(
-          row.id,
-          row.edit_oldpassword,
-          row.edit_newpassword
-        );
+        try {
+          await $api.updateUserPassword(
+            row.id,
+            row.edit_oldpassword,
+            row.edit_newpassword
+          );
+        } catch (e) {
+          this.$message(e);
+        }
       }
       if (row.edit_authority !== row.authority) {
-        let resAuthority = $api.updateAuthority(row.id, row.edit_authority);
+        try {
+          await $api.updateAuthority(row.id, row.edit_authority);
+          this.initUserList();
+        } catch (e) {
+          this.$message(e);
+        }
       }
       row.edit = false;
       this.getUserList();
@@ -243,6 +260,10 @@ export default {
     cancelClick(index, row) {
       row.edit_password = row.password;
       row.edit = false;
+    },
+    getUserAuthority(userInfo) {
+      const { authority } = userInfo;
+      return userType[authority].label;
     },
   },
 };

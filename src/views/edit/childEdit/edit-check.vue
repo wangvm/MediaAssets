@@ -82,7 +82,7 @@
           </el-form-item>
           <el-form-item
             label="正题名"
-            :class="{ 'exame-style': form.title.exame==='false' }"
+            :class="{ 'exame-style': form.title.exame === 'false' }"
           >
             <el-input
               v-model="form.title.value"
@@ -92,7 +92,7 @@
           </el-form-item>
           <el-form-item
             label="首播日期"
-            :class="{ 'exame-style': form.premiereDate.exame==='false' }"
+            :class="{ 'exame-style': form.premiereDate.exame === 'false' }"
           >
             <el-date-picker
               v-model="form.premiereDate.value"
@@ -107,7 +107,7 @@
           </el-form-item>
           <el-form-item
             label="节目类型"
-            :class="{ 'exame-style': form.programType.exame==='false' }"
+            :class="{ 'exame-style': form.programType.exame === 'false' }"
           >
             <el-select
               v-model="form.programType.value"
@@ -121,7 +121,9 @@
           </el-form-item>
           <el-form-item
             label="内容描述"
-            :class="{ 'exame-style': form.contentDescription.exame==='false' }"
+            :class="{
+              'exame-style': form.contentDescription.exame === 'false',
+            }"
           >
             <el-input
               type="textarea"
@@ -134,7 +136,7 @@
           </el-form-item>
           <el-form-item
             label="字幕形式"
-            :class="{ 'exame-style': form.subtitleForm.exame==='false' }"
+            :class="{ 'exame-style': form.subtitleForm.exame === 'false' }"
           >
             <el-input
               v-model="form.subtitleForm.value"
@@ -153,7 +155,7 @@
           </el-form-item>
           <el-form-item
             label="其他责任者"
-            :class="{ 'exame-style': form.groupMembers.exame==='false' }"
+            :class="{ 'exame-style': form.groupMembers.exame === 'false' }"
           >
             <el-input
               v-model="form.groupMembers.value"
@@ -165,7 +167,7 @@
           </el-form-item>
           <el-form-item
             label="节目形态"
-            :class="{ 'exame-style': form.programForm.exame==='false' }"
+            :class="{ 'exame-style': form.programForm.exame === 'false' }"
           >
             <el-select
               v-show="this.editAndView"
@@ -181,7 +183,7 @@
           </el-form-item>
           <el-form-item
             label="栏目"
-            :class="{ 'exame-style': form.column.exame==='false' }"
+            :class="{ 'exame-style': form.column.exame === 'false' }"
           >
             <el-input
               v-model="form.column.value"
@@ -191,7 +193,7 @@
           </el-form-item>
           <el-form-item
             label="色彩"
-            :class="{ 'exame-style': form.color.exame==='false' }"
+            :class="{ 'exame-style': form.color.exame === 'false' }"
           >
             <el-radio-group
               v-model="form.color.value"
@@ -204,7 +206,7 @@
           </el-form-item>
           <el-form-item
             label="制式"
-            :class="{ 'exame-style': form.standard.exame==='false' }"
+            :class="{ 'exame-style': form.standard.exame === 'false' }"
           >
             <el-radio-group
               v-model="form.standard.value"
@@ -218,7 +220,7 @@
           </el-form-item>
           <el-form-item
             label="声道格式"
-            :class="{ 'exame-style': form.channelFormat.exame==='false' }"
+            :class="{ 'exame-style': form.channelFormat.exame === 'false' }"
           >
             <el-radio-group
               v-model="form.channelFormat.value"
@@ -234,7 +236,7 @@
           </el-form-item>
           <el-form-item
             label="画面宽高比"
-            :class="{ 'exame-style': form.AspectRatio.exame==='false' }"
+            :class="{ 'exame-style': form.AspectRatio.exame === 'false' }"
           >
             <el-radio-group
               v-model="form.AspectRatio.value"
@@ -248,7 +250,7 @@
           </el-form-item>
           <el-form-item
             label="入点"
-            :class="{ 'exame-style': form.entryPoint.exame==='false' }"
+            :class="{ 'exame-style': form.entryPoint.exame === 'false' }"
           >
             <el-time-picker
               v-model="form.entryPoint.value"
@@ -263,7 +265,7 @@
           </el-form-item>
           <el-form-item
             label="时长"
-            :class="{ 'exame-style': form.duration.exame==='false' }"
+            :class="{ 'exame-style': form.duration.exame === 'false' }"
           >
             <el-time-picker
               v-model="form.duration.value"
@@ -278,7 +280,7 @@
           </el-form-item>
           <el-form-item
             label="资料获取方式"
-            :class="{ 'exame-style': form.AcquisitionMethod.exame==='false' }"
+            :class="{ 'exame-style': form.AcquisitionMethod.exame === 'false' }"
           >
             <el-input
               v-model="form.AcquisitionMethod.value"
@@ -290,7 +292,7 @@
           </el-form-item>
           <el-form-item
             label="资料提供者"
-            :class="{ 'exame-style': form.provider.exame==='false' }"
+            :class="{ 'exame-style': form.provider.exame === 'false' }"
           >
             <el-input
               v-model="form.provider.value"
@@ -345,7 +347,7 @@
     </div>
     <div class="onload">
       <el-button type="success" size="small" @click="uploadEdit()"
-        >上传保存</el-button
+        >上传</el-button
       >
       <el-button type="primary" size="small" @click="uploadExame()"
         >提交审核</el-button
@@ -577,19 +579,37 @@ export default {
     },
     // 上传至后端保存数据
     async uploadEdit() {
-      let uploadList = _.cloneDeep(this.catalogList);
-      delete uploadList[0].id;
-      delete uploadList[0].edit;
-      delete uploadList[0].state;
-      if (uploadList[0].children.length !== 0) {
-        for (let i in uploadList[0].children) {
-          delete uploadList[0].children[i].id;
-          delete uploadList[0].children[i].edit;
-          delete uploadList[0].children[i].state;
-        }
-      }
-      uploadList[0].taskName = this.taskName;
-      let res = await $api.updateCatalog(uploadList[0]);
+      this.$confirm("请再次确认编目内容是否已保存！", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let uploadList = _.cloneDeep(this.catalogList);
+          delete uploadList[0].id;
+          delete uploadList[0].edit;
+          delete uploadList[0].state;
+          if (uploadList[0].children.length !== 0) {
+            for (let i in uploadList[0].children) {
+              delete uploadList[0].children[i].id;
+              delete uploadList[0].children[i].edit;
+              delete uploadList[0].children[i].state;
+            }
+          }
+          uploadList[0].taskName = this.taskName;
+          try {
+            $api.updateCatalog(uploadList[0]);
+            this.$router.push("/edit/task");
+          } catch (e) {
+            this.$message(e);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消上传",
+          });
+        });
     },
     async uploadExame() {
       this.uploadEdit();

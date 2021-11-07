@@ -69,7 +69,7 @@
         <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-show="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="编辑项目"
@@ -85,7 +85,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0||loginType === 1"
+              v-show="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="删除项目"
@@ -118,14 +118,14 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0||loginType === 1"
+              v-show="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="保存修改"
               placement="left"
             >
               <el-button
-                v-show="scope.row.edit"
+                v-if="scope.row.edit"
                 size="small"
                 type="success"
                 icon="el-icon-check"
@@ -134,7 +134,7 @@
               ></el-button
             ></el-tooltip>
             <el-tooltip
-              v-if="loginType === 0||loginType === 1"
+              v-show="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="取消"

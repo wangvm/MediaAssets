@@ -1,5 +1,5 @@
 import axios from "axios"
-import { Message } from 'element-ui'
+// import { Message } from 'element-ui'
 // import { getUserToken } from "../config/storage"
 import { message } from '../assets/js/message'
 
@@ -50,7 +50,8 @@ export default function (url, data, method = 'GET') {
         : message.error(res.data.message)
       resolve(res.data)
     }).catch(err => {
-      Message.error(err.data.message)
+      // console.log(err);
+      // message.error(err.data.message)
       reject(err.data)
     })
   })

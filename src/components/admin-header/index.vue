@@ -13,7 +13,7 @@
 
 <script>
 import { mapMutations } from "vuex";
-import { removeAllSessionStorage } from "@/config/storage";
+// import { removeAllSessionStorage } from "@/config/storage";
 import $api from "@/network/api";
 
 export default {
@@ -40,6 +40,7 @@ export default {
         await $api
           .logout((res) => {
             console.log(res);
+            console.log("成功");
           })
           .catch((err) => {
             console.log(err);
