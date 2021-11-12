@@ -8,7 +8,7 @@
   >
     <el-button
       type="primary"
-      v-if="loginType === '0' || loginType === '1'"
+      v-if="loginType === 0 || loginType === 1"
       @click="newBuilt"
       >新建任务</el-button
     >
@@ -33,7 +33,7 @@
             </span>
             <div v-else>
               <span
-                v-if="loginType !== '0' || loginType !== '1'"
+                v-if="loginType !== 0 || loginType !== 1"
                 class="project-status"
                 :class="['project-status-' + scope.row.status]"
               >
@@ -102,7 +102,7 @@
         <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-tooltip
-              v-if="loginType === '0' || loginType === '1'"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="编辑任务"
@@ -118,7 +118,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === '0' || loginType === '1'"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="删除任务"
@@ -135,7 +135,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType !== '4'"
+              v-if="loginType !== 4"
               class="item"
               effect="light"
               content="进入任务"
@@ -151,7 +151,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === '0' || loginType === '1'"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="保存修改"
@@ -167,7 +167,7 @@
               ></el-button
             ></el-tooltip>
             <el-tooltip
-              v-if="loginType === '0' || loginType === '1'"
+              v-if="loginType === 0 || loginType === 1"
               class="item"
               effect="light"
               content="取消"
@@ -273,10 +273,10 @@ export default {
         if (res.code === 200) {
           this.setVideoSrc(res.data.position);
           this.getCatalogList(res.data);
-          if (this.loginType === '0' || this.loginType === '1') {
+          if (this.loginType === 0 || this.loginType === 1) {
             this.newTaskName = val.taskName;
             this.enterIn = true;
-          } else if (this.loginType === '2' || this.loginType === '4') {
+          } else if (this.loginType === 2 || this.loginType === 4) {
             this.$router.push({
               path: "/edit/check",
               //跳转路由时传递编目名称和edit状态true(审核)
@@ -288,7 +288,7 @@ export default {
             });
             this.setTaskName(val.taskName);
             this.setTitleStats(true);
-          } else if (this.loginType === '3') {
+          } else if (this.loginType === 3) {
             this.$router.push({
               path: "/edit/exame",
               //跳转路由时传递编目名称和edit状态true(审核)
