@@ -41,17 +41,11 @@ export default function (url, data, method = 'GET') {
       promise = instance.post(baseUrl + url, data)
     }
     promise.then(res => {
-      console.log(res);
-      // if (res.data.code !== 200) {
-      //   Message.error(res.data.message)
-      // }
       res.data.code === 200 ?
         message.success(res.data.message)
         : message.error(res.data.message)
       resolve(res.data)
     }).catch(err => {
-      // console.log(err);
-      // message.error(err.data.message)
       reject(err.data)
     })
   })
