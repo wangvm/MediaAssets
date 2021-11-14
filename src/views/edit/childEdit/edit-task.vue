@@ -8,7 +8,7 @@
   >
     <el-button
       type="primary"
-      v-if="loginType === 0 || loginType === 1"
+      v-if="isLoginTypeTrue"
       @click="newBuilt"
       >新建任务</el-button
     >
@@ -90,7 +90,7 @@
         <el-table-column label="操作" fixed="right" width="200">
           <template slot-scope="scope">
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-if="isLoginTypeTrue"
               class="item"
               effect="light"
               content="编辑任务"
@@ -106,7 +106,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-if="isLoginTypeTrue"
               class="item"
               effect="light"
               content="删除任务"
@@ -139,7 +139,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-if="isLoginTypeTrue"
               class="item"
               effect="light"
               content="保存修改"
@@ -155,7 +155,7 @@
               ></el-button
             ></el-tooltip>
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-if="isLoginTypeTrue"
               class="item"
               effect="light"
               content="取消"
@@ -173,8 +173,8 @@
           </template>
         </el-table-column>
       </el-table>
-      <edit-window v-show="this.createTask" @operation="operationClick" />
-      <edit-enter
+      <EditWindow v-show="this.createTask" @operation="operationClick" />
+      <EditEnter
         v-show="enterIn"
         :taskName="this.newTaskName"
         @enterIn="enterInClick"
@@ -211,6 +211,9 @@ export default {
   },
   computed: {
     ...mapState("common", ["taskList", "loginType"]),
+    isLoginTypeTrue(){
+      return [0,1].includes(this.loginType)
+    }
   },
   watch: {
     taskList: "updateTaskList",
@@ -290,7 +293,7 @@ export default {
             this.setTitleStats(true);
           }
           if (val.status === 1) {
-              await $api.updateTask(val.taskName, 2);
+            await $api.updateTask(val.taskName, 2);
             this.setTaskStatus(2);
           }
         }
@@ -304,7 +307,7 @@ export default {
     async saveEdit(index, row) {
       if (!/(^[1-9]\d*$)/.test(row.edit_cataloger)) {
         this.$message("请输入正确的审核员账号");
-      } else if (!/(^[1-9]\d*$)/.test(row.edit_auditor)) {
+      } else if (!/(^[1-9]\d*$)/.test(row.edit_cataloger)) {
         this.$message("请输入正确的编目员账号");
       } else {
         if (row.edit_status === "") {
@@ -322,7 +325,7 @@ export default {
         if (row.edit_catalogId === "") {
           row.edit_catalogId = row.catalogId;
         }
-         await $api.updateTask(
+        await $api.updateTask(
           row.taskName,
           row.edit_status,
           row.edit_cataloger,
@@ -351,7 +354,7 @@ export default {
     // 是否显示添加任务组件
     operationClick(val) {
       this.createTask = val;
-      if (val === false) {
+      if (!val) {
         this.initTaskList();
       }
     },
