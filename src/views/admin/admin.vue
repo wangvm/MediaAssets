@@ -45,16 +45,6 @@ export default {
   },
   methods: {
     ...mapMutations("common", ["updateLoginType", "updateCurrentMenu"]),
-    initUserToken() {
-      let loginType = getLoginType();
-      // if (!userToken) {
-      //   this.$message.error("登录超时，请重新登录");
-      //   this.$router.push("/");
-      // } else {
-      //   this.setToken(userToken);
-      //   this.updateLoginType(loginType);
-      // }
-    },
     getMenuList() {
       let loginType = this.loginType;
       let getMenu = [];

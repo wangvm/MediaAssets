@@ -302,7 +302,7 @@ export default {
             this.setTitleStats(true);
           }
           if (val.status === 1) {
-            let updateRes = await $api.updateTask(val.taskName, 2);
+              await $api.updateTask(val.taskName, 2);
             this.setTaskStatus(2);
           }
         }
@@ -334,7 +334,7 @@ export default {
         if (row.edit_catalogId === "") {
           row.edit_catalogId = row.catalogId;
         }
-        let resTask = await $api.updateTask(
+         await $api.updateTask(
           row.taskName,
           row.edit_status,
           row.edit_cataloger,

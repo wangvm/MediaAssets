@@ -423,7 +423,7 @@ export default {
   methods: {
     ...mapMutations("common", ["setscreenshotList", "setTaskStatus"]),
     // 点击查看详情
-    lookClick(row, column, event) {
+    lookClick(row) {
       if (this.editAndView === true) {
         this.$message("请结束修改再进行查看");
       } else {
