@@ -28,13 +28,6 @@
           @mouseover="videoEvent('mouseover')"
           @mouseout="videoEvent('mouseout')"
         ></video>
-        <video
-          v-show="false"
-          ref="playerPreview"
-          src="@/assets/video/test.mp4"
-          width="100%"
-          height="100%"
-        ></video>
       </div>
       <div class="video_btn">
         <!--     i：按钮封装       -->
