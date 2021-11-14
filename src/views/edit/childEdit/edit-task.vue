@@ -18,7 +18,9 @@
         <el-table-column prop="taskName" label="任务名称" width="200" />
         <el-table-column prop="createTime" label="创建时间" width="200">
           <template slot-scope="scope">
-            {{ dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm") }}
+            <span>{{
+              dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm")
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column prop="project" label="项目" width="200" />
@@ -63,7 +65,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="cataloger" label="审核员" width="200">
+        <el-table-column prop="auditor" label="审核员" width="200">
           <template slot-scope="scope">
             <span v-if="!scope.row.edit">{{ scope.row.auditor }}</span>
             <span v-else>
@@ -75,28 +77,14 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="cataloger" label="视频ID" width="200">
+        <el-table-column prop="videoId" label="视频ID" width="200">
           <template slot-scope="scope">
-            <span v-if="!scope.row.edit">{{ scope.row.videoId }}</span>
-            <span v-else>
-              <el-input
-                v-model="scope.row.edit_videoId"
-                placeholder="请输视频ID"
-                clearable
-              />
-            </span>
+            <span>{{ scope.row.videoId }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="cataloger" label="编目ID" width="200">
+        <el-table-column prop="catalogId" label="编目ID" width="200">
           <template slot-scope="scope">
-            <span v-if="!scope.row.edit">{{ scope.row.catalogId }}</span>
-            <span v-else>
-              <el-input
-                v-model="scope.row.edit_catalogId"
-                placeholder="编目ID"
-                clearable
-              />
-            </span>
+            <span>{{ scope.row.catalogId }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="200">
@@ -314,7 +302,7 @@ export default {
       row.edit = true;
     },
     async saveEdit(index, row) {
-      if (!/(^[1-9]\d*$)/.test(row.edit_auditor)) {
+      if (!/(^[1-9]\d*$)/.test(row.edit_cataloger)) {
         this.$message("请输入正确的审核员账号");
       } else if (!/(^[1-9]\d*$)/.test(row.edit_auditor)) {
         this.$message("请输入正确的编目员账号");
