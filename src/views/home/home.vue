@@ -143,7 +143,7 @@ export default {
       const params = { id, password };
       if (retNum.test(id)) {
         await this.userLogin(params);
-        if (this.loginType !== "") this.$router.push("/admin");
+        if (this.loginType) this.$router.push("/admin");
         this.initFormData();
       } else {
         this.$message.error("请输入正确格式的账号");
