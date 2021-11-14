@@ -100,14 +100,6 @@ export default {
       searchValue: "", //搜索康输入的值
       pageSize: 5, //默认每页显示多少条
       pageSizes: [5, 10, 15, 20], //每页显示多少条有哪些选项
-      select:
-        this.placeholder === "请输入用户名称"
-          ? 4
-          : this.placeholder === "请输入项目名称"
-          ? 7
-          : this.placeholder === "请输入编目名称"
-          ? 6
-          : 3,
       Project: [
         { value: 1, label: "项目名" },
         { value: 2, label: "项目类别" },
@@ -153,9 +145,19 @@ export default {
     },
     list: {
       type: Array,
-      default() {
-        return [];
-      },
+      default: () => [],
+    },
+  },
+  computed: {
+    select() {
+      // TODO 不应该通过placeholder来判断权限
+      return this.placeholder === "请输入用户名称"
+        ? 4
+        : this.placeholder === "请输入项目名称"
+        ? 7
+        : this.placeholder === "请输入编目名称"
+        ? 6
+        : 3;
     },
   },
   methods: {
