@@ -88,6 +88,6 @@ const $api = {
 
     // 获取视频文件列表
     getFileListAll: (pageSize, pageIndex) => request('/file/videoList', { pageSize, pageIndex }),
-    getFileListByName: (pageSize, pageIndex, fileName) => request('/file/videoList', { pageSize, pageIndex, fileName })
+    getFileListByName: (fileName) => request('/file/search', { fileName })
 }
 export default $api

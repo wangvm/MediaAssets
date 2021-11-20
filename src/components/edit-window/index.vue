@@ -22,25 +22,23 @@
               placeholder="请输入任务名"
               prefix-icon="el-icon-s-order"
             />
-            <el-upload
-              class="upload-demo"
-              action="http://121.196.100.229:8080/mam/file/videoUpload"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :on-success="handleSuccess"
-              :on-error="handleError"
-              :before-remove="beforeRemove"
-              :on-progress="handleProgress"
-              multiple
-              :limit="1"
-              :on-exceed="handleExceed"
-              :file-list="fileList"
+            <el-select
+              v-model="item.videoId"
+              :multiple="false"
+              :filterable="true"
+              :remote="true"
+              placeholder="请输入关键词"
+              :remote-method="remoteMethod"
+              :loading="loading"
             >
-              <el-button size="small" type="primary">点击上传</el-button>
-              <div slot="tip" class="el-upload__tip">
-                只能上传mp4文件，且不超过500M
-              </div>
-            </el-upload>
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
           </div>
         </template>
         <div class="add-item">
@@ -69,7 +67,6 @@
 </template>
 <script>
 import $api from "@/network/api";
-import { debounce } from "lodash-es";
 import { mapState } from "vuex";
 export default {
   name: "EditWindow",
@@ -77,6 +74,10 @@ export default {
     return {
       createList: [],
       catalogList: [],
+      // 选择videoid所需参数
+      options: [],
+      list: [],
+      loading: false,
     };
   },
   created() {
@@ -90,7 +91,15 @@ export default {
   },
   methods: {
     initTaskList() {
-      this.createList = [{ taskName: "", videoId: "", id: "", list: [] }];
+      this.createList = [
+        {
+          taskName: "",
+          videoId: "",
+          project: this.projectName,
+          id: "",
+          list: [],
+        },
+      ];
     },
     // 增加创建用户 +号按钮
     addItem() {
@@ -104,6 +113,7 @@ export default {
         this.createList.push({
           taskName: "",
           videoId: "",
+          project: this.projectName,
           id: "",
           list: [],
         });
@@ -130,8 +140,8 @@ export default {
         this.$message.error("注册信息为空");
         return;
       }
-      // let res = await $api.addTask(this.createList);
-      console.log(this.createList);
+      let res = await $api.addTask(this.createList);
+      console.log(res);
     }, 300),
     updateCatalog: _.debounce(async function () {
       for (let i in this.catalogList) {
@@ -183,48 +193,24 @@ export default {
       this.initTaskList();
       this.$emit("operation", false);
     },
-    // 上传成功时的钩子
-    handleSuccess(response, file) {
-      console.log(responce,file);
-      let index = 0;
-      let i = 0;
-      while (index !== 1) {
-        if (this.createList[i].videoId === "") {
-          this.createList[i].videoId = response.data.position;
-          this.createList[i].id = file.uid;
-          this.createList[i].list = response.data;
-          this.createList[i].list["taskName"] = this.createList[i].taskName;
-          index = 1;
-        }
-        i++;
+    async remoteMethod(query) {
+      if (query !== "") {
+        this.loading = true;
+        let res = await $api.getFileListByName(query);
+        console.log(res.data);
+        this.loading = false;
+        this.list = res.data.map((item) => {
+          return {
+            value: item.fileName,
+            label: item.fileName,
+          };
+        });
+        this.options = this.list.filter((item) => {
+          return item.label.toLowerCase().indexOf(query.toLowerCase()) > -1;
+        });
+      } else {
+        this.options = [];
       }
-    },
-    // 上传失败时的钩子
-    handleError(err, file, fileList) {
-      this.handleRemove(file, fileList);
-      this.$message("上传失败，请重新上传");
-    },
-    // 文件列表移除文件时的钩子
-    handleRemove(file) {
-      console.log(file);
-      for (let i in this.createList) {
-        if (this.createList[i].id === file.uid) {
-          this.createList[i].videoId = "";
-          this.createList[i].id = "";
-        }
-      }
-    },
-    // 文件超出个数限制时的钩子
-    handleExceed(files, fileList) {
-      this.$message.warning(
-        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${
-          files.length + fileList.length
-        } 个文件`
-      );
-    },
-    // 删除文件之前的钩子，参数为上传的文件和文件列表，若返回 false 或者返回 Promise 且被 reject，则停止删除。
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
     },
   },
 };

@@ -103,7 +103,7 @@ export default {
       if (content.state === "all" || content.searchValue === '') {
         res = await $api.getTaskAllList();
       } else if (content.state === "project") {
-        res = await $api.getTaskById(content.searchValue);
+        res = await $api.getTaskByProject(content.searchValue);
       } else if (content.state === "name") {
         res = await $api.getTaskByName(content.searchValue);
       } else if (content.state === "status") {
@@ -113,6 +113,7 @@ export default {
       } else if (content.state === "auditor") {
         res = await $api.getTaskByAuditor(content.searchValue);
       }
+      console.log(res);
       let taskList = []
       res.data.forEach((val, index) => {
         let options = {
@@ -156,14 +157,14 @@ export default {
     }
   },
 
-  // 获取反馈列表
+  // 获取文件列表
   async getFileList({ commit, state }, content) {
     try {
       let res;
       if (content.state === "all") {
         res = await $api.getFileListAll(content.pageSize, content.pageIndex);
       } else {
-        res = await $api.getFileListByName(content.pageSize, content.pageIndex, content.searchValue);
+        res = await $api.getFileListByName(content.searchValue);
       }
       let fileList = []
       res.data.forEach((val, index) => {
