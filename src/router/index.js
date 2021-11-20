@@ -34,6 +34,14 @@ const routes = [
 			{
 				path: '/admin/userCreate',
 				component: () => import('@/views/admin/childAdmin/admin-user-create'),
+			},
+			{
+				path: '/admin/fileList',
+				component: () => import('@/views/admin/childAdmin/admin-file-list'),
+			},
+			{
+				path: '/admin/fileCreate',
+				component: () => import('@/views/admin/childAdmin/admin-file-create'),
 			}
 		]
 	},

@@ -84,7 +84,10 @@ const $api = {
     // 关键帧截取接口
     getscreenshotList: (cutTime, taskName) => request('/catalog/cut', { cutTime, taskName }),
     // 管理员审核接口
-    setUploadExame:(taskName, status) => request('/catalog/audit', {taskName, status}),
+    setUploadExame: (taskName, status) => request('/catalog/audit', { taskName, status }),
 
+    // 获取视频文件列表
+    getFileListAll: (pageSize, pageIndex) => request('/file/videoList', { pageSize, pageIndex }),
+    getFileListByName: (pageSize, pageIndex, fileName) => request('/file/videoList', { pageSize, pageIndex, fileName })
 }
 export default $api

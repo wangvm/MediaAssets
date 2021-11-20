@@ -8,6 +8,7 @@ export default () => ({
   userList: [],
   taskList: [],
   feedbackList: [],
+  fileList: [],
   projectName: localStorage.getItem("projectName") !== "" ? localStorage.getItem("projectName") : "",
   taskName: localStorage.getItem("taskName") !== "" ? localStorage.getItem("taskName") : "",
   taskStatus: 2,

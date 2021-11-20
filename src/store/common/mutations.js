@@ -1,24 +1,27 @@
 export default {
   updateLoginType(state, val) {
-    state.loginType = val
+    state.loginType = val;
   },
   updateCurrentMenu(state, val) {
-    state.currentMenu = val
+    state.currentMenu = val;
   },
   setProjectList(state, val) {
-    state.projectList = val
+    state.projectList = val;
   },
   setUserList(state, val) {
-    state.userList = val
+    state.userList = val;
   },
   setTaskList(state, val) {
-    state.taskList = val
+    state.taskList = val;
   },
   setTaskStatus(state, val) {
     state.taskStatus = val;
   },
   setFeedbackList(state, val) {
-    state.feedbackList = val
+    state.feedbackList = val;
+  },
+  setFileList(state, val) {
+    state.fileList = val;
   },
   // 保存编目名以及任务名
   setProjectName(state, val) {

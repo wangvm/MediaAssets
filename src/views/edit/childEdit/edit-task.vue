@@ -210,7 +210,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("common", ["taskList", "loginType"]),
+    ...mapState("common", ["taskList", "loginType", "projectName"]),
   },
   watch: {
     taskList: "updateTaskList",
@@ -229,9 +229,10 @@ export default {
     //获取到信息
     initTaskList: debounce(async function () {
       let content = {
-        state: "all",
-        searchValue: "",
+        state: "project",
+        searchValue: this.projectName,
       };
+      console.log(content);
       this.loading = true; //开始缓冲
       await this.getTaskList(content);
       this.handleSizeChange(5);
@@ -290,7 +291,7 @@ export default {
             this.setTitleStats(true);
           }
           if (val.status === 1) {
-              await $api.updateTask(val.taskName, 2);
+            await $api.updateTask(val.taskName, 2);
             this.setTaskStatus(2);
           }
         }
@@ -322,7 +323,7 @@ export default {
         if (row.edit_catalogId === "") {
           row.edit_catalogId = row.catalogId;
         }
-         await $api.updateTask(
+        await $api.updateTask(
           row.taskName,
           row.edit_status,
           row.edit_cataloger,
@@ -361,6 +362,7 @@ export default {
     //新建编目任务
     newBuilt() {
       this.createTask = true;
+      console.log(this.projectName);
     },
   },
 };

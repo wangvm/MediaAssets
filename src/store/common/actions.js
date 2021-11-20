@@ -156,6 +156,28 @@ export default {
     }
   },
 
+  // 获取反馈列表
+  async getFileList({ commit, state }, content) {
+    try {
+      let res;
+      if (content.state === "all") {
+        res = await $api.getFileListAll(content.pageSize, content.pageIndex);
+      } else {
+        res = await $api.getFileListByName(content.pageSize, content.pageIndex, content.searchValue);
+      }
+      let fileList = []
+      res.data.forEach((val, index) => {
+        let options = {
+          "index": index + 1,
+        }
+        fileList.push({ ...val, ...options })
+      })
+      commit('setFileList', fileList)
+    } catch (e) {
+      this.$catch = e
+    }
+  },
+
   // 获取编目列表
   getCatalogList({ commit, state }, catalogList) {
     try {

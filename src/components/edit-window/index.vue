@@ -70,6 +70,7 @@
 <script>
 import $api from "@/network/api";
 import { debounce } from "lodash-es";
+import { mapState } from "vuex";
 export default {
   name: "EditWindow",
   data() {
@@ -83,6 +84,9 @@ export default {
   },
   watch: {
     catalogList: "updateCatalog",
+  },
+  computed: {
+    ...mapState("common", ["projectName"]),
   },
   methods: {
     initTaskList() {
@@ -126,40 +130,18 @@ export default {
         this.$message.error("注册信息为空");
         return;
       }
-      let repeatIndex = this.repeatItem(this.createList);
-      if (repeatIndex[0] !== repeatIndex[1])
-        return this.$message.error(
-          `任务${repeatIndex[0] + 1}与任务${repeatIndex[1] + 1}名子重复`
-        );
-      let taskList = this.filterItem(this.createList).map((val) => {
-        return {
-          taskName: val.taskName,
-          videoId: val.videoId,
-        };
-      });
-      let catalogList = this.filterItem(this.createList).map((val) => {
-        return {
-          list: val.list,
-        };
-      });
-      // this.catalogList = catalogList;
-      try {
-        let res = await $api.addTask(taskList);
-        if (res.code === 200) {
-          this.catalogList = catalogList;
-          this.$emit("operation", false);
-        }
-      } catch (e) {
-        this.$catch(e);
-        this.$emit("operation", false);
-      }
+      // let res = await $api.addTask(this.createList);
+      console.log(this.createList);
     }, 300),
     updateCatalog: _.debounce(async function () {
       for (let i in this.catalogList) {
         this.catalogList[i].list.title = { value: "默认数据", exame: true };
         this.catalogList[i].list.premiereDate = { value: "", exame: true };
         this.catalogList[i].list.programType = { value: "", exame: true };
-        this.catalogList[i].list.contentDescription = { value: "", exame: true };
+        this.catalogList[i].list.contentDescription = {
+          value: "",
+          exame: true,
+        };
         this.catalogList[i].list.subtitleForm = { value: "", exame: true };
         this.catalogList[i].list.groupMembers = { value: "", exame: true };
         this.catalogList[i].list.programForm = { value: "", exame: true };
@@ -203,6 +185,7 @@ export default {
     },
     // 上传成功时的钩子
     handleSuccess(response, file) {
+      console.log(responce,file);
       let index = 0;
       let i = 0;
       while (index !== 1) {
@@ -223,6 +206,7 @@ export default {
     },
     // 文件列表移除文件时的钩子
     handleRemove(file) {
+      console.log(file);
       for (let i in this.createList) {
         if (this.createList[i].id === file.uid) {
           this.createList[i].videoId = "";

@@ -67,6 +67,20 @@
               :key="item.value"
             ></el-option>
           </el-select>
+          <el-select
+            v-else-if="placeholder === '请输入文件名称'"
+            class="search-select"
+            v-model="select"
+            slot="prepend"
+            placeholder="请选择"
+          >
+            <el-option
+              :label="item.label"
+              :value="item.value"
+              v-for="item in file"
+              :key="item.value"
+            ></el-option>
+          </el-select>
         </el-input>
         <el-button type="mini" @click="searchClick">搜索</el-button>
       </div>
@@ -92,7 +106,7 @@
 <script>
 import { mapActions } from "vuex";
 export default {
-  name: "AdminLIst",
+  name: "AdminList",
   data() {
     return {
       currentPage: 1, //默认显示第几页
@@ -107,6 +121,8 @@ export default {
           ? 7
           : this.placeholder === "请输入编目名称"
           ? 6
+          : this.placeholder === "请输入文件名称"
+          ? 2
           : 3,
       Project: [
         { value: 1, label: "项目名" },
@@ -136,6 +152,10 @@ export default {
         { value: 2, label: "处理中" },
         { value: 3, label: "全部内容" },
       ],
+      file: [
+        { value: 1, label: "文件名称" },
+        { value: 2, label: "全部内容" },
+      ],
     };
   },
   props: {
@@ -164,6 +184,7 @@ export default {
       "getProjectList",
       "getTaskList",
       "getFeedbackList",
+      "getFileList",
     ]),
     //每页显示多少条
     handleSizeChange(val) {
@@ -202,6 +223,8 @@ export default {
       let content = {
         state: "",
         searchValue: "",
+        pageSize: 5,
+        pageIndex: 1,
       };
       if (this.placeholder === "请输入用户名称") {
         if (this.select === 1) {
@@ -287,6 +310,16 @@ export default {
         }
         content.searchValue = this.searchValue;
         await this.getFeedbackList(content);
+      } else if (this.placeholder === "请输入文件名称") {
+        if (this.select === 1) {
+          content.state = "fileName";
+        } else {
+          content.state = "all";
+        }
+        content.pageSize = this.pageSize;
+        content.pageIndex = this.page;
+        content.searchValue = this.searchValue;
+        await this.getFileList(content);
       }
     },
   },
