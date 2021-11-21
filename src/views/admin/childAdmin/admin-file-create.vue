@@ -47,7 +47,6 @@ export default {
     },
     // 文件列表移除文件时的钩子
     handleRemove(file) {
-      console.log(file);
       for (let i in this.createList) {
         if (this.createList[i].id === file.uid) {
           this.createList[i].videoId = "";

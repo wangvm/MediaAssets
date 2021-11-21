@@ -4,7 +4,6 @@ import $api from "@/network/api";
 export default {
   // 用户登录
   async userLogin({ commit, state }, params) {
-    // commit('setToken', '')
     try {
       const { id: id, password } = params
       let resLogin = await $api.login(id, password);
@@ -13,6 +12,7 @@ export default {
         let loginType = resLogin.data.authority;
         // setUserToken(token);
         // setLoginType(loginType);
+        console.log(loginType)
         commit('updateLoginType', loginType)
         localStorage.setItem('loginType', loginType);
         // commit('setToken', token)
@@ -56,7 +56,6 @@ export default {
         }
         projectList.push({ ...val, ...options })
       })
-      console.log(projectList);
       commit('setProjectList', projectList)
     } catch (e) {
       this.$catch = e
@@ -100,26 +99,22 @@ export default {
   async getTaskList({ commit, state }, content) {
     try {
       let res;
-      if (state.loginType === 2) {
-
-      } else if (state.loginType === 3) {
-
-      } else {
-        if (content.state === "all" || content.searchValue === '') {
-          res = await $api.getTaskAllList(state.projectName);
-        } else if (content.state === "project") {
-          res = await $api.getTaskByProject(content.searchValue);
-        } else if (content.state === "name") {
-          res = await $api.getTaskByName(state.projectName, content.searchValue);
-        } else if (content.state === "status") {
-          res = await $api.getTaskByStatus(state.projectName, content.searchValue);
-        } else if (content.state === "cataloger") {
-          res = await $api.getTaskByCataloger(state.projectName, content.searchValue);
-        } else if (content.state === "auditor") {
-          res = await $api.getTaskByAuditor(state.projectName, content.searchValue);
-        }
+      if (content.state === "all" || content.searchValue === '') {
+        res = await $api.getTaskAllList(state.projectName);
+      } else if (content.state === "project") {
+        delete content.state
+        console.log(content)
+        res = await $api.getTaskByProject(content);
+      } else if (content.state === "name") {
+        res = await $api.getTaskByName(state.projectName, content.searchValue);
+      } else if (content.state === "status") {
+        res = await $api.getTaskByStatus(state.projectName, content.searchValue);
+      } else if (content.state === "cataloger") {
+        res = await $api.getTaskByCataloger(state.projectName, content.searchValue);
+      } else if (content.state === "auditor") {
+        res = await $api.getTaskByAuditor(state.projectName, content.searchValue);
       }
-      console.log(res);
+      console.log(res)
       let taskList = []
       res.data.forEach((val, index) => {
         let options = {

@@ -60,7 +60,7 @@ const $api = {
     // 根据任务名查询
     getTaskByName: (project, name) => request('/task/search', { project, name }),
     // 根据任务名查询
-    getTaskByProject: (project) => request('/task/search', { project }),
+    getTaskByProject: (project) => request('/task/search', project),
     // 根据任务名查询
     getTaskByStatus: (project, status) => request('/task/search', { project, status }),
     // 根据任务名查询

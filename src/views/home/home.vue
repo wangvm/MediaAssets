@@ -4,7 +4,10 @@
     <el-main class="home-main">
       <div class="home-container">
         <div class="login-type">
-          <div class="type-login type-common" @click="changeLoginStatus('login')">
+          <div
+            class="type-login type-common"
+            @click="changeLoginStatus('login')"
+          >
             <el-button type="primary" class="type-common">登录</el-button>
           </div>
           <div
@@ -143,6 +146,7 @@ export default {
       const params = { id, password };
       if (retNum.test(id)) {
         await this.userLogin(params);
+        sessionStorage.setItem("uid", id);
         if (this.loginType) this.$router.push("/admin");
         this.initFormData();
       } else {

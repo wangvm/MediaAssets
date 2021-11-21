@@ -1,4 +1,7 @@
 export default {
+  setUid(state, val) {
+    state.uid = val
+  },
   updateLoginType(state, val) {
     state.loginType = val;
   },

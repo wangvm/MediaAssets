@@ -6,25 +6,22 @@
     title="编目列表"
     placeholder="请输入编目名称"
   >
-    <el-button
-      type="primary"
-      v-if="isLoginTypeTrue"
-      @click="newBuilt"
+    <el-button type="primary" v-if="isLoginTypeTrue" @click="newBuilt"
       >新建任务</el-button
     >
     <div class="content_table">
       <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
-        <el-table-column prop="index" label="序号" fixed="left" width="100" />
-        <el-table-column prop="taskName" label="任务名称" width="200" />
-        <el-table-column prop="createTime" label="创建时间" width="200">
+        <el-table-column prop="index" label="序号" fixed="left" />
+        <el-table-column prop="taskName" label="任务名称" />
+        <el-table-column prop="createTime" label="创建时间">
           <template slot-scope="scope">
             <span>{{
               dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm")
             }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="project" label="项目" width="200" />
-        <el-table-column prop="status" label="进度" width="200">
+        <el-table-column prop="project" label="项目" />
+        <el-table-column prop="status" label="进度">
           <template slot-scope="scope">
             <span
               v-if="!scope.row.edit"
@@ -53,7 +50,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="cataloger" label="编目员" width="200">
+        <el-table-column prop="cataloger" label="编目员">
           <template slot-scope="scope">
             <span v-if="!scope.row.edit">{{ scope.row.cataloger }}</span>
             <span v-else>
@@ -65,7 +62,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="auditor" label="审核员" width="200">
+        <el-table-column prop="auditor" label="审核员">
           <template slot-scope="scope">
             <span v-if="!scope.row.edit">{{ scope.row.auditor }}</span>
             <span v-else>
@@ -77,17 +74,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="videoId" label="视频ID" width="200">
-          <template slot-scope="scope">
-            <span>{{ scope.row.videoId }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="catalogId" label="编目ID" width="200">
-          <template slot-scope="scope">
-            <span>{{ scope.row.catalogId }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" fixed="right" width="200">
+        <el-table-column label="操作" fixed="right">
           <template slot-scope="scope">
             <el-tooltip
               v-if="isLoginTypeTrue"
@@ -173,7 +160,11 @@
           </template>
         </el-table-column>
       </el-table>
-      <EditWindow v-show="this.createTask" @operation="operationClick" />
+      <EditWindow
+        v-show="this.createTask"
+        @operation="operationClick"
+        @change="createTask = false"
+      />
       <EditEnter
         v-show="enterIn"
         :taskName="this.newTaskName"
@@ -188,7 +179,7 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import { debounce } from "lodash";
 import AdminList from "@/components/admin-list";
 import $api from "@/network/api";
-import { taskStatus } from "@/constants/common";
+import { taskStatus, userType } from "@/constants/common";
 import EditWindow from "@/components/edit-window";
 import EditEnter from "@/components/edit-enter";
 
@@ -211,9 +202,9 @@ export default {
   },
   computed: {
     ...mapState("common", ["taskList", "loginType"]),
-    isLoginTypeTrue(){
-      return [0,1].includes(this.loginType)
-    }
+    isLoginTypeTrue() {
+      return [0, 1].includes(this.loginType);
+    },
   },
   watch: {
     taskList: "updateTaskList",
@@ -231,12 +222,18 @@ export default {
     ]),
     //获取到信息
     initTaskList: debounce(async function () {
+      console.log(sessionStorage.getItem("uid"));
+      console.log(this.loginType);
+      console.log(userType[this.loginType].role);
       let content = {
         state: "project",
-        searchValue: this.projectName,
+        project: this.$route.query.projectName,
       };
-      console.log(content);
+      if (![0, 1].includes(this.loginType)) {
+        content[userType[this.loginType].role] = sessionStorage.getItem("uid");
+      }
       this.loading = true; //开始缓冲
+      console.log(content);
       await this.getTaskList(content);
       this.handleSizeChange(5);
       this.loading = false; //结束缓冲
@@ -365,7 +362,6 @@ export default {
     //新建编目任务
     newBuilt() {
       this.createTask = true;
-      console.log(this.projectName);
     },
   },
 };

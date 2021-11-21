@@ -8,10 +8,9 @@
   >
     <div class="content_table">
       <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
-        <el-table-column prop="index" label="序号" fixed="left" width="100" />
-        <el-table-column prop="projectName" label="项目名称" width="200">
-        </el-table-column>
-        <el-table-column prop="leaderId" label="组长账号" width="200">
+        <el-table-column prop="index" label="序号" fixed="left" />
+        <el-table-column prop="projectName" label="项目名称"> </el-table-column>
+        <el-table-column prop="leaderId" label="组长账号">
           <template slot-scope="scope">
             <span v-if="!scope.row.edit">
               {{ scope.row.leaderId }}
@@ -25,26 +24,12 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="200">
+        <el-table-column prop="createTime" label="创建时间">
           <template slot-scope="scope">
             {{ dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm") }}
           </template>
         </el-table-column>
-        <el-table-column prop="category" label="类别" width="200">
-          <template slot-scope="scope">
-            <span v-if="!scope.row.edit">
-              {{ scope.row.category }}
-            </span>
-            <span v-else>
-              <el-input
-                v-model="scope.row.edit_category"
-                placeholder="请输类别"
-                clearable
-              />
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="进度" width="200">
+        <el-table-column prop="status" label="进度">
           <template slot-scope="scope">
             <span
               v-if="!scope.row.edit"
@@ -66,7 +51,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" fixed="right" width="200">
+        <el-table-column label="操作" fixed="right">
           <template slot-scope="scope">
             <el-tooltip
               v-show="loginType === 0 || loginType === 1"
@@ -242,13 +227,10 @@ export default {
       if (row.edit_leaderId === "") {
         row.edit_leaderId = row.leaderId;
       }
-      if (row.edit_category === "") {
-        row.edit_category = row.category;
-      }
       if (row.edit_status === "") {
         row.edit_status = row.status;
       }
-      let resProject = await $api.updateProject(
+      await $api.updateProject(
         row.projectName,
         row.edit_leaderId,
         row.edit_category,

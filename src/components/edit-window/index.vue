@@ -27,7 +27,7 @@
               :multiple="false"
               :filterable="true"
               :remote="true"
-              placeholder="请输入关键词"
+              placeholder="请输入视频名称"
               :remote-method="remoteMethod"
               :loading="loading"
             >
@@ -57,10 +57,10 @@
         </div>
       </div>
       <div class="table-operation">
-        <el-button type="primary" @click="createTask()" size="small" plain
+        <el-button type="primary" @click="createTask" size="small" plain
           >确认</el-button
         >
-        <el-button size="small" @click="noEnterClick()" plain>取消</el-button>
+        <el-button size="small" @click="noEnterClick" plain>取消</el-button>
       </div>
     </el-card>
   </div>
@@ -68,6 +68,8 @@
 <script>
 import $api from "@/network/api";
 import { mapState } from "vuex";
+import { debounce } from "lodash-es";
+
 export default {
   name: "EditWindow",
   data() {
@@ -131,7 +133,7 @@ export default {
     },
 
     // 创建任务
-    createTask: _.debounce(async function () {
+    createTask: debounce(async function () {
       if (
         this.createList.length === 1 &&
         (this.createList[0].taskName === "" ||
@@ -140,10 +142,14 @@ export default {
         this.$message.error("注册信息为空");
         return;
       }
-      let res = await $api.addTask(this.createList);
-      console.log(res);
+      try {
+        await $api.addTask(this.createList);
+        this.$emit("success");
+      } catch (err) {
+        this.$message.error(err);
+      }
     }, 300),
-    updateCatalog: _.debounce(async function () {
+    updateCatalog: debounce(async function () {
       for (let i in this.catalogList) {
         this.catalogList[i].list.title = { value: "默认数据", exame: true };
         this.catalogList[i].list.premiereDate = { value: "", exame: true };
@@ -246,7 +252,7 @@ export default {
     }
     .table-content {
       display: flex;
-      justify-content: space-around;
+      justify-content: flex-start;
       align-items: center;
       flex-direction: column;
       overflow-y: scroll;
