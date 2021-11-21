@@ -22,25 +22,23 @@
               placeholder="请输入任务名"
               prefix-icon="el-icon-s-order"
             />
-            <el-upload
-              class="upload-demo"
-              action="http://121.196.100.229:8080/mam/file/videoUpload"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :on-success="handleSuccess"
-              :on-error="handleError"
-              :before-remove="beforeRemove"
-              :on-progress="handleProgress"
-              multiple
-              :limit="1"
-              :on-exceed="handleExceed"
-              :file-list="fileList"
+            <el-select
+              v-model="item.videoId"
+              :multiple="false"
+              :filterable="true"
+              :remote="true"
+              placeholder="请输入视频名称"
+              :remote-method="remoteMethod"
+              :loading="loading"
             >
-              <el-button size="small" type="primary">点击上传</el-button>
-              <div slot="tip" class="el-upload__tip">
-                只能上传mp4文件，且不超过500M
-              </div>
-            </el-upload>
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
           </div>
         </template>
         <div class="add-item">
@@ -59,23 +57,29 @@
         </div>
       </div>
       <div class="table-operation">
-        <el-button type="primary" @click="createTask()" size="small" plain
+        <el-button type="primary" @click="createTask" size="small" plain
           >确认</el-button
         >
-        <el-button size="small" @click="noEnterClick()" plain>取消</el-button>
+        <el-button size="small" @click="noEnterClick" plain>取消</el-button>
       </div>
     </el-card>
   </div>
 </template>
 <script>
 import $api from "@/network/api";
+import { mapState } from "vuex";
 import { debounce } from "lodash-es";
+
 export default {
   name: "EditWindow",
   data() {
     return {
       createList: [],
       catalogList: [],
+      // 选择videoid所需参数
+      options: [],
+      list: [],
+      loading: false,
     };
   },
   created() {
@@ -84,9 +88,20 @@ export default {
   watch: {
     catalogList: "updateCatalog",
   },
+  computed: {
+    ...mapState("common", ["projectName"]),
+  },
   methods: {
     initTaskList() {
-      this.createList = [{ taskName: "", videoId: "", id: "", list: [] }];
+      this.createList = [
+        {
+          taskName: "",
+          videoId: "",
+          project: this.projectName,
+          id: "",
+          list: [],
+        },
+      ];
     },
     // 增加创建用户 +号按钮
     addItem() {
@@ -100,6 +115,7 @@ export default {
         this.createList.push({
           taskName: "",
           videoId: "",
+          project: this.projectName,
           id: "",
           list: [],
         });
@@ -117,7 +133,7 @@ export default {
     },
 
     // 创建任务
-    createTask: _.debounce(async function () {
+    createTask: debounce(async function () {
       if (
         this.createList.length === 1 &&
         (this.createList[0].taskName === "" ||
@@ -126,40 +142,22 @@ export default {
         this.$message.error("注册信息为空");
         return;
       }
-      let repeatIndex = this.repeatItem(this.createList);
-      if (repeatIndex[0] !== repeatIndex[1])
-        return this.$message.error(
-          `任务${repeatIndex[0] + 1}与任务${repeatIndex[1] + 1}名子重复`
-        );
-      let taskList = this.filterItem(this.createList).map((val) => {
-        return {
-          taskName: val.taskName,
-          videoId: val.videoId,
-        };
-      });
-      let catalogList = this.filterItem(this.createList).map((val) => {
-        return {
-          list: val.list,
-        };
-      });
-      // this.catalogList = catalogList;
       try {
-        let res = await $api.addTask(taskList);
-        if (res.code === 200) {
-          this.catalogList = catalogList;
-          this.$emit("operation", false);
-        }
-      } catch (e) {
-        this.$catch(e);
-        this.$emit("operation", false);
+        await $api.addTask(this.createList);
+        this.$emit("success");
+      } catch (err) {
+        this.$message.error(err);
       }
     }, 300),
-    updateCatalog: _.debounce(async function () {
+    updateCatalog: debounce(async function () {
       for (let i in this.catalogList) {
         this.catalogList[i].list.title = { value: "默认数据", exame: true };
         this.catalogList[i].list.premiereDate = { value: "", exame: true };
         this.catalogList[i].list.programType = { value: "", exame: true };
-        this.catalogList[i].list.contentDescription = { value: "", exame: true };
+        this.catalogList[i].list.contentDescription = {
+          value: "",
+          exame: true,
+        };
         this.catalogList[i].list.subtitleForm = { value: "", exame: true };
         this.catalogList[i].list.groupMembers = { value: "", exame: true };
         this.catalogList[i].list.programForm = { value: "", exame: true };
@@ -201,46 +199,23 @@ export default {
       this.initTaskList();
       this.$emit("operation", false);
     },
-    // 上传成功时的钩子
-    handleSuccess(response, file) {
-      let index = 0;
-      let i = 0;
-      while (index !== 1) {
-        if (this.createList[i].videoId === "") {
-          this.createList[i].videoId = response.data.position;
-          this.createList[i].id = file.uid;
-          this.createList[i].list = response.data;
-          this.createList[i].list["taskName"] = this.createList[i].taskName;
-          index = 1;
-        }
-        i++;
+    async remoteMethod(query) {
+      if (query !== "") {
+        this.loading = true;
+        let res = await $api.getFileListByName(query);
+        this.loading = false;
+        this.list = res.data.map((item) => {
+          return {
+            value: item.fileName,
+            label: item.fileName,
+          };
+        });
+        this.options = this.list.filter((item) => {
+          return item.label.toLowerCase().indexOf(query.toLowerCase()) > -1;
+        });
+      } else {
+        this.options = [];
       }
-    },
-    // 上传失败时的钩子
-    handleError(err, file, fileList) {
-      this.handleRemove(file, fileList);
-      this.$message("上传失败，请重新上传");
-    },
-    // 文件列表移除文件时的钩子
-    handleRemove(file) {
-      for (let i in this.createList) {
-        if (this.createList[i].id === file.uid) {
-          this.createList[i].videoId = "";
-          this.createList[i].id = "";
-        }
-      }
-    },
-    // 文件超出个数限制时的钩子
-    handleExceed(files, fileList) {
-      this.$message.warning(
-        `当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${
-          files.length + fileList.length
-        } 个文件`
-      );
-    },
-    // 删除文件之前的钩子，参数为上传的文件和文件列表，若返回 false 或者返回 Promise 且被 reject，则停止删除。
-    beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
     },
   },
 };
@@ -277,7 +252,7 @@ export default {
     }
     .table-content {
       display: flex;
-      justify-content: space-around;
+      justify-content: flex-start;
       align-items: center;
       flex-direction: column;
       overflow-y: scroll;

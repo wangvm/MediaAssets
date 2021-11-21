@@ -4,7 +4,6 @@ import $api from "@/network/api";
 export default {
   // 用户登录
   async userLogin({ commit, state }, params) {
-    // commit('setToken', '')
     try {
       const { id: id, password } = params
       let resLogin = await $api.login(id, password);
@@ -13,6 +12,7 @@ export default {
         let loginType = resLogin.data.authority;
         // setUserToken(token);
         // setLoginType(loginType);
+        console.log(loginType)
         commit('updateLoginType', loginType)
         localStorage.setItem('loginType', loginType);
         // commit('setToken', token)
@@ -99,20 +99,22 @@ export default {
   async getTaskList({ commit, state }, content) {
     try {
       let res;
-      // let res = await $api.getUserList();
       if (content.state === "all" || content.searchValue === '') {
-        res = await $api.getTaskAllList();
+        res = await $api.getTaskAllList(state.projectName);
       } else if (content.state === "project") {
-        res = await $api.getTaskById(content.searchValue);
+        delete content.state
+        console.log(content)
+        res = await $api.getTaskByProject(content);
       } else if (content.state === "name") {
-        res = await $api.getTaskByName(content.searchValue);
+        res = await $api.getTaskByName(state.projectName, content.searchValue);
       } else if (content.state === "status") {
-        res = await $api.getTaskByStatus(content.searchValue);
+        res = await $api.getTaskByStatus(state.projectName, content.searchValue);
       } else if (content.state === "cataloger") {
-        res = await $api.getTaskByCataloger(content.searchValue);
+        res = await $api.getTaskByCataloger(state.projectName, content.searchValue);
       } else if (content.state === "auditor") {
-        res = await $api.getTaskByAuditor(content.searchValue);
+        res = await $api.getTaskByAuditor(state.projectName, content.searchValue);
       }
+      console.log(res)
       let taskList = []
       res.data.forEach((val, index) => {
         let options = {
@@ -151,6 +153,28 @@ export default {
         feedbackList.push({ ...val, ...options })
       })
       commit('setFeedbackList', feedbackList)
+    } catch (e) {
+      this.$catch = e
+    }
+  },
+
+  // 获取文件列表
+  async getFileList({ commit, state }, content) {
+    try {
+      let res;
+      if (content.state === "all") {
+        res = await $api.getFileListAll(content.pageSize, content.pageIndex);
+      } else {
+        res = await $api.getFileListByName(content.searchValue);
+      }
+      let fileList = []
+      res.data.forEach((val, index) => {
+        let options = {
+          "index": index + 1,
+        }
+        fileList.push({ ...val, ...options })
+      })
+      commit('setFileList', fileList)
     } catch (e) {
       this.$catch = e
     }

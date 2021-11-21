@@ -61,6 +61,9 @@ export default {
           { name: "用户管理", value: "20" },
           { name: "用户列表", value: "21" },
           { name: "创建用户", value: "22" },
+          { name: "文件管理", value: "30" },
+          { name: "文件列表", value: "31" },
+          { name: "文件上传", value: "32" },
         ];
       } else if (loginType.toString() === userType["4"].key.toString()) {
         getMenu = [{ name: "主页", value: "00" }];

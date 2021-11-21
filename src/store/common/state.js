@@ -1,6 +1,7 @@
 export default () => ({
   // 首页部分
   loginType: localStorage.getItem("loginType") * 1 ?? "",
+  uid: '',
   currentMenu: '',
   // token: '',
   // 管理部分
@@ -8,6 +9,7 @@ export default () => ({
   userList: [],
   taskList: [],
   feedbackList: [],
+  fileList: [],
   projectName: localStorage.getItem("projectName") !== "" ? localStorage.getItem("projectName") : "",
   taskName: localStorage.getItem("taskName") !== "" ? localStorage.getItem("taskName") : "",
   taskStatus: 2,

@@ -198,7 +198,6 @@ export default {
       this.ifUploadLoading = false;
     },
     success(response, file, fileList) {
-      console.log(response, file, fileList);
       fileList = [];
       if (response.code === 200) {
         this.$message({
@@ -211,7 +210,6 @@ export default {
       }
     },
     error(err, file, fileList) {
-      console.log(err, file, fileList);
       fileList = [];
       this.$message(err.message);
     },

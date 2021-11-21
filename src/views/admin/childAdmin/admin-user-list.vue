@@ -166,25 +166,6 @@ export default {
       this.handleSizeChange(5);
       this.loading = false; //结束缓冲
     },
-    // //添加(属性)信息项
-    // addAttr(list) {
-    //   console.log(111);
-    //   this.loading = true;
-    //   let resUserList = [];
-    //   list.map((val, index) => {
-    //     val["edit"] = false;
-    //     val["index"] = index + 1;
-    //     val["edit_username"] = "";
-    //     val["edit_oldpassword"] = "";
-    //     val["edit_newpassword"] = "";
-    //     val["edit_password"] = "";
-    //     val["edit_authority"] = "";
-    //     resUserList.push(val);
-    //   });
-    //   this.userList = resUserList;
-    //   console.log(this.userList);
-    //   this.loading = false; //结束缓冲
-    // },
     //每页显示多少条
     handleSizeChange(val) {
       let show = [];
@@ -198,8 +179,6 @@ export default {
     //编辑任务
     EditUser(row) {
       row.edit = true;
-      // let name = row.username;
-      // row.edit_username = name;
     },
     //删除任务
     async deleteUser(currentUser) {
@@ -226,7 +205,7 @@ export default {
         }
       }
       if (
-        row.edit_newpassword !== undefined &&
+        row.edit_oldpassword !== undefined &&
         row.edit_newpassword !== undefined
       ) {
         try {

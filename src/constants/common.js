@@ -3,26 +3,31 @@ const userType = {
   0: {
     key: 0,
     label: '总管理员',
+    role: 'root'
   },
   /** 创建任务 */
   1: {
     key: 1,
     label: '管理员',
+    role: 'manager'
   },
   /** 编目 */
   2: {
     key: 2,
     label: '编目',
+    role: 'cataloger'
   },
   /** 审核 */
   3: {
     key: 3,
     label: '审核',
+    role: 'auditor',
   },
   /** 未设置权限 */
   4: {
     key: 4,
-    label: '未设置权限'
+    label: '未设置权限',
+    role: 'none'
   }
 }
 
