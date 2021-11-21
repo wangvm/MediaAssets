@@ -197,7 +197,6 @@ export default {
       if (query !== "") {
         this.loading = true;
         let res = await $api.getFileListByName(query);
-        console.log(res.data);
         this.loading = false;
         this.list = res.data.map((item) => {
           return {

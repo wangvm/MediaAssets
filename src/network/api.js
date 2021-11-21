@@ -18,7 +18,7 @@ const $api = {
     // 更改用户权限
     updateAuthority: (id, authority) => request('/user/update/authority', { id, authority }, 'POST'),//ok
     // 根据id获取用户
-    getUserById: (uid) => request('/user/search', { uid }),//ok
+    getUserById: (id) => request('/user/search', { id }),//ok
     // 根据用户名获取用户
     getUserByName: (name) => request('/user/search', { name }),//ok
     // 根据用户权限获取用户
@@ -29,7 +29,7 @@ const $api = {
     //获取项目列表
     getProjectList: () => request('/project/search'),//ok
     // 创建项目
-    createProject: (projectName) => request('/project/add/project', { projectName }, 'POST'),//ok
+    createProject: (projectName, leaderId) => request('/project/add/project', { projectName, leaderId }, 'POST'),//ok
     //删除项目
     deleteProject: (projectName) => request('/project/delete', { projectName }, 'POST'),//ok
     // 更改项目
@@ -56,17 +56,17 @@ const $api = {
     // 更改任务
     updateTask: (taskName, status, cataloger, auditor, videoId, catalogId) => request('/task/update', { taskName, status, cataloger, auditor, videoId, catalogId }, 'POST'),
     // 任务查询
-    getTaskAllList: () => request('/task/search'),
+    getTaskAllList: (project) => request('/task/search', { project }),
     // 根据任务名查询
-    getTaskByName: (name) => request('/task/search', { name }),
+    getTaskByName: (project, name) => request('/task/search', { project, name }),
     // 根据任务名查询
     getTaskByProject: (project) => request('/task/search', { project }),
     // 根据任务名查询
-    getTaskByStatus: (status) => request('/task/search', { status }),
+    getTaskByStatus: (project, status) => request('/task/search', { project, status }),
     // 根据任务名查询
-    getTaskByCatalog: (cataloger) => request('/task/search', { cataloger }),
+    getTaskByCatalog: (project, cataloger) => request('/task/search', { project, cataloger }),
     // 根据任务名查询
-    getTaskByAuditor: (auditor) => request('/task/search', { auditor }),
+    getTaskByAuditor: (project, auditor) => request('/task/search', { project, auditor }),
 
     // 添加反馈
     AddFeedback: (title, details) => request('/feedback', { title, details }, 'POST'),
