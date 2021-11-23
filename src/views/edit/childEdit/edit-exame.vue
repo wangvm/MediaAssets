@@ -405,10 +405,8 @@
       </el-card>
     </div>
     <div class="onload">
-      <el-button type="warning" size="small" @click="repulse()">打回</el-button>
-      <el-button type="success" size="small" @click="complete()"
-        >通过</el-button
-      >
+      <el-button type="warning" size="small" @click="repulse">打回</el-button>
+      <el-button type="success" size="small" @click="complete">通过</el-button>
     </div>
   </div>
 </template>
@@ -418,7 +416,7 @@
  * 目前处于点击左侧显示右侧对应信息
  * */
 import videoPlayer from "@/components/video-player/video-player";
-import { mapState, mapMutations } from "vuex";
+import { mapState } from "vuex";
 import $api from "@/network/api";
 
 export default {
@@ -476,8 +474,8 @@ export default {
   },
   methods: {
     // 点击查看详情
-    lookClick(row, column, event) {
-      if (this.editAndView === true) {
+    lookClick(row) {
+      if (this.editAndView) {
         this.$message("请结束修改再进行查看");
       } else {
         this.form = row;
@@ -485,58 +483,22 @@ export default {
     },
     // 保存更改
     saveClick() {
+      // 节目
       if (this.state === "节目") {
-        this.catalogList[0].title = this.form.title;
-        this.catalogList[0].premiereDate = this.form.premiereDate;
-        this.catalogList[0].programType = this.form.programType;
-        this.catalogList[0].contentDescription = this.form.contentDescription;
-        this.catalogList[0].subtitleForm = this.form.subtitleForm;
-        this.catalogList[0].taskName = this.form.taskName;
-        this.catalogList[0].groupMembers = this.form.groupMembers;
-        this.catalogList[0].programForm = this.form.programForm;
-        this.catalogList[0].column = this.form.column;
-        this.catalogList[0].color = this.form.color;
-        this.catalogList[0].standard = this.form.standard;
-        this.catalogList[0].channelFormat = this.form.channelFormat;
-        this.catalogList[0].AspectRatio = this.form.AspectRatio;
-        this.catalogList[0].entryPoint = this.form.entryPoint;
-        this.catalogList[0].duration = this.form.duration;
-        this.catalogList[0].AcquisitionMethod = this.form.AcquisitionMethod;
-        this.catalogList[0].provider = this.form.provider;
-        this.catalogList[0].edit = false;
-        // // this.state = "节目";
-        this.catalogList[0].imageList = this.form.imageList;
+        this.catalogList[0] = {
+          ...this.form,
+          edit: false,
+        };
       } else {
-        for (let i in this.catalogList[0].children) {
-          if (this.count === this.catalogList[0].children[i].id) {
-            // this.state = "片段";
-            this.catalogList[0].children[i].title = this.form.title;
-            this.catalogList[0].children[i].premiereDate =
-              this.form.premiereDate;
-            this.catalogList[0].children[i].programType = this.form.programType;
-            this.catalogList[0].children[i].contentDescription =
-              this.form.contentDescription;
-            this.catalogList[0].children[i].subtitleForm =
-              this.form.subtitleForm;
-            this.catalogList[0].children[i].taskName = this.form.taskName;
-            this.catalogList[0].children[i].groupMembers =
-              this.form.groupMembers;
-            this.catalogList[0].children[i].programForm = this.form.programForm;
-            this.catalogList[0].children[i].column = this.form.column;
-            this.catalogList[0].children[i].color = this.form.color;
-            this.catalogList[0].children[i].standard = this.form.standard;
-            this.catalogList[0].children[i].channelFormat =
-              this.form.channelFormat;
-            this.catalogList[0].children[i].AspectRatio = this.form.AspectRatio;
-            this.catalogList[0].children[i].entryPoint = this.form.entryPoint;
-            this.catalogList[0].children[i].duration = this.form.duration;
-            this.catalogList[0].children[i].AcquisitionMethod =
-              this.form.AcquisitionMethod;
-            this.catalogList[0].children[i].provider = this.form.provider;
-            this.catalogList[0].children[i].edit = false;
-            this.catalogList[0].children[i].imageList = this.form.imageList;
+        // 片段
+        this.catalogList[0].children.forEach((item, index) => {
+          if (this.count === this.catalogList[0].children[index].id) {
+            this.catalogList[0].children[index] = {
+              ...this.form,
+              edit: false,
+            };
           }
-        }
+        });
       }
       this.count = null;
       this.editAndView = false;
@@ -546,11 +508,11 @@ export default {
       if (this.state === "节目") {
         this.catalogList[0].edit = false;
       } else {
-        for (let i in this.catalogList[0].children) {
-          if (this.count === this.catalogList[0].children[i].id) {
-            this.catalogList[0].children[i].edit = false;
+        this.catalogList[0].children.forEach((item, index) => {
+          if (this.count === this.catalogList[0].children[index].id) {
+            this.catalogList[0].children[index].edit = false;
           }
-        }
+        });
       }
       this.count = null;
       this.editAndView = false;
@@ -558,12 +520,12 @@ export default {
     },
     // 编辑内容
     editItem(row) {
-      if (this.isEdit === false) {
+      if (!this.isEdit) {
         this.isEdit = true;
         row.edit = true;
         this.count = row.id;
         this.form = _.cloneDeep(row);
-        this.state = row.state === "节目" ? "节目" : "片段";
+        this.state = row.state;
         this.editAndView = true;
       } else {
         this.$message("请保存或取消上一编辑内容");
@@ -576,11 +538,11 @@ export default {
       delete uploadList[0].edit;
       delete uploadList[0].state;
       if (uploadList[0].children.length !== 0) {
-        for (let i in uploadList[0].children) {
-          delete uploadList[0].children[i].id;
-          delete uploadList[0].children[i].edit;
-          delete uploadList[0].children[i].state;
-        }
+        uploadList[0].children.forEach((item, index) => {
+          delete uploadList[0].children[index].id;
+          delete uploadList[0].children[index].edit;
+          delete uploadList[0].children[index].state;
+        });
       }
       uploadList[0].taskName = this.taskName;
     },

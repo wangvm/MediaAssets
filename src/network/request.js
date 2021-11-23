@@ -3,8 +3,8 @@ import axios from "axios"
 // import { getUserToken } from "../config/storage"
 import { message } from '../assets/js/message'
 
-let baseUrl = 'http://121.196.100.229:8080/mam'
-// let baseUrl = 'http://192.168.3.206:8080'
+// let baseUrl = 'http://121.196.100.229:8080/mam'
+let baseUrl = 'http://10.1.252.45:8080/mam'
 
 let instance = axios.create({
   headers: {},
@@ -41,17 +41,11 @@ export default function (url, data, method = 'GET') {
       promise = instance.post(baseUrl + url, data)
     }
     promise.then(res => {
-      console.log(res);
-      // if (res.data.code !== 200) {
-      //   Message.error(res.data.message)
-      // }
       res.data.code === 200 ?
         message.success(res.data.message)
         : message.error(res.data.message)
       resolve(res.data)
     }).catch(err => {
-      // console.log(err);
-      // message.error(err.data.message)
       reject(err.data)
     })
   })

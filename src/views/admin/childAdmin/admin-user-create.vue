@@ -75,7 +75,7 @@
       <el-upload
         v-loading="ifUploadLoading"
         class="upload-demo"
-        action="http://121.196.100.229:8080/mam/user/add/file"
+        action="http://10.1.252.45:8080/mam/user/add/file"
         multiple
         :limit="1"
         :on-change="upload"
@@ -198,7 +198,6 @@ export default {
       this.ifUploadLoading = false;
     },
     success(response, file, fileList) {
-      console.log(response, file, fileList);
       fileList = [];
       if (response.code === 200) {
         this.$message({
@@ -211,7 +210,6 @@ export default {
       }
     },
     error(err, file, fileList) {
-      console.log(err, file, fileList);
       fileList = [];
       this.$message(err.message);
     },

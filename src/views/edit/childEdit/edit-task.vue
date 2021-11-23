@@ -6,25 +6,22 @@
     title="编目列表"
     placeholder="请输入编目名称"
   >
-    <el-button
-      type="primary"
-      v-if="loginType === 0 || loginType === 1"
-      @click="newBuilt"
+    <el-button type="primary" v-if="isLoginTypeTrue" @click="newBuilt"
       >新建任务</el-button
     >
     <div class="content_table">
       <el-table :data="showList" tooltip-effect="dark" v-loading="loading">
-        <el-table-column prop="index" label="序号" fixed="left" width="100" />
-        <el-table-column prop="taskName" label="任务名称" width="200" />
-        <el-table-column prop="createTime" label="创建时间" width="200">
+        <el-table-column prop="index" label="序号" fixed="left" />
+        <el-table-column prop="taskName" label="任务名称" />
+        <el-table-column prop="createTime" label="创建时间">
           <template slot-scope="scope">
             <span>{{
               dayjs(scope.row.createTime).format("YYYY-MM-DD HH:mm")
             }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="project" label="项目" width="200" />
-        <el-table-column prop="status" label="进度" width="200">
+        <el-table-column prop="project" label="项目" />
+        <el-table-column prop="status" label="进度">
           <template slot-scope="scope">
             <span
               v-if="!scope.row.edit"
@@ -53,7 +50,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="cataloger" label="编目员" width="200">
+        <el-table-column prop="cataloger" label="编目员">
           <template slot-scope="scope">
             <span v-if="!scope.row.edit">{{ scope.row.cataloger }}</span>
             <span v-else>
@@ -65,7 +62,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="auditor" label="审核员" width="200">
+        <el-table-column prop="auditor" label="审核员">
           <template slot-scope="scope">
             <span v-if="!scope.row.edit">{{ scope.row.auditor }}</span>
             <span v-else>
@@ -77,20 +74,10 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="videoId" label="视频ID" width="200">
-          <template slot-scope="scope">
-            <span>{{ scope.row.videoId }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="catalogId" label="编目ID" width="200">
-          <template slot-scope="scope">
-            <span>{{ scope.row.catalogId }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" fixed="right" width="200">
+        <el-table-column label="操作" fixed="right">
           <template slot-scope="scope">
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-if="isLoginTypeTrue"
               class="item"
               effect="light"
               content="编辑任务"
@@ -106,7 +93,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-if="isLoginTypeTrue"
               class="item"
               effect="light"
               content="删除任务"
@@ -139,7 +126,7 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-if="isLoginTypeTrue"
               class="item"
               effect="light"
               content="保存修改"
@@ -155,7 +142,7 @@
               ></el-button
             ></el-tooltip>
             <el-tooltip
-              v-if="loginType === 0 || loginType === 1"
+              v-if="isLoginTypeTrue"
               class="item"
               effect="light"
               content="取消"
@@ -173,8 +160,12 @@
           </template>
         </el-table-column>
       </el-table>
-      <edit-window v-show="this.createTask" @operation="operationClick" />
-      <edit-enter
+      <EditWindow
+        v-show="this.createTask"
+        @operation="operationClick"
+        @change="createTask = false"
+      />
+      <EditEnter
         v-show="enterIn"
         :taskName="this.newTaskName"
         @enterIn="enterInClick"
@@ -188,7 +179,7 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import { debounce } from "lodash";
 import AdminList from "@/components/admin-list";
 import $api from "@/network/api";
-import { taskStatus } from "@/constants/common";
+import { taskStatus, userType } from "@/constants/common";
 import EditWindow from "@/components/edit-window";
 import EditEnter from "@/components/edit-enter";
 
@@ -210,7 +201,10 @@ export default {
     };
   },
   computed: {
-    ...mapState("common", ["taskList", "loginType"]),
+    ...mapState("common", ["taskList", "loginType", "projectName"]),
+    isLoginTypeTrue() {
+      return [0, 1].includes(this.loginType);
+    },
   },
   watch: {
     taskList: "updateTaskList",
@@ -228,11 +222,18 @@ export default {
     ]),
     //获取到信息
     initTaskList: debounce(async function () {
+      // console.log(sessionStorage.getItem("uid"));
+      // console.log(this.loginType);
+      // console.log(userType[this.loginType].role);
       let content = {
-        state: "all",
-        searchValue: "",
+        state: "project",
+        project: this.projectName,
       };
+      if (![0, 1].includes(this.loginType)) {
+        content[userType[this.loginType].role] = sessionStorage.getItem("uid");
+      }
       this.loading = true; //开始缓冲
+      // console.log(content);
       await this.getTaskList(content);
       this.handleSizeChange(5);
       this.loading = false; //结束缓冲
@@ -290,7 +291,7 @@ export default {
             this.setTitleStats(true);
           }
           if (val.status === 1) {
-            let updateRes = await $api.updateTask(val.taskName, 2);
+            await $api.updateTask(val.taskName, 2);
             this.setTaskStatus(2);
           }
         }
@@ -304,7 +305,7 @@ export default {
     async saveEdit(index, row) {
       if (!/(^[1-9]\d*$)/.test(row.edit_cataloger)) {
         this.$message("请输入正确的审核员账号");
-      } else if (!/(^[1-9]\d*$)/.test(row.edit_auditor)) {
+      } else if (!/(^[1-9]\d*$)/.test(row.edit_cataloger)) {
         this.$message("请输入正确的编目员账号");
       } else {
         if (row.edit_status === "") {
@@ -322,7 +323,7 @@ export default {
         if (row.edit_catalogId === "") {
           row.edit_catalogId = row.catalogId;
         }
-        let resTask = await $api.updateTask(
+        await $api.updateTask(
           row.taskName,
           row.edit_status,
           row.edit_cataloger,
@@ -351,7 +352,7 @@ export default {
     // 是否显示添加任务组件
     operationClick(val) {
       this.createTask = val;
-      if (val === false) {
+      if (!val) {
         this.initTaskList();
       }
     },

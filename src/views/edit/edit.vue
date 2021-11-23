@@ -1,12 +1,12 @@
 <template>
   <el-card class="edit">
     <div slot="header" class="clearfix">
-      <el-page-header class="edit-header" @back="goBack()">
+      <el-page-header class="edit-header" @back="goBack">
         <template slot="content">
-          <span v-if="this.titleStatus === false"
+          <span v-if="!this.titleStatus"
             >项目名称：{{ projectName }}</span
           >
-          <span v-else-if="this.titleStatus === true"
+          <span v-else
             >编目名称：{{ taskName }}</span
           >
         </template>
@@ -26,8 +26,6 @@ export default {
   methods: {
     ...mapMutations("common", ["setTitleStats"]),
     goBack() {
-      // this.$router.push("/admin/projectList");
-      // this.$router.go(-1);
       if (this.$route.path === "/edit/task") {
         this.$router.push("/admin/projectList");
       } else if (

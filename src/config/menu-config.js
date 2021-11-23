@@ -37,6 +37,22 @@ const menuConfig = {
         name: '创建用户',
         value: '22',
         index: '/admin/userCreate'
+    },
+    '30': {
+        name: '文件管理',
+        value: '30',
+        index: 'file',
+        icon: 'el-icon-video-camera'
+    },
+    '31': {
+        name: '文件列表',
+        value: '31',
+        index: '/admin/fileList'
+    },
+    '32': {
+        name: '文件上传',
+        value: '32',
+        index: '/admin/fileCreate'
     }
 }
 export default menuConfig
