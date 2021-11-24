@@ -13,6 +13,8 @@ import _ from "lodash"
 
 // 引用修改后的message提示
 import { message } from './assets/js/message'
+// 开启开发者Vue devtools插件
+Vue.config.devtools = true
 Vue.prototype.$message = message; // 这一个操作一定要放在Vue.use(ElementUI) 后面
 
 Vue.prototype.dayjs = dayjs;//可以全局使用dayjs
@@ -24,6 +26,7 @@ Vue.use(VueParticles)
 Vue.use(VueLazyload)
 // 引用loadsh
 Vue.use(_)
+
 
 new Vue({
     router,

@@ -3,7 +3,7 @@
     <el-upload
       class="upload-demo"
       drag
-      action="http://121.196.100.229:8080/mam/file/videoUpload"
+      action="http://10.1.252.45:8080/mam/file/videoUpload"
       multiple
       :on-preview="handlePreview"
       :on-remove="handleRemove"

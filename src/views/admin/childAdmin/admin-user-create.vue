@@ -75,7 +75,7 @@
       <el-upload
         v-loading="ifUploadLoading"
         class="upload-demo"
-        action="http://121.196.100.229:8080/mam/user/add/file"
+        action="http://10.1.252.45:8080/mam/user/add/file"
         multiple
         :limit="1"
         :on-change="upload"

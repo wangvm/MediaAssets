@@ -379,7 +379,7 @@ export default {
       index: 10,
       //播放器
       videoInfo: {
-        url: "http://121.196.100.229/vod/test.mp4",
+        url: "http://10.1.252.45/vod/test.mp4",
         frameRate: 25,
       },
 
