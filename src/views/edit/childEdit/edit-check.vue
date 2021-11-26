@@ -115,7 +115,7 @@
               v-show="this.editAndView"
             >
               <el-option label="新闻" value="新闻"></el-option>
-              <el-option label="综艺" value="综艺"></el-option>
+              <el-option label="专题" value="专题"></el-option>
             </el-select>
             <span v-show="!this.editAndView">{{ form.programType.value }}</span>
           </el-form-item>
