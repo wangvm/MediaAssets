@@ -532,7 +532,8 @@ export default {
       // 后续将id写成添加项中的index
       this.catalogList[0].children.push({
         id: this.index,
-        title: { value: "默认数据" + this.index, exame: true },
+        // 指定片段名
+        title: { value: this.taskName, exame: true },
         premiereDate: { value: "", exame: true },
         programType: { value: "", exame: true },
         contentDescription: { value: "", exame: true },

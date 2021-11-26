@@ -55,7 +55,7 @@ export default {
         state: "all",
         searchValue: "",
         pageSize: 5,
-        pageIndex: 1,
+        pageIndex: 0,
       };
       this.loading = true; //开始缓冲
       await this.getFileList(content);

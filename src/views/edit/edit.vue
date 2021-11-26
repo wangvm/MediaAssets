@@ -3,12 +3,8 @@
     <div slot="header" class="clearfix">
       <el-page-header class="edit-header" @back="goBack">
         <template slot="content">
-          <span v-if="!this.titleStatus"
-            >项目名称：{{ projectName }}</span
-          >
-          <span v-else
-            >编目名称：{{ taskName }}</span
-          >
+          <span v-if="!this.titleStatus">项目名称：{{ projectName }}</span>
+          <span v-else>编目名称：{{ taskName }}</span>
         </template>
       </el-page-header>
     </div>
@@ -32,7 +28,10 @@ export default {
         this.$route.path === "/edit/check" ||
         this.$route.path === "/edit/exame"
       ) {
-        this.$router.push("/edit/task");
+        this.$router.push({
+          path: "/edit/task",
+          query: { projectName: 123123 },
+        });
       }
       this.setTitleStats(false);
     },
