@@ -161,9 +161,10 @@ export default {
   // 获取文件列表
   async getFileList({ commit, state }, content) {
     try {
+      console.log(content);
       let res;
       if (content.state === "all") {
-        res = await $api.getFileListAll(content.pageSize, content.pageIndex);
+        res = await $api.getFileListAll(content.pageSize, content.pageIndex - 1);
       } else {
         res = await $api.getFileListByName(content.searchValue);
       }

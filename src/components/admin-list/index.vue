@@ -175,7 +175,7 @@ export default {
         ? 7
         : this.placeholder === "请输入编目名称"
         ? 6
-        : 3;
+        : 2;
     },
   },
   methods: {

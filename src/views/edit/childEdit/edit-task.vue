@@ -201,7 +201,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("common", ["taskList", "loginType"]),
+    ...mapState("common", ["taskList", "loginType", "projectName"]),
     isLoginTypeTrue() {
       return [0, 1].includes(this.loginType);
     },
@@ -222,18 +222,18 @@ export default {
     ]),
     //获取到信息
     initTaskList: debounce(async function () {
-      console.log(sessionStorage.getItem("uid"));
-      console.log(this.loginType);
-      console.log(userType[this.loginType].role);
+      // console.log(sessionStorage.getItem("uid"));
+      // console.log(this.loginType);
+      // console.log(userType[this.loginType].role);
       let content = {
         state: "project",
-        project: this.$route.query.projectName,
+        project: this.projectName,
       };
       if (![0, 1].includes(this.loginType)) {
         content[userType[this.loginType].role] = sessionStorage.getItem("uid");
       }
       this.loading = true; //开始缓冲
-      console.log(content);
+      // console.log(content);
       await this.getTaskList(content);
       this.handleSizeChange(5);
       this.loading = false; //结束缓冲
