@@ -34,9 +34,6 @@ export default {
       showList: [], //每页显示的数组
     };
   },
-  created() {
-    console.log(this.loginType, typeof this.loginType);
-  },
   computed: {
     ...mapState("common", ["fileList", "loginType"]),
   },

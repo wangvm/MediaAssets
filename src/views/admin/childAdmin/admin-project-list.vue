@@ -160,9 +160,6 @@ export default {
       showList: [], //每页显示的数组
     };
   },
-  created() {
-    console.log(this.loginType, typeof this.loginType);
-  },
   computed: {
     ...mapState("common", ["projectList", "loginType"]),
   },
@@ -213,12 +210,9 @@ export default {
           },
         })
         .catch((err) => {});
-      let res = await $api.updateProject(val.projectName, 2);
+        await $api.updateProject(val.projectName, 2);
       this.setProjectName(val.projectName);
       this.setTitleStats(false);
-      // this.$router.replace({ name: "task" }).catch((err) => {
-      //   console.log(err);
-      // });
     },
     editProject(row) {
       row.edit = true;

@@ -75,8 +75,7 @@ export default {
         this.$message.error("组长账号不能为空");
         return;
       } else {
-        let res = $api.createProject(this.projectName, this.leaderId);
-        console.log(res);
+        $api.createProject(this.projectName, this.leaderId);
         this.projectName = "";
         this.leaderId = "";
       }

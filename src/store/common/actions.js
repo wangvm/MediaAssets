@@ -12,7 +12,6 @@ export default {
         let loginType = resLogin.data.authority;
         // setUserToken(token);
         // setLoginType(loginType);
-        console.log(loginType)
         commit('updateLoginType', loginType)
         localStorage.setItem('loginType', loginType);
         // commit('setToken', token)
@@ -103,7 +102,6 @@ export default {
         res = await $api.getTaskAllList(state.projectName);
       } else if (content.state === "project") {
         delete content.state
-        console.log(content)
         res = await $api.getTaskByProject(content);
       } else if (content.state === "name") {
         res = await $api.getTaskByName(state.projectName, content.searchValue);
@@ -114,7 +112,6 @@ export default {
       } else if (content.state === "auditor") {
         res = await $api.getTaskByAuditor(state.projectName, content.searchValue);
       }
-      console.log(res)
       let taskList = []
       res.data.forEach((val, index) => {
         let options = {
@@ -161,7 +158,6 @@ export default {
   // 获取文件列表
   async getFileList({ commit, state }, content) {
     try {
-      console.log(content);
       let res;
       if (content.state === "all") {
         res = await $api.getFileListAll(content.pageSize, content.pageIndex - 1);
