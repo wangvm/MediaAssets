@@ -376,6 +376,7 @@ export default {
         let canvas = document.createElement("canvas"); // 创建一个画布
         canvas.width = 100;
         canvas.height = 50;
+        if(!this.playerPreview) return
         this.playerPreview.currentTime =
           (this.player.duration * event.offsetX) /
           this.$refs.progress.offsetWidth;

@@ -153,6 +153,13 @@
             ></el-input>
             <h3 v-show="!this.editAndView">{{ form.taskName }}</h3>
           </el-form-item>
+          <el-form-item label="创建者类型">
+            <el-input
+              v-model="form.taskType.value"
+              v-show="this.editAndView"
+            ></el-input>
+            <h3 v-show="!this.editAndView">{{ form.taskType.value }}</h3>
+          </el-form-item>
           <el-form-item
             label="其他责任者"
             :class="{ 'exame-style': form.groupMembers.exame === 'false' }"
@@ -379,7 +386,7 @@ export default {
       index: 10,
       //播放器
       videoInfo: {
-        url: "http://10.1.252.45/vod/test.mp4",
+        url:'',
         frameRate: 25,
       },
 
@@ -390,6 +397,7 @@ export default {
         contentDescription: { value: "", exame: true },
         subtitleForm: { value: "", exame: true },
         taskName: this.taskNamef,
+        taskType: { value: "", exame: true },
         groupMembers: { value: "", exame: true },
         programForm: { value: "", exame: true },
         column: { value: "", exame: true },
@@ -405,7 +413,6 @@ export default {
       },
     };
   },
-
   components: {
     videoPlayer,
   },
@@ -452,6 +459,7 @@ export default {
           this.form.contentDescription.value;
         this.catalogList[0].subtitleForm.value = this.form.subtitleForm.value;
         this.catalogList[0].taskName = this.form.taskName;
+        this.catalogList[0].taskType = this.form.taskType.value;
         this.catalogList[0].groupMembers.value = this.form.groupMembers.value;
         this.catalogList[0].programForm.value = this.form.programForm.value;
         this.catalogList[0].column.value = this.form.column.value;
@@ -481,6 +489,7 @@ export default {
             this.catalogList[0].children[i].subtitleForm.value =
               this.form.subtitleForm.value;
             this.catalogList[0].children[i].taskName = this.form.taskName;
+            this.catalogList[0].taskType = this.form.taskType.value;
             this.catalogList[0].children[i].groupMembers.value =
               this.form.groupMembers.value;
             this.catalogList[0].children[i].programForm.value =
@@ -539,6 +548,7 @@ export default {
         contentDescription: { value: "", exame: true },
         subtitleForm: { value: "", exame: true },
         taskName: "",
+        taskType: { value: "", exame: true },
         groupMembers: { value: "", exame: true },
         programForm: { value: "", exame: true },
         column: { value: "", exame: true },

@@ -16,7 +16,6 @@ export default {
   },
   setTaskList(state, val) {
     state.taskList = val;
-    console.log(state.taskList);
   },
   setTaskStatus(state, val) {
     state.taskStatus = val;

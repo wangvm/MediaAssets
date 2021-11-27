@@ -30,7 +30,7 @@ export default {
       ) {
         this.$router.push({
           path: "/edit/task",
-          query: { projectName: 123123 },
+          query: { projectName: this.projectName },
         });
       }
       this.setTitleStats(false);
