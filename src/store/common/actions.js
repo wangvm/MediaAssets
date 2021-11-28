@@ -160,7 +160,7 @@ export default {
     try {
       let res;
       if (content.state === "all") {
-        res = await $api.getFileListAll(content.pageSize, content.pageIndex - 1);
+        res = await $api.getFileListAll(content.pageSize, content.pageIndex);
       } else {
         res = await $api.getFileListByName(content.searchValue);
       }

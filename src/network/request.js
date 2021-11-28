@@ -3,8 +3,8 @@ import axios from "axios"
 // import { getUserToken } from "../config/storage"
 import { message } from '../assets/js/message'
 
-// let baseUrl = 'http://10.1.252.45:8080/mam'
-let baseUrl = 'http://121.196.100.229:8080/mam'
+let baseUrl = 'http://10.1.252.45:8080/mam'
+// let baseUrl = 'http://121.196.100.229:8080/mam'
 
 let instance = axios.create({
   headers: {},
