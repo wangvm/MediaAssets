@@ -143,39 +143,52 @@ export default {
         return;
       }
       try {
-        await $api.addTask(this.createList);
+        let res = await $api.addTask(this.createList);
+        this.updateCatalog();
         this.$emit("success");
       } catch (err) {
         this.$message.error(err);
       }
     }, 300),
-    updateCatalog: debounce(async function () {
+    async updateCatalog() {
+      for (let i = 0; i < this.createList.length; i++) {
+        let res = await $api.getCatalog(
+          "taskName",
+          this.createList[i].taskName
+        );
+        this.catalogList[i] = res.data;
+      }
       for (let i in this.catalogList) {
-        this.catalogList[i].list.title = { value: "默认数据", exame: true };
-        this.catalogList[i].list.premiereDate = { value: "", exame: true };
-        this.catalogList[i].list.programType = { value: "", exame: true };
-        this.catalogList[i].list.contentDescription = {
+        this.catalogList[i].title = { value: "默认数据", exame: true };
+        this.catalogList[i].premiereDate = { value: "", exame: true };
+        this.catalogList[i].programType = { value: "", exame: true };
+        this.catalogList[i].contentDescription = {
           value: "",
           exame: true,
         };
-        this.catalogList[i].list.subtitleForm = { value: "", exame: true };
-        this.catalogList[i].list.groupMembers = { value: "", exame: true };
-        this.catalogList[i].list.programForm = { value: "", exame: true };
-        this.catalogList[i].list.column = { value: "", exame: true };
-        this.catalogList[i].list.color = { value: "", exame: true };
-        this.catalogList[i].list.standard = { value: "", exame: true };
-        this.catalogList[i].list.channelFormat = { value: "", exame: true };
-        this.catalogList[i].list.AspectRatio = { value: "", exame: true };
-        this.catalogList[i].list.entryPoint = { value: "", exame: true };
-        this.catalogList[i].list.duration = { value: "", exame: true };
-        this.catalogList[i].list.AcquisitionMethod = { value: "", exame: true };
-        this.catalogList[i].list.provider = { value: "", exame: true };
-        this.catalogList[i].list.imageList = { value: [], exame: true };
-        this.catalogList[i].list.children = [];
-        this.catalogList[i].list.exame = false;
-        let res = await $api.setCatalog(this.catalogList[i].list);
+        this.catalogList[i].subtitleForm = { value: "", exame: true };
+        this.catalogList[i].groupMembers = { value: "", exame: true };
+        this.catalogList[i].programForm = { value: "", exame: true };
+        this.catalogList[i].column = { value: "", exame: true };
+        this.catalogList[i].color = { value: "", exame: true };
+        this.catalogList[i].standard = { value: "", exame: true };
+        this.catalogList[i].channelFormat = { value: "", exame: true };
+        this.catalogList[i].AspectRatio = { value: "", exame: true };
+        this.catalogList[i].entryPoint = { value: "", exame: true };
+        this.catalogList[i].duration = { value: "", exame: true };
+        this.catalogList[i].AcquisitionMethod = { value: "", exame: true };
+        this.catalogList[i].provider = { value: "", exame: true };
+        this.catalogList[i].taskType = { value: "", exame: true };
+        this.catalogList[i].imageList = { value: [], exame: true };
+        this.catalogList[i].children = [];
+        this.catalogList[i].exame = false;
+        let res = await $api.updateCatalog(this.catalogList[i]);
+        res = await $api.getCatalog(
+          "taskName",
+          this.catalogList[i].taskName
+        );
       }
-    }, 500),
+    },
     // 判断任务名是否重复
     repeatItem(list) {
       let idList = [];

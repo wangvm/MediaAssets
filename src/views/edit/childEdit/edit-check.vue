@@ -386,7 +386,7 @@ export default {
       index: 10,
       //播放器
       videoInfo: {
-        url:'',
+        url: "",
         frameRate: 25,
       },
 
@@ -396,7 +396,7 @@ export default {
         programType: { value: "", exame: true },
         contentDescription: { value: "", exame: true },
         subtitleForm: { value: "", exame: true },
-        taskName: this.taskNamef,
+        taskName: this.taskName,
         taskType: { value: "", exame: true },
         groupMembers: { value: "", exame: true },
         programForm: { value: "", exame: true },
@@ -623,10 +623,10 @@ export default {
         });
     },
     async uploadExame() {
-      this.uploadEdit();
       let res = await $api.updateTask(this.taskName, 4);
       if (res.code === 200) {
-        this.$router.push("/edit/task");
+        this.uploadEdit();
+        // this.$router.push("/edit/task");
         this.setTaskStatus(4);
       }
     },

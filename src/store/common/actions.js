@@ -184,6 +184,9 @@ export default {
       list.id = 1;
       list.edit = false;
       list.state = '节目';
+      if (!list.children) {
+        list.children = []
+      }
 
       if (list.children.length !== 0) {
         for (let i in list.children) {
