@@ -2,7 +2,7 @@
   <div class="home">
     <div class="home-left">
       <div class="home-video">
-        <videoPlayer :video-info="videoInfo" />
+        <videoPlayer :video-info="videoInfo" :logReset="logRemove" />
       </div>
       <el-card class="home-list" shadow="hover">
         <el-table
@@ -259,30 +259,14 @@
             label="入点"
             :class="{ 'exame-style': form.entryPoint.exame === 'false' }"
           >
-            <el-time-picker
-              v-model="form.entryPoint.value"
-              :picker-options="{
-                selectableRange: '00:00:00 - 23:59:59',
-              }"
-              placeholder="任意时间点"
-              v-show="this.editAndView"
-            >
-            </el-time-picker>
+            <span v-show="this.editAndView">{{ form.entryPoint.value }}</span>
             <span v-show="!this.editAndView">{{ form.entryPoint.value }}</span>
           </el-form-item>
           <el-form-item
             label="时长"
             :class="{ 'exame-style': form.duration.exame === 'false' }"
           >
-            <el-time-picker
-              v-model="form.duration.value"
-              :picker-options="{
-                selectableRange: '00:00:00 - 23:59:59',
-              }"
-              placeholder="任意时间点"
-              v-show="this.editAndView"
-            >
-            </el-time-picker>
+            <span v-show="this.editAndView">{{ form.duration.value }}</span>
             <span v-show="!this.editAndView">{{ form.duration.value }}</span>
           </el-form-item>
           <el-form-item
@@ -375,6 +359,8 @@ export default {
   name: "editCheck",
   data() {
     return {
+      //重置时间帧入点和出点
+      logRemove: false,
       // 限制只能编辑一个
       isEdit: false,
       // 查看与编辑模式切换
@@ -405,8 +391,8 @@ export default {
         standard: { value: "", exame: true },
         channelFormat: { value: "", exame: true },
         AspectRatio: { value: "", exame: true },
-        entryPoint: { value: "", exame: true },
-        duration: { value: "", exame: true },
+        entryPoint: { value: "--提示：请点击视频入点按钮获取--", exame: true },
+        duration: { value: "--提示：请点击视频出点按钮获取--", exame: true },
         AcquisitionMethod: { value: "", exame: true },
         provider: { value: "", exame: true },
         imageList: { value: [], exame: true },
@@ -418,6 +404,8 @@ export default {
   },
   watch: {
     screenshotList: "updateFormImageList",
+    loginTime: "setEntryPoint",
+    logTime: "setDuration",
   },
   computed: {
     ...mapState("common", [
@@ -425,6 +413,8 @@ export default {
       "videoSrc",
       "catalogList",
       "screenshotList",
+      "loginTime",
+      "logTime",
     ]),
   },
   methods: {
@@ -436,6 +426,14 @@ export default {
       } else {
         this.form = row;
       }
+    },
+    // 写入入点时间
+    setEntryPoint() {
+      this.form.entryPoint.value = this.loginTime;
+    },
+    // 写入时长
+    setDuration() {
+      this.form.duration.value = this.logTime;
     },
     // 更新表单图片数据
     updateFormImageList() {
@@ -451,6 +449,7 @@ export default {
     },
     // 保存更改
     saveClick() {
+      this.logRemove = false;
       if (this.state === "节目") {
         this.catalogList[0].title.value = this.form.title.value;
         this.catalogList[0].premiereDate.value = this.form.premiereDate.value;
@@ -523,6 +522,7 @@ export default {
       this.setscreenshotList([]);
     },
     cancleClick() {
+      this.logRemove = false;
       if (this.state === "节目") {
         this.catalogList[0].edit = false;
       } else {
@@ -576,6 +576,7 @@ export default {
     },
     // 编辑内容
     editItem(row) {
+      this.logRemove = true;
       if (this.isEdit === false) {
         this.isEdit = true;
         row.edit = true;

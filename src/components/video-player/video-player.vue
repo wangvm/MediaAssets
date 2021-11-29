@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 import $api from "@/network/api";
 
 export default {
@@ -154,10 +154,14 @@ export default {
       ifPreviewMouseDown: false, //进度条实时变化
       ifPreview: false, //进度条预览图
       ifVolumeMouseDown: false, //音量实时变化
+      loginTime: null, //入点时间string类型
+      logoutTime: null, //出点时间string类型
+      start: null, //入点数值number，用来算时长
     };
   },
   props: {
     videoInfo: Object,
+    logReset: Boolean,
   },
   created() {},
   mounted() {
@@ -171,6 +175,9 @@ export default {
     this.timer = null;
     document.removeEventListener("keydown", this.videoPlayerKeyEvent);
   },
+  watch: {
+    logReset: "updateVideoLog",
+  },
   computed: {
     getPlayerDuration() {
       return this.player.duration;
@@ -179,6 +186,13 @@ export default {
   },
   methods: {
     ...mapActions("common", ["updateScreenshotList"]),
+    ...mapMutations("common", ["setLoginTime", "setLogTime"]),
+    updateVideoLog() {
+      //当父组件保存或者取消时，将入点和出点重置
+      if (this.logReset === false) {
+        this.logEvent("logRemove");
+      }
+    },
     videoPlayerKeyEvent(event) {
       let myVid = this.player;
       if (event.key === " " && this.ifPlay === false) {
@@ -280,12 +294,36 @@ export default {
     },
     logEvent(status) {
       let logIndex = (this.player.currentTime / this.player.duration) * 100;
+      let logTime = timeFormat(
+        this.player.currentTime,
+        this.videoInfo.frameRate
+      );
       switch (status) {
         case "login":
-          ifLoginSmall(this.$refs.login, this.$refs.logout, true, logIndex);
+          ifLoginSmall(
+            this.$refs.login,
+            this.$refs.logout,
+            true,
+            logIndex,
+            logTime
+          );
+          this.start = this.player.currentTime;
+          this.loginTime = logTime;
+          if (this.logReset === true) this.setLoginTime(this.loginTime);
           break;
         case "logout":
-          ifLoginSmall(this.$refs.login, this.$refs.logout, false, logIndex);
+          let time = timeFormat(
+            this.player.currentTime - this.start,
+            this.videoInfo.frameRate
+          );
+          if (this.logReset === true) this.setLogTime(time);
+          ifLoginSmall(
+            this.$refs.login,
+            this.$refs.logout,
+            false,
+            logIndex,
+            logTime
+          );
           break;
         case "logRemove":
           this.$refs.login.style.left = 0;
@@ -320,7 +358,7 @@ export default {
           break;
       }
 
-      function ifLoginSmall(login, logout, ifLogin, value) {
+      function ifLoginSmall(login, logout, ifLogin, value, logTime) {
         let leftLog = isNaN(parseFloat(login.style.left))
           ? 0
           : parseFloat(login.style.left);
@@ -376,7 +414,7 @@ export default {
         let canvas = document.createElement("canvas"); // 创建一个画布
         canvas.width = 100;
         canvas.height = 50;
-        if(!this.playerPreview) return
+        if (!this.playerPreview) return;
         this.playerPreview.currentTime =
           (this.player.duration * event.offsetX) /
           this.$refs.progress.offsetWidth;

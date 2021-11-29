@@ -19,4 +19,6 @@ export default () => ({
   screenshotList: [],
   // 编目信息列表
   catalogList: [],
+  loginTime: null,//入点时间
+  logTime: null//时长
 })
