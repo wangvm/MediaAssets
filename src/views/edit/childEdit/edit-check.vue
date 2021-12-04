@@ -35,7 +35,7 @@
                 ></el-button>
               </el-tooltip>
               <el-tooltip
-                v-show="scope.row.state === '节目'"
+                v-show="scope.row.state !== '场景'"
                 class="item"
                 effect="light"
                 content="增加"
@@ -45,12 +45,12 @@
                   type="success"
                   size="mini"
                   icon="el-icon-plus"
-                  @click.stop="addItem()"
+                  @click.stop="addItem(scope.row)"
                   circle
                 ></el-button>
               </el-tooltip>
               <el-tooltip
-                v-show="scope.row.state === '片段'"
+                v-show="scope.row.state !== '节目'"
                 class="item"
                 effect="light"
                 content="删除"
@@ -375,6 +375,7 @@ export default {
         url: "",
         frameRate: 25,
       },
+      hasChildren: true,
 
       form: {
         title: { value: "", exame: true },
@@ -474,7 +475,7 @@ export default {
         this.catalogList[0].edit = false;
         // this.state = "节目";
         this.catalogList[0].imageList.value = this.form.imageList.value;
-      } else {
+      } else if (this.state === "节目") {
         for (let i in this.catalogList[0].children) {
           if (this.count === this.catalogList[0].children[i].id) {
             // this.state = "片段";
@@ -515,6 +516,54 @@ export default {
               this.form.imageList.value;
           }
         }
+      } else if (this.state === "场景") {
+        for (let i in this.catalogList[0].children) {
+          for (let j in this.catalogList[0].children[i].children) {
+            if (this.count === this.catalogList[0].children[i].children[j].id) {
+              // this.state = "片段";
+              this.catalogList[0].children[i].children[j].title.value =
+                this.form.title.value;
+              this.catalogList[0].children[i].children[j].premiereDate.value =
+                this.form.premiereDate.value;
+              this.catalogList[0].children[i].children[j].programType.value =
+                this.form.programType.value;
+              this.catalogList[0].children[i].children[
+                j
+              ].contentDescription.value = this.form.contentDescription.value;
+              this.catalogList[0].children[i].children[j].subtitleForm.value =
+                this.form.subtitleForm.value;
+              this.catalogList[0].children[i].children[j].taskName =
+                this.form.taskName;
+              this.catalogList[0].taskType = this.form.taskType.value;
+              this.catalogList[0].children[i].children[j].groupMembers.value =
+                this.form.groupMembers.value;
+              this.catalogList[0].children[i].children[j].programForm.value =
+                this.form.programForm.value;
+              this.catalogList[0].children[i].children[j].column.value =
+                this.form.column.value;
+              this.catalogList[0].children[i].children[j].color.value =
+                this.form.color.value;
+              this.catalogList[0].children[i].children[j].standard.value =
+                this.form.standard.value;
+              this.catalogList[0].children[i].children[j].channelFormat.value =
+                this.form.channelFormat.value;
+              this.catalogList[0].children[i].children[j].AspectRatio.value =
+                this.form.AspectRatio.value;
+              this.catalogList[0].children[i].children[j].entryPoint.value =
+                this.form.entryPoint.value;
+              this.catalogList[0].children[i].children[j].duration.value =
+                this.form.duration.value;
+              this.catalogList[0].children[i].children[
+                j
+              ].AcquisitionMethod.value = this.form.AcquisitionMethod.value;
+              this.catalogList[0].children[i].children[j].provider.value =
+                this.form.provider.value;
+              this.catalogList[0].children[i].children[j].edit = false;
+              this.catalogList[0].children[i].children[j].imageList.value =
+                this.form.imageList.value;
+            }
+          }
+        }
       }
       this.count = null;
       this.editAndView = false;
@@ -525,10 +574,18 @@ export default {
       this.logRemove = false;
       if (this.state === "节目") {
         this.catalogList[0].edit = false;
-      } else {
+      } else if (this.state === "片段") {
         for (let i in this.catalogList[0].children) {
           if (this.count === this.catalogList[0].children[i].id) {
             this.catalogList[0].children[i].edit = false;
+          }
+        }
+      } else if (this.state === "场景") {
+        for (let i in this.catalogList[0].children) {
+          for (let j in this.catalogList[0].children[i].children) {
+            if (this.count === this.catalogList[0].children[i].children[j].id) {
+              this.catalogList[0].children[i].edit = false;
+            }
           }
         }
       }
@@ -537,40 +594,83 @@ export default {
       this.isEdit = false;
     },
     // 添加子行
-    addItem() {
-      // 后续将id写成添加项中的index
-      this.catalogList[0].children.push({
-        id: this.index,
-        // 指定片段名
-        title: { value: this.taskName, exame: true },
-        premiereDate: { value: "", exame: true },
-        programType: { value: "", exame: true },
-        contentDescription: { value: "", exame: true },
-        subtitleForm: { value: "", exame: true },
-        taskName: "",
-        taskType: { value: "", exame: true },
-        groupMembers: { value: "", exame: true },
-        programForm: { value: "", exame: true },
-        column: { value: "", exame: true },
-        color: { value: "", exame: true },
-        standard: { value: "", exame: true },
-        channelFormat: { value: "", exame: true },
-        AspectRatio: { value: "", exame: true },
-        entryPoint: { value: "", exame: true },
-        duration: { value: "", exame: true },
-        AcquisitionMethod: { value: "", exame: true },
-        provider: { value: "", exame: true },
-        imageList: { value: [], exame: true },
-        state: "片段",
-        edit: false,
-      });
-      this.index++;
+    addItem(row) {
+      if (row.state === "节目") {
+        // 后续将id写成添加项中的index
+        this.catalogList[0].children.push({
+          id: this.index,
+          // 指定片段名
+          title: { value: "片段", exame: true },
+          premiereDate: { value: "", exame: true },
+          programType: { value: "", exame: true },
+          contentDescription: { value: "", exame: true },
+          subtitleForm: { value: "", exame: true },
+          taskName: "",
+          taskType: { value: "", exame: true },
+          groupMembers: { value: "", exame: true },
+          programForm: { value: "", exame: true },
+          column: { value: "", exame: true },
+          color: { value: "", exame: true },
+          standard: { value: "", exame: true },
+          channelFormat: { value: "", exame: true },
+          AspectRatio: { value: "", exame: true },
+          entryPoint: { value: "", exame: true },
+          duration: { value: "", exame: true },
+          AcquisitionMethod: { value: "", exame: true },
+          provider: { value: "", exame: true },
+          imageList: { value: [], exame: true },
+          children: [],
+          state: "片段",
+          edit: false,
+        });
+        this.index++;
+      } else if (row.state === "片段") {
+        for (let i in this.catalogList[0].children) {
+          if (row.id === this.catalogList[0].children[i].id) {
+            this.catalogList[0].children[i].children.push({
+              id: this.index,
+              // 指定片段名
+              title: { value: "场景", exame: true },
+              premiereDate: { value: "", exame: true },
+              programType: { value: "", exame: true },
+              contentDescription: { value: "", exame: true },
+              subtitleForm: { value: "", exame: true },
+              taskName: "",
+              taskType: { value: "", exame: true },
+              groupMembers: { value: "", exame: true },
+              programForm: { value: "", exame: true },
+              column: { value: "", exame: true },
+              color: { value: "", exame: true },
+              standard: { value: "", exame: true },
+              channelFormat: { value: "", exame: true },
+              AspectRatio: { value: "", exame: true },
+              entryPoint: { value: "", exame: true },
+              duration: { value: "", exame: true },
+              AcquisitionMethod: { value: "", exame: true },
+              provider: { value: "", exame: true },
+              imageList: { value: [], exame: true },
+              state: "场景",
+              edit: false,
+            });
+            this.index++;
+          }
+        }
+      }
     },
     // 删除行
     deleteItem(row) {
-      for (let i in this.catalogList[0].children) {
-        if (row.id === this.catalogList[0].children[i].id) {
-          this.catalogList[0].children.splice(i, 1);
+      if (row.state === "片段") {
+        for (let i in this.catalogList[0].children) {
+          if (row.id === this.catalogList[0].children[i].id) {
+            this.catalogList[0].children.splice(i, 1);
+          }
+        }
+      } else if (row.state === "场景") {
+        for (let i in this.catalogList[0].children) {
+          for (let j in this.catalogList[0].children[i].children)
+            if (row.id === this.catalogList[0].children[i].children[j].id) {
+              this.catalogList[0].children[i].children.splice(j, 1);
+            }
         }
       }
     },
@@ -582,7 +682,12 @@ export default {
         row.edit = true;
         this.count = row.id;
         this.form = _.cloneDeep(row);
-        this.state = row.state === "节目" ? "节目" : "片段";
+        this.state =
+          row.state === "节目"
+            ? "节目"
+            : row.state === "片段"
+            ? "片段"
+            : "场景";
         this.editAndView = true;
         // this.setscreenshotList([]);
       } else {
@@ -606,9 +711,17 @@ export default {
               delete uploadList[0].children[i].id;
               delete uploadList[0].children[i].edit;
               delete uploadList[0].children[i].state;
+              if (uploadList[0].children[i].children.length !== 0) {
+                for (let j in uploadList[0].children[i].children) {
+                  delete uploadList[0].children[i].children[j].id;
+                  delete uploadList[0].children[i].children[j].edit;
+                  delete uploadList[0].children[i].children[j].state;
+                }
+              }
             }
           }
           uploadList[0].taskName = this.taskName;
+          console.log(uploadList[0]);
           try {
             $api.updateCatalog(uploadList[0]);
             this.$router.push("/edit/task");

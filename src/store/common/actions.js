@@ -193,6 +193,15 @@ export default {
           list.children[i].id = i * 1 + 10;
           list.children[i].edit = false;
           list.children[i].state = '片段';
+          if (list.children[i].children.length !== 0) {
+            for (let j in list.children[i].children) {
+              list.children[i].children[j].id = i * 1 + 100;
+              list.children[i].children[j].edit = false;
+              list.children[i].children[j].state = '场景';
+            }
+          } else {
+            list.children[i].children = []
+          }
         }
       }
       let newList = [list];

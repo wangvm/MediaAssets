@@ -48,6 +48,7 @@ export default {
   // 编目信息
   setCatalogList(state, val) {
     state.catalogList = val;
+    console.log(state.catalogList);
   },
 
   // 设置入点时间
