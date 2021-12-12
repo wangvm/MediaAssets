@@ -116,6 +116,8 @@
             >
               <el-option label="新闻" value="新闻"></el-option>
               <el-option label="专题" value="专题"></el-option>
+              <el-option label="综艺" value="综艺"></el-option>
+              <el-option label="素材" value="素材"></el-option>
             </el-select>
             <span v-show="!this.editAndView">{{ form.programType.value }}</span>
           </el-form-item>
@@ -138,10 +140,22 @@
             label="字幕形式"
             :class="{ 'exame-style': form.subtitleForm.exame === 'false' }"
           >
-            <el-input
+            <el-select
               v-model="form.subtitleForm.value"
+              placeholder="请选择活动区域"
               v-show="this.editAndView"
-            ></el-input>
+            >
+              <el-option label="无字幕" value="无字幕"></el-option>
+              <el-option
+                label="只有画面叠加字幕"
+                value="只有画面叠加字幕"
+              ></el-option>
+              <el-option label="只有隐藏字幕" value="只有隐藏字幕"></el-option>
+              <el-option
+                label="既有画面叠加字幕也有隐藏字幕"
+                value="既有画面叠加字幕也有隐藏字幕"
+              ></el-option>
+            </el-select>
             <span v-show="!this.editAndView">{{
               form.subtitleForm.value
             }}</span>
@@ -181,10 +195,24 @@
               v-model="form.programForm.value"
               placeholder="请选择活动区域"
             >
-              <el-option label="综合" value="综合"></el-option>
-              <el-option label="内容" value="内容"></el-option>
-              <el-option label="主题" value="主题"></el-option>
-              <el-option label="形式" value="形式"></el-option>
+              <el-option label="口播新闻" value="口播新闻"></el-option>
+              <el-option label="会议新闻" value="会议新闻"></el-option>
+              <el-option label="新闻综述" value="新闻综述"></el-option>
+              <el-option label="消息/简讯" value="消息/简讯"></el-option>
+              <el-option label="专题" value="专题"></el-option>
+              <el-option
+                label="人物专访/介绍"
+                value="人物专访/介绍"
+              ></el-option>
+              <el-option label="谈话" value="谈话"></el-option>
+              <el-option label="宣传预告" value="宣传预告"></el-option>
+              <el-option label="连续报道" value="连续报道"></el-option>
+              <el-option label="深度报道" value="深度报道"></el-option>
+              <el-option label="特别报道" value="特别报道"></el-option>
+              <el-option label="系列报道" value="系列报道"></el-option>
+              <el-option label="现场报道" value="现场报道"></el-option>
+              <el-option label="其它" value="其它"></el-option>
+              <el-option label="广告" value="广告"></el-option>
             </el-select>
             <span v-show="!this.editAndView">{{ form.programForm.value }}</span>
           </el-form-item>
@@ -475,7 +503,7 @@ export default {
         this.catalogList[0].edit = false;
         // this.state = "节目";
         this.catalogList[0].imageList.value = this.form.imageList.value;
-      } else if (this.state === "节目") {
+      } else if (this.state === "片段") {
         for (let i in this.catalogList[0].children) {
           if (this.count === this.catalogList[0].children[i].id) {
             // this.state = "片段";
@@ -721,7 +749,7 @@ export default {
             }
           }
           uploadList[0].taskName = this.taskName;
-          console.log(uploadList[0]);
+          // console.log(uploadList[0]);
           try {
             $api.updateCatalog(uploadList[0]);
             this.$router.push("/edit/task");

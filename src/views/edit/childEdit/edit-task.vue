@@ -50,6 +50,18 @@
             </div>
           </template>
         </el-table-column>
+        <!-- <el-table-column prop="mark" label="分数">
+          <template slot-scope="scope">
+            <span v-if="!scope.row.edit">{{ scope.row.mark }}</span>
+            <span v-else>
+              <el-input
+                v-model="scope.row.mark"
+                placeholder="请输入分数"
+                clearable
+              />
+            </span>
+          </template>
+        </el-table-column> -->
         <el-table-column prop="cataloger" label="编目员">
           <template slot-scope="scope">
             <span v-if="!scope.row.edit">{{ scope.row.cataloger }}</span>

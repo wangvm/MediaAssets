@@ -52,7 +52,7 @@
             >
           </el-form-item>
           <el-form-item label="正题名" class="exame-style">
-            <span>{{ form.title.value }}</span>
+            <span v-show="!this.editAndView">{{ form.title.value }}</span>
             <span
               class="exame-select"
               :class="{ 'exame-select-false': form.title.exame === 'false' }"
@@ -73,7 +73,7 @@
               class="exame-select"
               v-show="this.editAndView"
               v-model="form.premiereDate.exame"
-              placeholder="请选择活动区域"
+              placeholder="请选择首播日期"
             >
               <el-option label="合格" value="true"></el-option>
               <el-option label="不合格" value="false"></el-option>
@@ -81,6 +81,7 @@
             <span>{{ form.premiereDate.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.premiereDate.exame === 'false',
               }"
@@ -100,6 +101,7 @@
             <span>{{ form.programType.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.programType.exame === 'false',
               }"
@@ -119,6 +121,7 @@
             <span>{{ form.contentDescription.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.contentDescription.exame === 'false',
               }"
@@ -138,6 +141,7 @@
             <span>{{ form.subtitleForm.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.subtitleForm.exame === 'false',
               }"
@@ -160,6 +164,7 @@
             <span>{{ form.groupMembers.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.groupMembers.exame === 'false',
               }"
@@ -179,6 +184,7 @@
             <span>{{ form.programForm.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.programForm.exame === 'false',
               }"
@@ -198,6 +204,7 @@
             <span>{{ form.column.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{ 'exame-select-false': form.column.exame === 'false' }"
               >{{ form.column.exame }}</span
             >
@@ -215,6 +222,7 @@
             <span>{{ form.color.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{ 'exame-select-false': form.color.exame === 'false' }"
               >{{ form.color.exame }}</span
             >
@@ -232,6 +240,7 @@
             <span>{{ form.standard.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{ 'exame-select-false': form.standard.exame === 'false' }"
               >{{ form.standard.exame }}</span
             >
@@ -249,6 +258,7 @@
             <span>{{ form.channelFormat.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.channelFormat.exame === 'false',
               }"
@@ -268,6 +278,7 @@
             <span>{{ form.AspectRatio.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.AspectRatio.exame === 'false',
               }"
@@ -287,6 +298,7 @@
             <span>{{ form.entryPoint.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.entryPoint.exame === 'false',
               }"
@@ -306,6 +318,7 @@
             <span>{{ form.duration.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{ 'exame-select-false': form.duration.exame === 'false' }"
               >{{ form.duration.exame }}</span
             >
@@ -323,6 +336,7 @@
             <span>{{ form.AcquisitionMethod.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.AcquisitionMethod.exame === 'false',
               }"
@@ -342,6 +356,7 @@
             <span>{{ form.provider.value }}</span>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{ 'exame-select-false': form.provider.exame === 'false' }"
               >{{ form.provider.exame }}</span
             >
@@ -362,6 +377,7 @@
             </el-select>
             <span
               class="exame-select"
+              v-show="!this.editAndView"
               :class="{
                 'exame-select-false': form.imageList.exame === 'false',
               }"
@@ -548,11 +564,26 @@ export default {
     },
     // 完成
     async complete() {
-      this.uploadExame();
-      let res = await $api.setUploadExame(this.taskName, 3);
-      if (res.code === 200) {
-        this.$router.push("/edit/task");
-      }
+      this.$prompt("请输入分数", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputPattern: /^(-)?\d+(\.\d+)?$/,
+        inputErrorMessage: "分数格式不正确",
+      })
+        .then(async ({ value }) => {
+          this.catalogList[0].mark.value = value;
+          this.uploadExame();
+          let res = await $api.setUploadExame(this.taskName, 3);
+          if (res.code === 200) {
+            this.$router.push("/edit/task");
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入",
+          });
+        });
     },
     // 打回
     async repulse() {

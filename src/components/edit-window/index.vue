@@ -159,7 +159,8 @@ export default {
         this.catalogList[i] = res.data;
       }
       for (let i in this.catalogList) {
-        this.catalogList[i].title = { value: "默认数据", exame: true };
+        let title = _.cloneDeep(this.catalogList[i].fileName.split(".mp4")[0]);
+        this.catalogList[i].title = { value: title, exame: true };
         this.catalogList[i].premiereDate = { value: "", exame: true };
         this.catalogList[i].programType = { value: "", exame: true };
         this.catalogList[i].contentDescription = {
@@ -181,12 +182,10 @@ export default {
         this.catalogList[i].taskType = { value: "", exame: true };
         this.catalogList[i].imageList = { value: [], exame: true };
         this.catalogList[i].children = [];
+        this.catalogList[i].mark = { value: "", exame: true };
         this.catalogList[i].exame = false;
         let res = await $api.updateCatalog(this.catalogList[i]);
-        res = await $api.getCatalog(
-          "taskName",
-          this.catalogList[i].taskName
-        );
+        res = await $api.getCatalog("taskName", this.catalogList[i].taskName);
       }
     },
     // 判断任务名是否重复
