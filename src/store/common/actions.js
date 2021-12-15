@@ -12,6 +12,7 @@ export default {
         let loginType = resLogin.data.authority;
         // setUserToken(token);
         // setLoginType(loginType);
+        sessionStorage.setItem('uid', id)
         commit('updateLoginType', loginType)
         localStorage.setItem('loginType', loginType);
         // commit('setToken', token)
@@ -25,7 +26,7 @@ export default {
   },
 
   // 获取项目列表
-  async getProjectList({ commit, state }, content) {
+  async getProjectList({ commit, state, rootState}, content) {
     try {
       let res;
       // let res = await $api.getProjectList();
@@ -95,7 +96,7 @@ export default {
   },
 
   // 获取任务列表
-  async getTaskList({ commit, state }, content) {
+  async getTaskList({ commit, state, rootState}, content) {
     try {
       let res;
       if (content.state === "all" || content.searchValue === '') {
@@ -125,7 +126,13 @@ export default {
         }
         taskList.push({ ...val, ...options })
       })
-      commit('setTaskList', taskList)
+      let id = sessionStorage.getItem('uid')
+      let loginType = localStorage.getItem('loginType')
+      console.log(id);
+      console.log(loginType)
+      let tasks = taskList.filter(task => task.cataloger == id || loginType <= 1)
+      console.log(tasks);
+      commit('setTaskList', tasks)
     } catch (e) {
       this.$catch = e
     }
